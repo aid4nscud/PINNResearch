@@ -105,7 +105,7 @@ def train_step(model, optimizer, t, x, y):
     return loss
 
 
-# Training data (random points for x, y, and t)
+# Training data (random points for x, y, and t) -- This is a temporary placeholder until we figure out what the format of the image training data will be
 N_train = 1000
 t_train = np.random.rand(N_train, 1)
 x_train = np.random.rand(N_train, 1)
