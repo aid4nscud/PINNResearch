@@ -3,38 +3,62 @@ import tensorflow as tf
 
 # Parameters
 alpha = 0.1
-# now we have input dimension 3, because our input is (x, y, t)
+# We have input dimension 3, because our input is (x, y, t)
 layers = [3, 20, 20, 20, 20, 1]
+# 4 hidden layers each with 20 neurons, an input layer of with 3 neurons, and an output layer with 1 neuron.
 
 # Define model architecture
 
 
 class PDENet(tf.keras.Model):
     def __init__(self, layers):
+        # The base Model class initializer is called to provide the model with a number of useful features.
         super(PDENet, self).__init__()
+
+        # Here, 'layers' is a list that contains the number of neurons in each layer of the network.
+        
         self.layers = layers
-        # Initialize the weights and biases for each layer in the neural network
+
+        # 'self.weights' and 'self.biases' are lists that will contain the weight matrices and bias vectors
+        # for each layer in the network (except for the input layer, which doesn't have weights or biases).
         self.weights = []
         self.biases = []
+
+        # This loop initializes the weights and biases for each layer in the network.
         for i in range(len(layers)-1):
-            # Each weight matrix's dimension is determined by the number of neurons in the current and next layers.
+            # Each weight matrix is of dimension (m, n), where 'm' is the number of neurons in the current layer
+            # (layers[i]) and 'n' is the number of neurons in the next layer (layers[i+1]).
+            # These weights are initialized with random values from a normal distribution.
             weight = self.add_weight(
                 shape=(layers[i], layers[i+1]), initializer='random_normal')
-            # Each bias vector's dimension is determined by the number of neurons in the next layer.
+
+            # Each bias vector is of dimension (n,) where 'n' is the number of neurons in the next layer (layers[i+1]).
+            # These biases are initialized as zeros.
             bias = self.add_weight(shape=(layers[i+1],), initializer='zeros')
+
+            # The initialized weights and biases are added to the respective lists.
             self.weights.append(weight)
             self.biases.append(bias)
 
-    # Define the forward pass
+    # This method defines the forward pass of the network.
     def call(self, X):
         Z = X
-        # Perform matrix multiplication followed by addition of bias for all but the last layer, followed by an activation function (tanh)
+        # Here, for each layer in the network (except for the last layer), we compute the layer's output (Z) as follows:
+        # - We multiply the layer's input (Z) with the layer's weight matrix,
+        # - Then we add the layer's bias vector,
+        # - Finally, we apply the tanh activation function to the result.
+        # This is done in the loop for each layer up to the second-to-last layer.
         for i in range(len(self.layers)-2):
             Z = tf.nn.tanh(
                 tf.add(tf.matmul(Z, self.weights[i]), self.biases[i]))
-        # For the last layer, we only perform matrix multiplication and addition of bias, without an activation function
+
+        # For the last layer, we only perform the matrix multiplication and addition of bias, without applying an activation function.
+        # This is because for regression tasks, where the output can take any value as opposed to classification tasks
+
         Z = tf.add(tf.matmul(Z, self.weights[-1]), self.biases[-1])
+
         return Z
+
 
 
 # Instantiate the model
@@ -42,7 +66,7 @@ model = PDENet(layers)
 
 # Define MSE loss
 def loss_fn(model, t, x, y):
-    # We use TensorFlow's GradientTape for automatic differentiation.
+    # Using TensorFlow's GradientTape for automatic differentiation.
     # The "persistent=True" argument allows us to compute multiple derivatives, as the tape is not immediately discarded after use.
     with tf.GradientTape(persistent=True) as tape:
         # We tell the tape to watch the t, x, y variables, as we want to differentiate with respect to these variables later.
@@ -71,8 +95,6 @@ def loss_fn(model, t, x, y):
 
 
 # Define training step
-
-
 def train_step(model, optimizer, t, x, y):
     # Compute the loss and gradients with respect to model parameters
     with tf.GradientTape() as tape:
