@@ -53,7 +53,7 @@ class PDENet(tf.keras.Model):
                 tf.add(tf.matmul(Z, self.weights[i]), self.biases[i]))
 
         # For the last layer, we only perform the matrix multiplication and addition of bias, without applying an activation function.
-        # This is because for regression tasks, where the output can take any value as opposed to classification tasks
+        # This is for regression tasks, where the output can take any value as opposed to classification tasks
 
         Z = tf.add(tf.matmul(Z, self.weights[-1]), self.biases[-1])
 
