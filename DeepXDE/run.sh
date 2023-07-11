@@ -9,6 +9,7 @@
 #SBATCH --time=1:00:00            # Wall clock time limit
 
 # Activate the conda environment
+. ~/.bashrc
 source activate tf-env
 
 # Run the Python script
