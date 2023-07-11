@@ -4,6 +4,10 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import tensorflow as tf
 
+
+# Check if TensorFlow is using GPU
+print(tf.config.list_physical_devices('GPU'))
+
 # Parameters
 alpha = 1.0
 length = 1.0
