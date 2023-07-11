@@ -1,18 +1,19 @@
 #!/bin/bash
-#SBATCH -J python           # job name
-#SBATCH -o log_slurm.o%j    # output and error file name (%j expands to jobID)
-#SBATCH -n 1                # total number of tasks requested
-#SBATCH -N 1                # number of nodes you want to run on
-#SBATCH -p bsudfq           # queue (partition) for R2 use defq
-#SBATCH -t 1:00:00         # run time (hh:mm:ss) - 12.0 hours in this example.
+#SBATCH --job-name=python         # Job name
+#SBATCH --output=log_slurm.%j.out # Output file
+#SBATCH --error=log_slurm.%j.err  # Error file
+#SBATCH --nodes=1                 # Number of nodes
+#SBATCH --ntasks-per-node=1       # Number of tasks per node
+#SBATCH --gres=gpu:1              # Number of GPUs
+#SBATCH --partition=bsudfq        # Partition/queue name
+#SBATCH --time=1:00:00            # Wall clock time limit
+
+# Load necessary modules
+module load cuda
+module load cudnn
 
 # Activate the conda environment
-# Replace environmentName with your environment name
+source activate tf-env
 
-. ~/.bashrc
-
-cd .. && source ./bin/activate && cd DeepXDE
-
-conda activate climate
-
+# Run the Python script
 python3 PINN.py
