@@ -61,14 +61,16 @@ axs[0].pcolormesh(test_x, test_t, predicted_solution, shading='auto')
 axs[0].set_xlabel('x')
 axs[0].set_ylabel('t')
 axs[0].set_title('Predicted Solution')
-axs[0].colorbar(label='Solution')
+colorbar = plt.colorbar(ax=axs[0])
+colorbar.set_label('Solution')
 
 # Plot the residual in the second subplot
 axs[1].pcolormesh(test_x, test_t, residual, shading='auto')
 axs[1].set_xlabel('x')
 axs[1].set_ylabel('t')
 axs[1].set_title('Residual')
-axs[1].colorbar(label='Residual')
+colorbar = plt.colorbar(ax=axs[1])
+colorbar.set_label('Residual')
 
 # Adjust the spacing between subplots
 plt.tight_layout()
