@@ -3,16 +3,23 @@ import deepxde as dde
 import numpy as np
 import matplotlib.pyplot as plt
 
+# Parameters
+alpha = 1.0
+length = 1.0
+max_time = 1.0
+
 # Computational Domain
-geom = dde.geometry.Interval(-1, 1)
-timedomain = dde.geometry.TimeDomain(0,1)
+geom = dde.geometry.Interval(0, length)
+timedomain = dde.geometry.TimeDomain(0,max_time)
 geotime = dde.geometry.GeometryXTime(geom, timedomain)
 
-# PDE
+
+
+# PDE Residual
 def pde(x, y):
     dy_t = dde.grad.jacobian(y , x, j=1)
     dy_xx = dde.grad.hessian(y, x, j=0)
-    return dy_t - dy_xx * 0.33
+    return dy_t - dy_xx * alpha
 
 # Initial Condidtion & Boundary Condition
 def func(x):
