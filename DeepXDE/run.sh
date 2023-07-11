@@ -8,10 +8,6 @@
 #SBATCH --partition=bsudfq        # Partition/queue name
 #SBATCH --time=1:00:00            # Wall clock time limit
 
-# Load necessary modules
-module load cuda
-module load cudnn
-
 # Activate the conda environment
 source activate tf-env
 
