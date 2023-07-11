@@ -11,6 +11,6 @@
 
 . ~/.bashrc
 
-conda activate pinn
+conda activate climate
 
 python PINN.py
