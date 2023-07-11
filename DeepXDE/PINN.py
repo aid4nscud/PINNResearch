@@ -57,24 +57,23 @@ residual = residual.reshape(test_x.shape)
 fig, axs = plt.subplots(1, 2, figsize=(12, 6))
 
 # Plot the predicted solution in the first subplot
-axs[0].pcolormesh(test_x, test_t, predicted_solution, shading='auto')
+cmap1 = axs[0].pcolormesh(test_x, test_t, predicted_solution, shading='auto')
 axs[0].set_xlabel('x')
 axs[0].set_ylabel('t')
 axs[0].set_title('Predicted Solution')
-colorbar = plt.colorbar(ax=axs[0])
-colorbar.set_label('Solution')
+colorbar1 = fig.colorbar(cmap1, ax=axs[0])
+colorbar1.set_label('Solution')
 
 # Plot the residual in the second subplot
-axs[1].pcolormesh(test_x, test_t, residual, shading='auto')
+cmap2 = axs[1].pcolormesh(test_x, test_t, residual, shading='auto')
 axs[1].set_xlabel('x')
 axs[1].set_ylabel('t')
 axs[1].set_title('Residual')
-colorbar = plt.colorbar(ax=axs[1])
-colorbar.set_label('Residual')
+colorbar2 = fig.colorbar(cmap2, ax=axs[1])
+colorbar2.set_label('Residual')
 
 # Adjust the spacing between subplots
-plt.tight_layout()
+fig.tight_layout()
 
 # Show the figure with both subplots
 plt.show()
-
