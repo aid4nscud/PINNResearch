@@ -6,9 +6,9 @@ import tensorflow as tf
 
 
 # Check if TensorFlow is using GPU
-print("GPU DEVICES:\n\n"
+print("GPU DEVICES:\n\n")
 print(tf.config.list_physical_devices('GPU'))
-print("\n------------------------------------------\n"
+print("\n------------------------------------------\n")
 
 # Parameters
 alpha = 1.0
