@@ -15,4 +15,4 @@ cd .. && source ./bin/activate && cd DeepXDE
 
 conda activate climate
 
-python PINN.py
+python3 PINN.py
