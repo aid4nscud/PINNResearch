@@ -5,10 +5,7 @@ import matplotlib.animation as animation
 import tensorflow as tf
 
 
-# Check if TensorFlow is using GPU
-print("GPU DEVICES:\n\n")
-print(tf.config.list_physical_devices('GPU'))
-print("\n------------------------------------------\n")
+print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('GPU')))
 
 # Parameters
 alpha = 1.0
