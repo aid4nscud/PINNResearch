@@ -6,7 +6,7 @@
 #SBATCH --ntasks-per-node=1       # Number of tasks per node
 #SBATCH --gres=gpu:1              # Number of GPUs
 #SBATCH --partition=bsudfq        # Partition/queue name
-#SBATCH --time=1:00:00            # Wall clock time limit
+#SBATCH --time=1:00:00            # time limit
 
 # Activate the conda environment
 . ~/.bashrc
