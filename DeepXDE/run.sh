@@ -9,8 +9,7 @@
 #SBATCH --time=1:00:00            # time limit
 
 # Activate the conda environment
-. ~/.bashrc
-source activate tf-env
+conda activate tf-env
 
 # Run the Python script
 python3 PINN.py
