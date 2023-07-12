@@ -13,4 +13,4 @@
 source activate tf-env
 
 # Run the Python script
-python3 PINN.py
+python PINN.py
