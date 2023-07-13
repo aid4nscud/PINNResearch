@@ -71,8 +71,8 @@ data = dde.data.TimePDE(
 pde_resampler = dde.callbacks.PDEPointResampler(period=50)
 
 # Model Architecture
-layer_size = [3] + [40] * 6 + [1]
-activation = "tanh"
+layer_size = [3] + [32] * 6 + [1]
+activation = "relu"
 initializer = "Glorot uniform"
 optimizer = "adam"
 learning_rate = 0.001
@@ -81,7 +81,7 @@ learning_rate = 0.001
 net = dde.nn.FNN(layer_size, activation, initializer)
 model = dde.Model(data, net)
 model.compile(optimizer, learning_rate)
-model.train(iterations=200000, callbacks=[pde_resampler])
+model.train(iterations=100000, callbacks=[pde_resampler])
 
 
 
