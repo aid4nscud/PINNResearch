@@ -74,8 +74,8 @@ pde_resampler = dde.callbacks.PDEPointResampler(period=50)
 layer_size = [3] + [40] * 6 + [1]
 activation = "tanh"
 initializer = "Glorot uniform"
-optimizer = "L-BFGS-B"
-learning_rate = 0.001
+optimizer = "adam"
+learning_rate = 0.005
 
 # Compile and Train Model
 net = dde.nn.FNN(layer_size, activation, initializer)
