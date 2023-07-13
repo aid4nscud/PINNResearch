@@ -5,7 +5,7 @@ import matplotlib.animation as animation
 import tensorflow as tf
 
 
-print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('GPU')))
+print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices("GPU")))
 
 # Parameters
 alpha = 1.0
@@ -18,6 +18,7 @@ geom = dde.geometry.Rectangle([0, 0], [length, width])
 timedomain = dde.geometry.TimeDomain(0, max_time)
 geotime = dde.geometry.GeometryXTime(geom, timedomain)
 
+
 # PDE Residual
 def pde(X, u):
     du_X = tf.gradients(u, X)[0]
@@ -26,38 +27,63 @@ def pde(X, u):
     du_yy = tf.gradients(du_y, X)[0][:, 1:2]
     return du_t - alpha * (du_xx + du_yy)
 
+
 # Initial Condidtion & Boundary Condition
-def func_bc(x):
-    # Apply condition for boundaries
-    return np.where(
-        np.logical_or(np.isclose(x[:, 0], length), np.isclose(x[:, 1], width)),
-        100.0,
-        0.0
-    )[:, None]
+def func_bc_right_edge(x):
+    # Assign a value of 100.0 if the point lies on the right edge and 0.0 otherwise.
+    # The output is reshaped to ensure compatibility with TensorFlow.
+    return np.where(np.isclose(x[:, 0], length), 100.0, 0.0)[:, None]
+
 
 def func_ic(x):
     # The initial condition is zero everywhere
     return np.zeros((len(x), 1))
 
-bc = dde.DirichletBC(geotime, func_bc, lambda _, on_boundary: on_boundary)
+
+def func_zero(x):
+    return np.zeros_like(x)
+
+
+bc_right_edge = dde.DirichletBC(
+    geotime, func_bc_right_edge, lambda _, on_boundary: on_boundary
+)
+bc_left = dde.NeumannBC(
+    geotime, func_zero, lambda x, on_boundary: on_boundary and np.isclose(x[0], 0)
+)
+bc_top = dde.NeumannBC(
+    geotime, func_zero, lambda x, on_boundary: on_boundary and np.isclose(x[1], width)
+)
+bc_bottom = dde.NeumannBC(
+    geotime, func_zero, lambda x, on_boundary: on_boundary and np.isclose(x[1], 0)
+)
 ic = dde.IC(geotime, func_ic, lambda _, on_initial: on_initial)
 
 # Training Data
-data = dde.data.TimePDE(geotime, pde, [bc, ic], num_domain=4000, num_boundary=2000, num_initial=1000, num_test=1000)
+data = dde.data.TimePDE(
+    geotime,
+    pde,
+    [bc_right_edge, bc_left, bc_top, bc_bottom, ic],
+    num_domain=2540,
+    num_boundary=80,
+    num_initial=160,
+    num_test=2540,
+)
+pde_resampler = dde.callbacks.PDEPointResampler(period=50)
 
 # Model Architecture
-layer_size = [3] + [32]*4 + [1]
+layer_size = [3] + [40] * 6 + [1]
 activation = "tanh"
 initializer = "Glorot uniform"
 optimizer = "adam"
 learning_rate = 0.001
 
-#Compile and Train Model
+# Compile and Train Model
 net = dde.nn.FNN(layer_size, activation, initializer)
 model = dde.Model(data, net)
 model.compile(optimizer, learning_rate)
-model.train(10000)
+model.train(iterations=10000, callbacks=[pde_resampler])
 model.compile("L-BFGS")
+
 
 # Results
 x_data = np.linspace(0, length, num=100)
@@ -68,33 +94,43 @@ test_domain = np.vstack((np.ravel(test_x), np.ravel(test_y), np.ravel(test_t))).
 predicted_solution = model.predict(test_domain)
 residual = model.predict(test_domain, operator=pde)
 
+
 # Reshape the data for animation
-predicted_solution = predicted_solution.reshape(test_x.shape[0], test_y.shape[1], test_t.shape[2])
+predicted_solution = predicted_solution.reshape(
+    test_x.shape[0], test_y.shape[1], test_t.shape[2]
+)
 residual = residual.reshape(test_x.shape[0], test_y.shape[1], test_t.shape[2])
 
-fig = plt.figure(figsize=(6, 6))
-ax = plt.axes()
+# Prepare the figure
 
-# Create the initial plot and color bar
-cmap = ax.contourf(test_x[:, :, 0], test_y[:, :, 0], predicted_solution[:, :, 0], cmap='viridis')
-ax.set_xlabel('x')
-ax.set_ylabel('y')
-ax.set_title('Predicted Solution, t={:.2f}'.format(t_data[0]))
-colorbar = fig.colorbar(cmap, ax=ax)
+fig, ax = plt.subplots(figsize=(6, 6))
 
-# Update function for the animation
+# Calculate the global maximum temperature across all frames
+global_max = np.max(predicted_solution)
+
+cmap = plt.get_cmap("hot")
+norm = plt.Normalize(vmin=0, vmax=global_max)
+
+# Hold the contour plot in a dictionary
+plots = {}
+plots["contour"] = ax.contourf(test_x[:, :, 0], test_y[:, :, 0], predicted_solution[:, :, 0], cmap=cmap, norm=norm)
+ax.set_xlabel("x")
+ax.set_ylabel("y")
+ax.set_title("Predicted Solution, t={:.2f}".format(t_data[0]))
+
+colorbar = fig.colorbar(plots["contour"], ax=ax)
+cax = colorbar.ax
+
 def update(i):
-    ax.cla()  # Clear the current plot
+    # Remove the previous contours
+    for coll in plots["contour"].collections:
+        coll.remove()
+    # Create new contours
+    plots["contour"] = ax.contourf(test_x[:, :, i], test_y[:, :, i], predicted_solution[:, :, i], cmap=cmap, norm=norm)
+    ax.set_xlabel("x")
+    ax.set_ylabel("y")
+    ax.set_title("Predicted Solution, t={:.2f}".format(t_data[i]))
 
-    cmap = ax.contourf(test_x[:, :, i], test_y[:, :, i], predicted_solution[:, :, i], cmap='viridis')
-    ax.set_xlabel('x')
-    ax.set_ylabel('y')
-    ax.set_title('Predicted Solution, t={:.2f}'.format(t_data[i]))
-    colorbar.update_bruteforce(cmap)
-    fig.colorbar(cmap, cax=colorbar.ax)
-
-# Create the animation
 anim = animation.FuncAnimation(fig, update, frames=test_t.shape[2], interval=200)
-
 # Save the animation as an mp4 file
-anim.save('heat2dPrediction.mp4', writer='ffmpeg')
+anim.save("heat2DPrediction.mp4", writer="ffmpeg")
