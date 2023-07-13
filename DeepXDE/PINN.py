@@ -63,10 +63,10 @@ data = dde.data.TimePDE(
     geotime,
     pde,
     [bc_right_edge, bc_left, bc_top, bc_bottom, ic],
-    num_domain=2540,
-    num_boundary=80,
-    num_initial=160,
-    num_test=2540,
+    num_domain=5060,
+    num_boundary=160,
+    num_initial=320,
+    num_test=5060,
 )
 pde_resampler = dde.callbacks.PDEPointResampler(period=50)
 
@@ -81,8 +81,8 @@ learning_rate = 0.001
 net = dde.nn.FNN(layer_size, activation, initializer)
 model = dde.Model(data, net)
 model.compile(optimizer, learning_rate)
-model.train(iterations=10000, callbacks=[pde_resampler])
-model.compile("L-BFGS")
+model.train(iterations=200000, callbacks=[pde_resampler])
+
 
 
 # Results

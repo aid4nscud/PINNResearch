@@ -10,6 +10,8 @@
 
 # Activate the conda environment
 . ~/.bashrc
+module load cudnn8.4-cuda11.4
+export XLA_FLAGS=--xla_gpu_cuda_data_dir=$CUDA_HOME
 conda activate tf-env
 
 # Run the Python script
