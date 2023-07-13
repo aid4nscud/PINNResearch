@@ -71,10 +71,10 @@ data = dde.data.TimePDE(
 pde_resampler = dde.callbacks.PDEPointResampler(period=50)
 
 # Model Architecture
-layer_size = [3] + [60] * 6 + [1]
+layer_size = [3] + [40] * 6 + [1]
 activation = "tanh"
 initializer = "Glorot uniform"
-optimizer = "L-BFG"
+optimizer = "L-BFGS-B"
 learning_rate = 0.001
 
 # Compile and Train Model
