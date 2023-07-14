@@ -48,13 +48,13 @@ bc_right_edge = dde.DirichletBC(
     geotime, func_bc_right_edge, lambda _, on_boundary: on_boundary
 )
 bc_left = dde.NeumannBC(
-    geotime, func_zero, lambda x, on_boundary: on_boundary and np.isclose(x[0], 0)
+    geotime, func_zero, lambda x, on_boundary: on_boundary and np.isclose(x[0], 0) and not np.isclose(x[1], width) and not np.isclose(x[1], 0)
 )
 bc_top = dde.NeumannBC(
-    geotime, func_zero, lambda x, on_boundary: on_boundary and np.isclose(x[1], width)
+    geotime, func_zero, lambda x, on_boundary: on_boundary and np.isclose(x[1], width) and not np.isclose(x[0], length) and not np.isclose(x[0], 0)
 )
 bc_bottom = dde.NeumannBC(
-    geotime, func_zero, lambda x, on_boundary: on_boundary and np.isclose(x[1], 0)
+    geotime, func_zero, lambda x, on_boundary: on_boundary and np.isclose(x[1], 0) and not np.isclose(x[0], length) and not np.isclose(x[0], 0)
 )
 ic = dde.IC(geotime, func_ic, lambda _, on_initial: on_initial)
 
@@ -82,7 +82,7 @@ net = dde.nn.FNN(layer_size, activation, initializer)
 model = dde.Model(data, net)
 model.compile(optimizer, learning_rate)
 
-model.train(iterations=50000, callbacks=[pde_resampler])
+losshistory, train_state = model.train(iterations=50000, callbacks=[pde_resampler], display_every=100)
 
 
 
