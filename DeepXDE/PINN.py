@@ -88,43 +88,75 @@ test_domain = np.vstack((np.ravel(test_x), np.ravel(test_y), np.ravel(test_t))).
 predicted_solution = model.predict(test_domain)
 residual = model.predict(test_domain, operator=pde)
 
+# Calculate the real solution using FDM
+# Modify the code below to implement the Finite Difference Method and calculate the real solution
+# real_solution = ...
+
+# Calculate the error
+error = np.abs(predicted_solution - real_solution)
 
 # Reshape the data for animation
 predicted_solution = predicted_solution.reshape(
     test_x.shape[0], test_y.shape[1], test_t.shape[2]
 )
 residual = residual.reshape(test_x.shape[0], test_y.shape[1], test_t.shape[2])
+error = error.reshape(test_x.shape[0], test_y.shape[1], test_t.shape[2])
 
-# Prepare the figure
-
+# Prepare the figure for predicted solution plot
 fig, ax = plt.subplots(figsize=(6, 6))
-
-# Calculate the global maximum temperature across all frames
 global_max = np.max(predicted_solution)
-
 cmap = plt.get_cmap("hot")
 norm = plt.Normalize(vmin=0, vmax=global_max)
-
-# Hold the contour plot in a dictionary
 plots = {}
 plots["contour"] = ax.contourf(test_x[:, :, 0], test_y[:, :, 0], predicted_solution[:, :, 0], cmap=cmap, norm=norm)
 ax.set_xlabel("x")
 ax.set_ylabel("y")
 ax.set_title("Predicted Solution, t={:.2f}".format(t_data[0]))
-
 colorbar = fig.colorbar(plots["contour"], ax=ax)
 cax = colorbar.ax
 
+# Prepare the figure for error plot
+fig_error, ax_error = plt.subplots(figsize=(6, 6))
+error_plot = ax_error.contourf(test_x[:, :, 0], test_y[:, :, 0], error[:, :, 0], cmap=cmap)
+ax_error.set_xlabel("x")
+ax_error.set_ylabel("y")
+ax_error.set_title("Error, t={:.2f}".format(t_data[0]))
+colorbar_error = fig_error.colorbar(error_plot, ax=ax_error)
+cax_error = colorbar_error.ax
+
 def update(i):
-    # Remove the previous contours
+    # Remove the previous plots
     for coll in plots["contour"].collections:
         coll.remove()
-    # Create new contours
+    for coll in error_plot.collections:
+        coll.remove()
+    # Create new plots
     plots["contour"] = ax.contourf(test_x[:, :, i], test_y[:, :, i], predicted_solution[:, :, i], cmap=cmap, norm=norm)
+    error_plot = ax_error.contourf(test_x[:, :, i], test_y[:, :, i], error[:, :, i], cmap=cmap)
     ax.set_xlabel("x")
     ax.set_ylabel("y")
     ax.set_title("Predicted Solution, t={:.2f}".format(t_data[i]))
+    ax_error.set_xlabel("x")
+    ax_error.set_ylabel("y")
+    ax_error.set_title("Error, t={:.2f}".format(t_data[i]))
 
 anim = animation.FuncAnimation(fig, update, frames=test_t.shape[2], interval=200)
-# Save the animation as an mp4 file
+# Save the animation as a GIF file
 anim.save("heat2DPrediction.gif", writer=PillowWriter(fps=5))
+
+# Calculate the maximum error
+max_error = np.max(error)
+
+def update_error(i):
+    # Remove the previous error plot
+    for coll in error_plot.collections:
+        coll.remove()
+    # Create new error plot
+    error_plot = ax_error.contourf(test_x[:, :, i], test_y[:, :, i], error[:, :, i], cmap=cmap)
+    ax_error.set_xlabel("x")
+    ax_error.set_ylabel("y")
+    ax_error.set_title("Error, t={:.2f}".format(t_data[i]))
+
+anim_error = animation.FuncAnimation(fig_error, update_error, frames=test_t.shape[2], interval=200)
+# Save the error animation as a GIF file
+anim_error.save("heat2DError.gif", writer=PillowWriter(fps=5))
