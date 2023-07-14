@@ -83,9 +83,9 @@ learning_rate = 0.001
 net = dde.nn.FNN(layer_size, activation, initializer)
 model = dde.Model(data, net)
 model.compile(optimizer, learning_rate)
-losshistory = dde.callbacks.LossHistory()
-model.train(iterations=50000, callbacks=[pde_resampler, losshistory])
-losshistory.plot()
+
+model.train(iterations=50000, callbacks=[pde_resampler])
+
 
 
 
