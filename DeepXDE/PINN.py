@@ -61,7 +61,7 @@ data = dde.data.TimePDE(
 pde_resampler = dde.callbacks.PDEPointResampler(period=50)
 
 # Define the custom PINN model
-class CustomPINN(dde.Model):
+class CustomPINN(dde.maps.FNN):
     def forward(self, x):
         u = self.net(x)
         x, y, t = dde.split_dim(x, 3)
@@ -75,8 +75,8 @@ optimizer = tf.keras.optimizers.Adam(learning_rate=0.0001)  # Using Adam optimiz
 learning_rate = None  # Not used for Adam optimizer
 
 # Compile and Train Model
-net = dde.maps.PINN([2, 50, 50, 50, 1], "tanh", "Glorot uniform")
-model = CustomPINN(data, net)
+net = CustomPINN([2, 50, 50, 50, 1], "tanh", "Glorot uniform")
+model = dde.Model(data, net)
 model.compile(optimizer, learning_rate)
 model.train(iterations=10000, callbacks=[pde_resampler])
 
