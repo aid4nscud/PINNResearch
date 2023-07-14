@@ -2,6 +2,8 @@ import deepxde as dde
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+from matplotlib.animation import PillowWriter
+
 import tensorflow as tf
 
 
@@ -133,4 +135,5 @@ def update(i):
 
 anim = animation.FuncAnimation(fig, update, frames=test_t.shape[2], interval=200)
 # Save the animation as an mp4 file
-anim.save("heat2DPrediction.mp4", writer="ffmpeg")
+pillow_writer = PillowWriter(fps=24)  # Adjust fps (frames per second) as needed
+anim.save("heat2DPrediction.gif", writer=pillow_writer)
