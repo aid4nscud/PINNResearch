@@ -89,6 +89,9 @@ test_domain = np.vstack((np.ravel(test_x), np.ravel(test_y), np.ravel(test_t))).
 results = model.predict(test_domain)
 predicted_solution = results[0]
 
+# Print the shape of predicted_solution
+print("Shape of predicted_solution:", predicted_solution.shape)
+
 # Reshape the data for animation
 predicted_solution = predicted_solution.reshape((len(x_data), len(y_data), len(t_data)))
 
