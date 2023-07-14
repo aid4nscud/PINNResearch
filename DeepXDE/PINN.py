@@ -71,7 +71,7 @@ data = dde.data.TimePDE(
 pde_resampler = dde.callbacks.PDEPointResampler(period=50)
 
 # Model Architecture
-layer_size = [3] + [80] * 10 + [1]
+layer_size = [3] + [20] * 8 + [1]
 activation = "tanh"
 initializer = "Glorot uniform"
 optimizer = "adam"
