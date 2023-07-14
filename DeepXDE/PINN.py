@@ -75,7 +75,6 @@ layer_size = [3] + [50] * 8 + [1]
 activation = "tanh"
 initializer = "Glorot uniform"
 optimizer = "L-BFGS-B"
-dde.optimizers.config.set_LBFGS_options(maxcor=10, ftol=1.0e-6, gtol=1.0e-6, maxiter=15000, maxfun=15000)
 learning_rate = 0.001
 
 # Compile and Train Model
