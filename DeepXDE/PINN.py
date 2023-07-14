@@ -74,10 +74,10 @@ pde_resampler = dde.callbacks.PDEPointResampler(period=50)
 
 # Model Architecture
 layer_size = [3] + [20] * 8 + [1]
-activation = "tanh"
+activation = "relu"
 initializer = "Glorot uniform"
 optimizer = "adam"
-learning_rate = 0.001
+learning_rate = 0.0001
 
 # Compile and Train Model
 net = dde.nn.FNN(layer_size, activation, initializer)
@@ -135,5 +135,5 @@ def update(i):
 
 anim = animation.FuncAnimation(fig, update, frames=test_t.shape[2], interval=200)
 # Save the animation as an mp4 file
-pillow_writer = PillowWriter(fps=24)  # Adjust fps (frames per second) as needed
+pillow_writer = PillowWriter(fps=6)  # Adjust fps (frames per second) as needed
 anim.save("heat2DPrediction.gif", writer=pillow_writer)
