@@ -90,10 +90,7 @@ results = model.predict(test_domain)
 predicted_solution = results[0]
 
 # Reshape the data for animation
-predicted_solution = np.squeeze(predicted_solution)
-predicted_solution = predicted_solution.reshape(
-    test_x.shape[1], test_y.shape[0], test_t.shape[2]
-)
+predicted_solution = predicted_solution.reshape(test_x.shape)
 
 # Prepare the figure for predicted solution plot
 fig, ax = plt.subplots(figsize=(6, 6))
