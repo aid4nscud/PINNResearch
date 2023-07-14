@@ -82,7 +82,7 @@ net = dde.nn.FNN(layer_size, activation, initializer)
 model = dde.Model(data, net)
 model.compile(optimizer, learning_rate)
 
-losshistory, train_state = model.train(iterations=50000, callbacks=[pde_resampler], display_every=100)
+losshistory, train_state = model.train(iterations=50000, callbacks=[pde_resampler])
 
 
 
