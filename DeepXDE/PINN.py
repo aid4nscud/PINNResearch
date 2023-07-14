@@ -17,12 +17,10 @@ timedomain = dde.geometry.TimeDomain(0, max_time)
 geotime = dde.geometry.GeometryXTime(geom, timedomain)
 
 # PDE Residual
-def pde(X, u):
-    du_X = tf.gradients(u, X)[0]
-    du_x, du_y, du_t = du_X[:, 0:1], du_X[:, 1:2], du_X[:, 2:3]
-    du_xx = tf.gradients(du_x, X)[0][:, 0:1]
-    du_yy = tf.gradients(du_y, X)[0][:, 1:2]
-    return du_t - alpha * (du_xx + du_yy)
+def pde(x, y, t, u, u_x, u_y, u_t):
+    u_xx = dde.grad.hessian(u, x, y, t)[0, 0]
+    u_yy = dde.grad.hessian(u, x, y, t)[1, 1]
+    return u_t - alpha * (u_xx + u_yy)
 
 # Initial Condition & Boundary Condition
 def func_bc_right_edge(x):
@@ -62,22 +60,25 @@ data = dde.data.TimePDE(
 )
 pde_resampler = dde.callbacks.PDEPointResampler(period=50)
 
-# Model Architecture
-layer_size = [3] + [50] * 8 + [1]  # Same as in the provided code
-activation = "tanh"  # Same as in the provided code
-initializer = "Glorot uniform"  # Same as in the provided code
+# Define the custom PINN model
+class CustomPINN(dde.Model):
+    def forward(self, x):
+        u = self.net(x)
+        x, y, t = dde.split_dim(x, 3)
+        u_x = dde.grad.jacobian(u, x)
+        u_y = dde.grad.jacobian(u, y)
+        u_t = dde.grad.jacobian(u, t)
+        return u, u_x, u_y, u_t
 
 # Optimizer and Learning Rate
 optimizer = tf.keras.optimizers.Adam(learning_rate=0.0001)  # Using Adam optimizer
 learning_rate = None  # Not used for Adam optimizer
 
 # Compile and Train Model
-net = dde.maps.FNN(layer_size, activation, initializer)  # FNN with specified layer size and activation function
-model = dde.Model(data, net)
+net = dde.maps.PINN([2, 50, 50, 50, 1], "tanh", "Glorot uniform")
+model = CustomPINN(data, net)
 model.compile(optimizer, learning_rate)
 model.train(iterations=10000, callbacks=[pde_resampler])
-
-
 
 # Results
 x_data = np.linspace(0, length, num=100)
@@ -85,40 +86,12 @@ y_data = np.linspace(0, width, num=100)
 t_data = np.linspace(0, 1, num=100)
 test_x, test_y, test_t = np.meshgrid(x_data, y_data, t_data)
 test_domain = np.vstack((np.ravel(test_x), np.ravel(test_y), np.ravel(test_t))).T
-predicted_solution = model.predict(test_domain)
-residual = model.predict(test_domain, operator=pde)
-
-# Calculate the real solution using FDM
-dx = length / (x_data.shape[0] - 1)
-dy = width / (y_data.shape[0] - 1)
-dt = max_time / (t_data.shape[0] - 1)
-
-# Define the initial condition
-real_solution = np.zeros_like(predicted_solution[:, :, 0])
-
-# Apply FDM iteration
-for k in range(1, t_data.shape[0]):
-    for i in range(1, x_data.shape[0] - 1):
-        for j in range(1, y_data.shape[0] - 1):
-            real_solution[i, j, k] = real_solution[i, j, k-1] + alpha * dt * (
-                (real_solution[i+1, j, k-1] - 2 * real_solution[i, j, k-1] + real_solution[i-1, j, k-1]) / dx**2
-                + (real_solution[i, j+1, k-1] - 2 * real_solution[i, j, k-1] + real_solution[i, j-1, k-1]) / dy**2
-            )
-    
-    # Apply the right boundary condition
-    real_solution[-1, :, k] = 100.0
-
-# Calculate the error
-error = np.abs(predicted_solution - real_solution)
-# Calculate the error
-error = np.abs(predicted_solution - real_solution)
+predicted_solution, _, _, _ = model.predict(test_domain)
 
 # Reshape the data for animation
 predicted_solution = predicted_solution.reshape(
     test_x.shape[0], test_y.shape[1], test_t.shape[2]
 )
-residual = residual.reshape(test_x.shape[0], test_y.shape[1], test_t.shape[2])
-error = error.reshape(test_x.shape[0], test_y.shape[1], test_t.shape[2])
 
 # Prepare the figure for predicted solution plot
 fig, ax = plt.subplots(figsize=(6, 6))
@@ -133,48 +106,16 @@ ax.set_title("Predicted Solution, t={:.2f}".format(t_data[0]))
 colorbar = fig.colorbar(plots["contour"], ax=ax)
 cax = colorbar.ax
 
-# Prepare the figure for error plot
-fig_error, ax_error = plt.subplots(figsize=(6, 6))
-error_plot = ax_error.contourf(test_x[:, :, 0], test_y[:, :, 0], error[:, :, 0], cmap=cmap)
-ax_error.set_xlabel("x")
-ax_error.set_ylabel("y")
-ax_error.set_title("Error, t={:.2f}".format(t_data[0]))
-colorbar_error = fig_error.colorbar(error_plot, ax=ax_error)
-cax_error = colorbar_error.ax
-
 def update(i):
     # Remove the previous plots
     for coll in plots["contour"].collections:
         coll.remove()
-    for coll in error_plot.collections:
-        coll.remove()
     # Create new plots
     plots["contour"] = ax.contourf(test_x[:, :, i], test_y[:, :, i], predicted_solution[:, :, i], cmap=cmap, norm=norm)
-    error_plot = ax_error.contourf(test_x[:, :, i], test_y[:, :, i], error[:, :, i], cmap=cmap)
     ax.set_xlabel("x")
     ax.set_ylabel("y")
     ax.set_title("Predicted Solution, t={:.2f}".format(t_data[i]))
-    ax_error.set_xlabel("x")
-    ax_error.set_ylabel("y")
-    ax_error.set_title("Error, t={:.2f}".format(t_data[i]))
 
 anim = animation.FuncAnimation(fig, update, frames=test_t.shape[2], interval=200)
 # Save the animation as a GIF file
 anim.save("heat2DPrediction.gif", writer=PillowWriter(fps=5))
-
-# Calculate the maximum error
-max_error = np.max(error)
-
-def update_error(i):
-    # Remove the previous error plot
-    for coll in error_plot.collections:
-        coll.remove()
-    # Create new error plot
-    error_plot = ax_error.contourf(test_x[:, :, i], test_y[:, :, i], error[:, :, i], cmap=cmap)
-    ax_error.set_xlabel("x")
-    ax_error.set_ylabel("y")
-    ax_error.set_title("Error, t={:.2f}".format(t_data[i]))
-
-anim_error = animation.FuncAnimation(fig_error, update_error, frames=test_t.shape[2], interval=200)
-# Save the error animation as a GIF file
-anim_error.save("heat2DError.gif", writer=PillowWriter(fps=5))
