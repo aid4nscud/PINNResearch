@@ -4,9 +4,6 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import tensorflow as tf
 
-
-print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices("GPU")))
-
 # Parameters
 alpha = 1.0
 length = 1.0
@@ -18,7 +15,6 @@ geom = dde.geometry.Rectangle([0, 0], [length, width])
 timedomain = dde.geometry.TimeDomain(0, max_time)
 geotime = dde.geometry.GeometryXTime(geom, timedomain)
 
-
 # PDE Residual
 def pde(X, u):
     du_X = tf.gradients(u, X)[0]
@@ -27,22 +23,17 @@ def pde(X, u):
     du_yy = tf.gradients(du_y, X)[0][:, 1:2]
     return du_t - alpha * (du_xx + du_yy)
 
-
-# Initial Condidtion & Boundary Condition
+# Initial Condition & Boundary Condition
 def func_bc_right_edge(x):
-    # Assign a value of 100.0 if the point lies on the right edge and 0.0 otherwise.
-    # The output is reshaped to ensure compatibility with TensorFlow.
+    # Assign a value of 100.0 if the point lies on the right edge and 0.0 otherwise
     return np.where(np.isclose(x[:, 0], length), 100.0, 0.0)[:, None]
-
 
 def func_ic(x):
     # The initial condition is zero everywhere
     return np.zeros((len(x), 1))
 
-
 def func_zero(x):
     return np.zeros_like(x)
-
 
 bc_right_edge = dde.DirichletBC(
     geotime, func_bc_right_edge, lambda _, on_boundary: on_boundary
@@ -63,27 +54,27 @@ data = dde.data.TimePDE(
     geotime,
     pde,
     [bc_right_edge, bc_left, bc_top, bc_bottom, ic],
-    num_domain=6000,
-    num_boundary=200,
-    num_initial=400,
-    num_test=6000,
+    num_domain=5060,
+    num_boundary=160,
+    num_initial=320,
+    num_test=5060,
 )
 pde_resampler = dde.callbacks.PDEPointResampler(period=50)
 
 # Model Architecture
-layer_size = [3] + [50] * 8 + [1]
-activation = "tanh"
-initializer = "Glorot uniform"
-optimizer = "L-BFGS-B"
-learning_rate = 0.001
+layer_size = [3] + [50] * 8 + [1]  # Same as in the provided code
+activation = "tanh"  # Same as in the provided code
+initializer = "Glorot uniform"  # Same as in the provided code
+
+# Optimizer and Learning Rate
+optimizer = tf.keras.optimizers.Adam(learning_rate=0.0001)  # Using Adam optimizer
+learning_rate = None  # Not used for Adam optimizer
 
 # Compile and Train Model
-net = dde.nn.FNN(layer_size, activation, initializer)
+net = dde.maps.FNN(layer_size, activation, initializer)  # FNN with specified layer size and activation function
 model = dde.Model(data, net)
 model.compile(optimizer, learning_rate)
-
-losshistory, train_state = model.train(iterations=50000, callbacks=[pde_resampler])
-
+model.train(iterations=50000, callbacks=[pde_resampler])
 
 
 
