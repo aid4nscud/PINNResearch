@@ -78,7 +78,7 @@ optimizer = tf.keras.optimizers.Adam(learning_rate=1e-4)  # Using Adam optimizer
 net = CustomPINN([2, 50, 50, 50, 50, 50, 1], "tanh", "Glorot uniform")
 model = dde.Model(data, net)
 model.compile(optimizer, 1e-4)
-model.train(iterations=10000, callbacks=[pde_resampler])
+model.train(iterations=100000, callbacks=[pde_resampler])
 
 # Results
 x_data = np.linspace(0, length, num=100)
