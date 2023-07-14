@@ -89,9 +89,27 @@ predicted_solution = model.predict(test_domain)
 residual = model.predict(test_domain, operator=pde)
 
 # Calculate the real solution using FDM
-# Modify the code below to implement the Finite Difference Method and calculate the real solution
-# real_solution = ...
+dx = length / (x_data.shape[0] - 1)
+dy = width / (y_data.shape[0] - 1)
+dt = max_time / (t_data.shape[0] - 1)
 
+# Define the initial condition
+real_solution = np.zeros_like(predicted_solution[:, :, 0])
+
+# Apply FDM iteration
+for k in range(1, t_data.shape[0]):
+    for i in range(1, x_data.shape[0] - 1):
+        for j in range(1, y_data.shape[0] - 1):
+            real_solution[i, j, k] = real_solution[i, j, k-1] + alpha * dt * (
+                (real_solution[i+1, j, k-1] - 2 * real_solution[i, j, k-1] + real_solution[i-1, j, k-1]) / dx**2
+                + (real_solution[i, j+1, k-1] - 2 * real_solution[i, j, k-1] + real_solution[i, j-1, k-1]) / dy**2
+            )
+    
+    # Apply the right boundary condition
+    real_solution[-1, :, k] = 100.0
+
+# Calculate the error
+error = np.abs(predicted_solution - real_solution)
 # Calculate the error
 error = np.abs(predicted_solution - real_solution)
 
