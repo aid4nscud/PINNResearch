@@ -17,7 +17,7 @@ timedomain = dde.geometry.TimeDomain(0, max_time)
 geotime = dde.geometry.GeometryXTime(geom, timedomain)
 
 # PDE Residual
-def pde(x, y, t, u, u_x, u_y, u_t):
+def pde(x, y, t, u, u_t):
     u_xx = dde.grad.hessian(u, x, y, t)[0, 0]
     u_yy = dde.grad.hessian(u, x, y, t)[1, 1]
     return u_t - alpha * (u_xx + u_yy)
@@ -71,13 +71,13 @@ class CustomPINN(dde.maps.FNN):
         return u, u_x, u_y, u_t
 
 # Optimizer and Learning Rate
-optimizer = tf.keras.optimizers.Adam(learning_rate=0.0001)  # Using Adam optimizer
-learning_rate = None  # Not used for Adam optimizer
+optimizer = tf.keras.optimizers.Adam(learning_rate=1e-4)  # Using Adam optimizer
+
 
 # Compile and Train Model
-net = CustomPINN([2, 50, 50, 50, 1], "tanh", "Glorot uniform")
+net = CustomPINN([2, 50, 50, 50, 50, 50, 1], "tanh", "Glorot uniform")
 model = dde.Model(data, net)
-model.compile(optimizer, learning_rate)
+model.compile(optimizer, 1e-4)
 model.train(iterations=10000, callbacks=[pde_resampler])
 
 # Results
@@ -87,9 +87,6 @@ t_data = np.linspace(0, 1, num=100)
 test_x, test_y, test_t = np.meshgrid(x_data, y_data, t_data)
 test_domain = np.vstack((np.ravel(test_x), np.ravel(test_y), np.ravel(test_t))).T
 predicted_solution = model.predict(test_domain)
-
-# Print the shape of predicted_solution
-print("Shape of predicted_solution:", predicted_solution.shape)
 
 # Reshape the data for animation
 predicted_solution = predicted_solution.reshape((len(x_data), len(y_data), len(t_data)))
