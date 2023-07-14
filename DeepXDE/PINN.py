@@ -74,7 +74,9 @@ pde_resampler = dde.callbacks.PDEPointResampler(period=50)
 layer_size = [3] + [50] * 8 + [1]
 activation = "tanh"
 initializer = "Glorot uniform"
-optimizer = "rmsprop"
+optimizer = "L-BFGS-B"
+dde.optimizers.config.set_LBFGS_options(maxcor=10, ftol=1.0e-6, gtol=1.0e-6, maxiter=15000, maxfun=15000)
+dde.config.set_default_float("float64")
 learning_rate = 0.001
 
 # Compile and Train Model
@@ -83,6 +85,7 @@ model = dde.Model(data, net)
 model.compile(optimizer, learning_rate)
 losshistory = dde.callbacks.LossHistory()
 model.train(iterations=50000, callbacks=[pde_resampler, losshistory])
+losshistory.plot()
 
 
 
