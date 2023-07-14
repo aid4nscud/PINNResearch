@@ -135,5 +135,5 @@ def update(i):
 
 anim = animation.FuncAnimation(fig, update, frames=test_t.shape[2], interval=200)
 # Save the animation as an mp4 file
-pillow_writer = PillowWriter(fps=6)  # Adjust fps (frames per second) as needed
-anim.save("heat2DPrediction.gif", writer=pillow_writer)
+
+anim.save("heat2DPrediction.gif", writer=PillowWriter)
