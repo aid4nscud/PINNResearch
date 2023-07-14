@@ -63,25 +63,26 @@ data = dde.data.TimePDE(
     geotime,
     pde,
     [bc_right_edge, bc_left, bc_top, bc_bottom, ic],
-    num_domain=5060,
-    num_boundary=160,
-    num_initial=320,
-    num_test=5060,
+    num_domain=6000,
+    num_boundary=200,
+    num_initial=400,
+    num_test=6000,
 )
 pde_resampler = dde.callbacks.PDEPointResampler(period=50)
 
 # Model Architecture
-layer_size = [3] + [40] * 6 + [1]
+layer_size = [3] + [50] * 8 + [1]
 activation = "tanh"
 initializer = "Glorot uniform"
-optimizer = "adam"
-learning_rate = 0.005
+optimizer = "rmsprop"
+learning_rate = 0.001
 
 # Compile and Train Model
 net = dde.nn.FNN(layer_size, activation, initializer)
 model = dde.Model(data, net)
 model.compile(optimizer, learning_rate)
-model.train(iterations=50000, callbacks=[pde_resampler])
+losshistory = dde.callbacks.LossHistory()
+model.train(iterations=50000, callbacks=[pde_resampler, losshistory])
 
 
 
