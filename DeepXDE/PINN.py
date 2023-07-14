@@ -86,8 +86,7 @@ y_data = np.linspace(0, width, num=100)
 t_data = np.linspace(0, 1, num=100)
 test_x, test_y, test_t = np.meshgrid(x_data, y_data, t_data)
 test_domain = np.vstack((np.ravel(test_x), np.ravel(test_y), np.ravel(test_t))).T
-results = model.predict(test_domain)
-predicted_solution = results[0]
+predicted_solution = model.predict(test_domain)
 
 # Print the shape of predicted_solution
 print("Shape of predicted_solution:", predicted_solution.shape)
