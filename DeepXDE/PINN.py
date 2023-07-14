@@ -75,7 +75,7 @@ learning_rate = None  # Not used for Adam optimizer
 net = dde.maps.FNN(layer_size, activation, initializer)  # FNN with specified layer size and activation function
 model = dde.Model(data, net)
 model.compile(optimizer, learning_rate)
-model.train(iterations=50000, callbacks=[pde_resampler])
+model.train(iterations=10000, callbacks=[pde_resampler])
 
 
 
