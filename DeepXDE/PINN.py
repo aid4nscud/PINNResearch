@@ -118,3 +118,4 @@ def update(i):
 anim = animation.FuncAnimation(fig, update, frames=test_t.shape[2], interval=200)
 # Save the animation as a GIF file
 anim.save("heat2DPrediction.gif", writer=PillowWriter(fps=5))
+
