@@ -70,7 +70,7 @@ optimizer = tf.keras.optimizers.Adam(learning_rate=1e-4)  # Using Adam optimizer
 # Compile and Train Model
 net = dde.maps.FNN([3] + [50] * 5 + [1], "tanh", "Glorot uniform")
 model = dde.Model(data, net)
-model.compile(optimizer, loss_weights=[1e-4], check_numerics=True)
+model.compile(optimizer, loss_weights=[1e-4])
 model.train(iterations=100000, callbacks=[pde_resampler])
 
 # Results
