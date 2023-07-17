@@ -83,7 +83,7 @@ learning_rate = 1e-3
 net = dde.nn.FNN(layer_size, activation, initializer)
 model = dde.Model(data, net)
 model.compile(optimizer, learning_rate)
-model.train(iterations=10000, callbacks=[pde_resampler])
+model.train(iterations=100000, callbacks=[pde_resampler])
 
 
 
