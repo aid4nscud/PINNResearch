@@ -33,28 +33,28 @@ def main():
         du_yy = tf.gradients(du_y, X)[0][:, 1:2]
         return du_t - ALPHA * (du_xx + du_yy)
     
-    def output_transform(x, y):
-        # Get the individual components
-        x_val, y_val, t_val = x[:, 0:1], x[:, 1:2], x[:, 2:3]
 
-        # Apply boundary conditions
-        left = y * (1 - x_val)
-        right = 100 * x_val
-        top = y * (1 - y_val)
-        bottom = y * y_val
-        initial = y * t_val
+    # Define Boundary Conditions
+    def func_bc_right_edge(x):
+        return np.where(np.isclose(x[:, 0], LENGTH), 100.0, 0.0)[:, None]
+    def func_ic(x):
+        return np.zeros((len(x), 1))
+    def func_zero(x):
+        return np.zeros_like(x)
 
-        # Combine the conditions
-        return left + right + top + bottom + initial
+    bc_right_edge = dde.DirichletBC(geotime, func_bc_right_edge, lambda _, on_boundary: on_boundary)
+    bc_left = dde.NeumannBC(geotime, func_zero, lambda x, on_boundary: on_boundary and np.isclose(x[0], 0))
+    bc_top = dde.NeumannBC(geotime, func_zero, lambda x, on_boundary: on_boundary and np.isclose(x[1], WIDTH))
+    bc_bottom = dde.NeumannBC(geotime, func_zero, lambda x, on_boundary: on_boundary and np.isclose(x[1], 0))
+    ic = dde.IC(geotime, func_ic, lambda _, on_initial: on_initial)
 
     # Define Training Data
-    data = dde.data.TimePDE(geotime, pde, [],
-                             num_domain=10000, num_boundary=2000, num_initial=4000, num_test=10000)
+    data = dde.data.TimePDE(geotime, pde, [bc_right_edge, bc_left, bc_top, bc_bottom, ic],
+                             num_domain=20000, num_boundary=10000, num_initial=5000, num_test=20000)
     pde_resampler = dde.callbacks.PDEPointResampler(period=50)
 
     # Define Neural Network Architecture and Model
     net = dde.nn.FNN(LAYER_SIZE, ACTIVATION, INITIALIZER)
-    net.apply_output_transform(output_transform)
     model = dde.Model(data, net)
     model.compile(OPTIMIZER, LEARNING_RATE)
 
