@@ -74,7 +74,7 @@ pde_resampler = dde.callbacks.PDEPointResampler(period=50)
 
 # Model Architecture
 layer_size = [3] + [40] * 8 + [1]
-activation = "relu"
+activation = "tanh"
 initializer = "Glorot uniform"
 optimizer = "adam"
 learning_rate = 1e-3
