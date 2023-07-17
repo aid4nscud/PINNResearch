@@ -9,10 +9,10 @@ ALPHA = 1.0
 LENGTH = 1.0
 WIDTH = 1.0
 MAX_TIME = 1.0
-LAYER_SIZE = [3] + [40] * 8 + [1]
-ACTIVATION = "silu"
+LAYER_SIZE = [3] + [20] * 10 + [1]
+ACTIVATION = "relu"
 INITIALIZER = "Glorot uniform"
-OPTIMIZER = "adam"
+OPTIMIZER = "SGD"
 LEARNING_RATE = 1e-3
 ITERATIONS = 10000
 
