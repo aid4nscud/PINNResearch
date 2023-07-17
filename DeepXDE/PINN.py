@@ -14,7 +14,7 @@ ACTIVATION = "relu"
 INITIALIZER = "Glorot uniform"
 OPTIMIZER = "adam"
 LEARNING_RATE = 1e-3
-ITERATIONS = 10000
+ITERATIONS = 100000
 
 def main():
     # Check GPU Availability
@@ -76,23 +76,24 @@ def main():
     residual = residual.reshape(test_x.shape[0], test_y.shape[1], test_t.shape[2])
 
     # Plot and Save Solution
-    animate_solution(predicted_solution, 'pinn_solution.gif', 'Heat equation solution', 'Temperature (K)')
-    animate_solution(residual, 'pinn_residual.gif', 'Residual plot', 'Residual')
+    animate_solution(predicted_solution, 'pinn_solution.gif', 'Heat equation solution', 'Temperature (K)', t_data)
+    animate_solution(residual, 'pinn_residual.gif', 'Residual plot', 'Residual', t_data)
 
-def animate_solution(data, filename, title, label):
+def animate_solution(data, filename, title, label, t_data):
     fig, ax = plt.subplots(figsize=(7, 7))
     im = ax.imshow(data[:, :, 0], origin='lower', cmap='hot', interpolation="bilinear")
     plt.colorbar(im, ax=ax, label=label)
-    ax.set_title(title)
     ax.set_xlabel('x')
     ax.set_ylabel('y')
 
     def updatefig(k):
         im.set_array(data[:, :, k])
+        ax.set_title(f'{title}, t = {t_data[k]:.2f}')  # Update the title with current time step
         return [im]
 
     ani = animation.FuncAnimation(fig, updatefig, frames=range(data.shape[2]), interval=50, blit=True)
     ani.save(filename, writer='pillow')
+
 
 if __name__ == "__main__":
     main()
