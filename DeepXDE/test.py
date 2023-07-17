@@ -43,11 +43,10 @@ def ic(x):
 data = dde.data.TimePDE(
     geomtime,
     pde,
-    [bc],
+    [bc, ic],
     num_domain=NUM_X_POINTS * NUM_Y_POINTS,
     num_boundary=4 * NUM_X_POINTS + 4 * NUM_Y_POINTS,
     num_initial=NUM_X_POINTS * NUM_Y_POINTS,
-    func_ic=ic,
     num_test=NUM_TIMEFRAMES,
 )
 
