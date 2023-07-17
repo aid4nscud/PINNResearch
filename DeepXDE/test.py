@@ -5,20 +5,19 @@ import matplotlib.animation as animation
 import os
 
 # Configuration Parameters
-DIFF_COEF = 0.1
+DIFF_COEF = 1.0
 PLATE_LENGTH = 1.0
 T_FINAL = 1.0
-HOT_EDGE_TEMP = 1.0
-COLD_EDGE_TEMP = -1.0
-INITIAL_TEMP = -1.0
+HOT_EDGE_TEMP = 100.0
+COLD_EDGE_TEMP = 0
+INITIAL_TEMP = 0
 NUM_TIMEFRAMES = 100000
 NUM_X_POINTS = 100
 NUM_Y_POINTS = 100
-OUTPUT_FOLDER = "fdm_results"
 NUM_PLOTS = 100
 
 # Domain definition
-geom = dde.geometry.Rectangle(0, 0, PLATE_LENGTH, PLATE_LENGTH)
+geom = dde.geometry.Rectangle([0, 0], [PLATE_LENGTH, PLATE_LENGTH])
 timedomain = dde.geometry.TimeDomain(0, T_FINAL)
 geomtime = dde.geometry.GeometryXTime(geom, timedomain)
 
