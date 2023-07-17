@@ -29,21 +29,24 @@ def pde(x, y):
     return dy_t - DIFF_COEF * (dy_xx + dy_xx.T)
 
 
-# Boundary conditions
-def bc(x, on_boundary):
-    return on_boundary
+# BCs
+bc_left = dde.DirichletBC(geom, lambda x: 0.0, lambda x, on_boundary: on_boundary and np.isclose(x[0], 0))
+bc_right = dde.DirichletBC(geom, lambda x: 100.0, lambda x, on_boundary: on_boundary and np.isclose(x[0], PLATE_LENGTH))
+bc_top = dde.DirichletBC(geom, lambda x: 0.0, lambda x, on_boundary: on_boundary and np.isclose(x[1], PLATE_LENGTH))
+bc_bottom = dde.DirichletBC(geom, lambda x: 0.0, lambda x, on_boundary: on_boundary and np.isclose(x[1], 0))
 
+bcs = [bc_left, bc_right, bc_top, bc_bottom]
 
-# Initial condition
+# IC
 def ic(x):
-    return INITIAL_TEMP * np.ones_like(x)
+    return np.zeros((len(x), 1))
 
 
 # Define the problem
 data = dde.data.TimePDE(
     geomtime,
     pde,
-    [bc, ic],
+    bcs, ic,
     num_domain=NUM_X_POINTS * NUM_Y_POINTS,
     num_boundary=4 * NUM_X_POINTS + 4 * NUM_Y_POINTS,
     num_initial=NUM_X_POINTS * NUM_Y_POINTS,
