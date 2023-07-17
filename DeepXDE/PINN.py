@@ -12,7 +12,7 @@ MAX_TIME = 1.0
 LAYER_SIZE = [3] + [20] * 10 + [1]
 ACTIVATION = "relu"
 INITIALIZER = "Glorot uniform"
-OPTIMIZER = "RMSProp"
+OPTIMIZER = "sgd"
 LEARNING_RATE = 1e-3
 ITERATIONS = 10000
 
