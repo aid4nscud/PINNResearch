@@ -103,38 +103,39 @@ predicted_solution = predicted_solution.reshape(
 )
 residual = residual.reshape(test_x.shape[0], test_y.shape[1], test_t.shape[2])
 
-# Prepare the figure
+# Plot solution
+fig1, ax1 = plt.subplots(figsize=(7, 7))
+im1 = ax1.imshow(predicted_solution[:, :, 0], origin='lower', cmap='hot', interpolation="bilinear")
+plt.colorbar(im1, ax=ax1, label="Temperature (K)")
+ax1.set_title('Heat equation solution')
+ax1.set_xlabel('x')
+ax1.set_ylabel('y')
 
-fig, ax = plt.subplots(figsize=(6, 6))
+# Define animation update function for solution
+def updatefig1(k):
+    im1.set_array(predicted_solution[:, :, k])
+    return [im1]
 
-# Calculate the global maximum temperature across all frames
-global_max = np.max(predicted_solution)
+# Create animation for solution
+ani1 = animation.FuncAnimation(fig1, updatefig1, frames=range(test_t.shape[2]), interval=50, blit=True)
 
-cmap = plt.get_cmap("hot")
-norm = plt.Normalize(vmin=0, vmax=global_max)
+# Save solution as gif
+ani1.save('pinn_solution.gif', writer='pillow')
 
-# Hold the contour plot in a dictionary
-plots = {}
-plots["contour"] = ax.contourf(test_x[:, :, 0], test_y[:, :, 0], predicted_solution[:, :, 0], cmap=cmap, norm=norm)
-ax.set_xlabel("x")
-ax.set_ylabel("y")
-ax.set_title("Predicted Solution, t={:.2f}".format(t_data[0]))
 
-colorbar = fig.colorbar(plots["contour"], ax=ax)
-cax = colorbar.ax
+# Plot residuals
+fig2, ax2 = plt.subplots(figsize=(7, 7))
+im2 = ax2.imshow(residual[:, :, 0], origin='lower', cmap='hot', interpolation="bilinear")
+plt.colorbar(im2, ax=ax2, label="Residual")
+ax2.set_title('Residual plot')
+ax2.set_xlabel('x')
+ax2.set_ylabel('y')
 
-def update(i):
-    # Remove the previous contours
-    for coll in plots["contour"].collections:
-        coll.remove()
-    # Create new contours
-    plots["contour"] = ax.contourf(test_x[:, :, i], test_y[:, :, i], predicted_solution[:, :, i], cmap=cmap, norm=norm)
-    ax.set_xlabel("x")
-    ax.set_ylabel("y")
-    ax.set_title("Predicted Solution, t={:.2f}".format(t_data[i]))
+# Define animation update function for residual
+def updatefig2(k):
+    im2.set_array(residual[:, :, k])
+    return [im2]
 
-anim = animation.FuncAnimation(fig, update, frames=test_t.shape[2], interval=200)
-# Save the animation as an mp4 file
-
-pillow_writer = PillowWriter(fps=10)  # Adjust fps (frames per second) as needed
-anim.save("pinn_solution.gif", writer=pillow_writer)
+# Create animation for residual
+ani2 = animation.FuncAnimation(fig2, updatefig2, frames=range(test_t.shape[2]), interval=50, blit=True)
+ani2.save('pinn_residual.gif', writer='pillow')
