@@ -77,7 +77,7 @@ layer_size = [3] + [20] * 8 + [1]
 activation = "relu"
 initializer = "Glorot uniform"
 optimizer = "adam"
-learning_rate = 0.0001
+learning_rate = 1e-3
 
 # Compile and Train Model
 net = dde.nn.FNN(layer_size, activation, initializer)
