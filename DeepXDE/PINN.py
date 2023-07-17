@@ -10,9 +10,9 @@ LENGTH = 1.0
 WIDTH = 1.0
 MAX_TIME = 1.0
 LAYER_SIZE = [3] + [20] * 10 + [1]
-ACTIVATION = "relu"
+ACTIVATION = "tanh"
 INITIALIZER = "Glorot uniform"
-OPTIMIZER = "sgd"
+OPTIMIZER = "nadam"
 LEARNING_RATE = 1e-3
 ITERATIONS = 10000
 
