@@ -9,12 +9,12 @@ ALPHA = 1.0
 LENGTH = 1.0
 WIDTH = 1.0
 MAX_TIME = 1.0
-LAYER_SIZE = [3] + [128] * 8 + [1]
+LAYER_SIZE = [3] + [32] * 4 + [1]
 ACTIVATION = "relu"
 INITIALIZER = "Glorot uniform"
 OPTIMIZER = "adam"
 LEARNING_RATE = 5e-4
-ITERATIONS = 20000
+ITERATIONS = 10000
 
 def main():
     # Check GPU Availability
