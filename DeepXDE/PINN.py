@@ -18,7 +18,9 @@ ITERATIONS = 10000
 
 # L-BFGS config
 dde.config.set_default_float("float32")
-dde.optimizers.config.set_LBFGS_options(maxcor=100, ftol=0, gtol=1e-12, maxiter=1000, maxfun=None)
+dde.optimizers.config.set_LBFGS_options(
+    maxcor=100, ftol=0, gtol=1e-12, maxiter=1000, maxfun=None
+)
 
 
 def main():
@@ -93,6 +95,8 @@ def main():
         num_boundary=8000,
         num_initial=4000,
         num_test=2000,
+        train_distribution="pseudo",
+        apply_transform=True,
     )
 
     pde_resampler = dde.callbacks.PDEPointResampler(period=50)
