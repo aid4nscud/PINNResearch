@@ -15,7 +15,10 @@ INITIALIZER = "Glorot uniform"
 OPTIMIZER = "L-BFGS"
 LEARNING_RATE = 1e-4
 ITERATIONS = 10000
+
+# L-BFGS config
 dde.config.set_default_float("float64")
+dde.optimizers.config.set_LBFGS_options(maxcor=100, ftol=0, gtol=1e-08, maxiter=5000, maxfun=None)
 
 
 def main():
