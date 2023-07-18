@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
 # Parameters
-alpha = 1  # Diffusivity
+alpha = 0.1  # Diffusivity
 L = 1.0  # Length of domain
 T = 1  # Time to solve until
 Nx = 100  # Number of spatial points in grid
