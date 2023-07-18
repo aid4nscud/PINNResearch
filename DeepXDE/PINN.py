@@ -60,9 +60,11 @@ def main():
     pde_resampler = dde.callbacks.PDEPointResampler(period=50)
 
     # Define Neural Network Architecture and Model
-    net = dde.nn.FNN(LAYER_SIZE, ACTIVATION, INITIALIZER)
+# Define Neural Network Architecture and Model
+    net = dde.nn.FNN(LAYER_SIZE, ACTIVATION, INITIALIZER, regularization="l2", regularizer_kwargs={"scale": L2_REG})
+
     model = dde.Model(data, net)
-    model.compile(OPTIMIZER, LEARNING_RATE, loss_weights=[1, 1e-4], regularizer=regularizers.l2(L2_REG))  # Regularization
+    model.compile(OPTIMIZER, LEARNING_RATE)  # Regularization
 
     # Normalize inputs and outputs (Step 5)
     model.apply_feature_transform(lambda x: normalize(x, np.array([LENGTH, WIDTH, MAX_TIME])))
