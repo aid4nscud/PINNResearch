@@ -51,8 +51,6 @@ def main():
         geotime,
         func_bc_right_edge,
         lambda _, on_boundary: on_boundary,
-        component=0,
-        weight=10,
     )
     bc_left = dde.NeumannBC(
         geotime,
