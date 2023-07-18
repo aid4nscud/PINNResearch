@@ -13,7 +13,7 @@ LAYER_SIZE = [3] + [64] * 8 + [1]
 ACTIVATION = "relu"
 INITIALIZER = "Glorot uniform"
 OPTIMIZER = "L-BFGS"
-LEARNING_RATE = 1e-3
+LEARNING_RATE = 1e-4
 ITERATIONS = 10000
 
 def main():
@@ -49,7 +49,7 @@ def main():
 
     # Define Training Data
     data = dde.data.TimePDE(geotime, pde, [bc_right_edge, bc_left, bc_top, bc_bottom, ic],
-                             num_domain=16000, num_boundary=4000, num_initial=6000, num_test=2000)
+                             num_domain=8000, num_boundary=2000, num_initial=3000, num_test=1000)
     pde_resampler = dde.callbacks.PDEPointResampler(period=50)
 
     # Define Neural Network Architecture and Model
