@@ -9,7 +9,7 @@ ALPHA = 1.0
 LENGTH = 1.0
 WIDTH = 1.0
 MAX_TIME = 1.0
-LAYER_SIZE = [3] + [96] * 8 + [1]
+LAYER_SIZE = [3] + [112] * 8 + [1]
 ACTIVATION = "relu"
 INITIALIZER = "Glorot uniform"
 OPTIMIZER = "L-BFGS"
@@ -53,7 +53,10 @@ def main():
     bc_right_edge = dde.DirichletBC(
         geotime,
         func_bc_right_edge,
-        lambda _, on_boundary: on_boundary,
+        lambda x, on_boundary: on_boundary
+        and np.isclose(x[0], LENGTH)
+        and not np.isclose(x[1], 0)
+        and not np.isclose(x[1], WIDTH),
     )
     bc_left = dde.NeumannBC(
         geotime,
