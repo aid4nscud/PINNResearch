@@ -9,12 +9,12 @@ ALPHA = 1.0
 LENGTH = 1.0
 WIDTH = 1.0
 MAX_TIME = 1.0
-LAYER_SIZE = [3] + [350] * 4 + [1]
+LAYER_SIZE = [3] + [350] * 3 + [1]
 ACTIVATION = "sin"
 INITIALIZER = "Glorot uniform"
 OPTIMIZER = "adam"
 LEARNING_RATE = 1e-4
-ITERATIONS = 10000
+ITERATIONS = 50000
 
 # L-BFGS config
 dde.config.set_default_float("float32")
