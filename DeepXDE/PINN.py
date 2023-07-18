@@ -3,7 +3,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import tensorflow as tf
-from tensorflow.keras import regularizers
 
 # Configuration Parameters
 ALPHA = 1.0
@@ -16,21 +15,6 @@ INITIALIZER = "Glorot uniform"
 OPTIMIZER = "adam"
 LEARNING_RATE = 1e-4
 ITERATIONS = 10000
-
-class NormalizedNetwork(dde.maps.FNN):
-    def __init__(self, layer_size, activation, kernel_initializer, normalization_constants):
-        self.normalization_constants = normalization_constants
-        super(NormalizedNetwork, self).__init__(layer_size, activation, kernel_initializer)
-
-    def evaluate(self, X):
-        X_normalized = X / self.normalization_constants
-        return super(NormalizedNetwork, self).evaluate(X_normalized)
-
-
-
-def normalize(data, max_value, min_value=0):
-    return (data - min_value) / (max_value - min_value)
-
 
 def main():
     # Check GPU Availability
@@ -57,8 +41,7 @@ def main():
     def func_zero(x):
         return np.zeros_like(x)
 
-
-    bc_right_edge = dde.DirichletBC(geotime, func_bc_right_edge, lambda _, on_boundary: on_boundary)
+    bc_right_edge = dde.DirichletBC(geotime, func_bc_right_edge, lambda _, on_boundary: on_boundary, component=0, weight=10)
     bc_left = dde.NeumannBC(geotime, func_zero, lambda x, on_boundary: on_boundary and np.isclose(x[0], 0) and not np.isclose(x[1], 0) and not np.isclose(x[1], WIDTH))
     bc_top = dde.NeumannBC(geotime, func_zero, lambda x, on_boundary: on_boundary and np.isclose(x[1], WIDTH) and not np.isclose(x[0], 0) and not np.isclose(x[0], LENGTH))
     bc_bottom = dde.NeumannBC(geotime, func_zero, lambda x, on_boundary: on_boundary and np.isclose(x[1], 0) and not np.isclose(x[0], 0) and not np.isclose(x[0], LENGTH))
@@ -66,18 +49,14 @@ def main():
 
     # Define Training Data
     data = dde.data.TimePDE(geotime, pde, [bc_right_edge, bc_left, bc_top, bc_bottom, ic],
-                             num_domain=8000, num_boundary=3000, num_initial=4000, num_test=1000)
+                             num_domain=8000, num_boundary=3000, num_initial=2000, num_test=1000)
     
     pde_resampler = dde.callbacks.PDEPointResampler(period=50)
 
     # Define Neural Network Architecture and Model
-    net = NormalizedNetwork(LAYER_SIZE, ACTIVATION, INITIALIZER, np.array([LENGTH, WIDTH, MAX_TIME]))
+    net = dde.nn.FNN(LAYER_SIZE, ACTIVATION, INITIALIZER)
     model = dde.Model(data, net)
-    model.compile(OPTIMIZER, LEARNING_RATE)  # Regularization
-
-    # Normalize inputs and outputs (Step 5)
-    model.apply_feature_transform(lambda x: normalize(x, np.array([LENGTH, WIDTH, MAX_TIME])))
-    model.apply_output_transform(lambda x: x * 100) # Assuming the output is temperature in Kelvin
+    model.compile(OPTIMIZER, LEARNING_RATE)
 
 
     # Train Model
