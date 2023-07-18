@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import tensorflow as tf
+from tensorflow.keras import regularizers
 
 # Configuration Parameters
 ALPHA = 1.0
@@ -15,6 +16,10 @@ INITIALIZER = "Glorot uniform"
 OPTIMIZER = "adam"
 LEARNING_RATE = 1e-4
 ITERATIONS = 10000
+L2_REG = 1e-4  # Regularization factor
+
+def normalize(data, max_value, min_value=0):
+    return (data - min_value) / (max_value - min_value)
 
 def main():
     # Check GPU Availability
@@ -57,7 +62,11 @@ def main():
     # Define Neural Network Architecture and Model
     net = dde.nn.FNN(LAYER_SIZE, ACTIVATION, INITIALIZER)
     model = dde.Model(data, net)
-    model.compile(OPTIMIZER, LEARNING_RATE)
+    model.compile(OPTIMIZER, LEARNING_RATE, loss_weights=[1, 1e-4], regularizer=regularizers.l2(L2_REG))  # Regularization
+
+    # Normalize inputs and outputs (Step 5)
+    model.apply_feature_transform(lambda x: normalize(x, np.array([LENGTH, WIDTH, MAX_TIME])))
+    model.apply_output_transform(lambda x: x * 100) # Assuming the output is temperature in Kelvin
 
 
     # Train Model
