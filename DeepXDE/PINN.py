@@ -40,8 +40,14 @@ def main():
         return np.zeros((len(x), 1))
     def func_zero(x):
         return np.zeros_like(x)
+    
+    def weighted_loss(y_true, y_pred, norm):
+        loss = dde.losses.L2Norm(norm)(y_true, y_pred)
+        weight = 10  # Choose an appropriate weight
+        return weight * loss
 
-    bc_right_edge = dde.DirichletBC(geotime, func_bc_right_edge, lambda _, on_boundary: on_boundary, component=0, weight=10)
+    bc_right_edge = dde.DirichletBC(geotime, func_bc_right_edge, lambda _, on_boundary: on_boundary, component=0, 
+                                func_loss=weighted_loss)
     bc_left = dde.NeumannBC(geotime, func_zero, lambda x, on_boundary: on_boundary and np.isclose(x[0], 0) and not np.isclose(x[1], 0) and not np.isclose(x[1], WIDTH))
     bc_top = dde.NeumannBC(geotime, func_zero, lambda x, on_boundary: on_boundary and np.isclose(x[1], WIDTH) and not np.isclose(x[0], 0) and not np.isclose(x[0], LENGTH))
     bc_bottom = dde.NeumannBC(geotime, func_zero, lambda x, on_boundary: on_boundary and np.isclose(x[1], 0) and not np.isclose(x[0], 0) and not np.isclose(x[0], LENGTH))
