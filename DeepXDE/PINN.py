@@ -13,7 +13,7 @@ LAYER_SIZE = [3] + [32] * 4 + [1]
 ACTIVATION = "tanh"
 INITIALIZER = "Glorot uniform"
 OPTIMIZER = "adam"
-LEARNING_RATE = 1e-3
+LEARNING_RATE = 1e-2
 ITERATIONS = 10000
 
 def main():
