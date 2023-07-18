@@ -13,7 +13,7 @@ LAYER_SIZE = [3] + [96] * 6 + [1]
 ACTIVATION = "relu"
 INITIALIZER = "Glorot uniform"
 OPTIMIZER = "adam"
-LEARNING_RATE = 5e-4
+LEARNING_RATE = 1e-4
 ITERATIONS = 100000
 
 def main():
