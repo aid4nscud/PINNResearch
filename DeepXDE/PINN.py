@@ -22,8 +22,11 @@ class NormalizedNetwork(dde.maps.FNN):
         self.normalization_constants = normalization_constants
         super(NormalizedNetwork, self).__init__(layer_size, activation, kernel_initializer)
 
-    def apply_feature_transform(self, X):
-        return X / self.normalization_constants
+    def evaluate(self, X):
+        X_normalized = X / self.normalization_constants
+        return super(NormalizedNetwork, self).evaluate(X_normalized)
+
+
 
 def normalize(data, max_value, min_value=0):
     return (data - min_value) / (max_value - min_value)
@@ -68,9 +71,7 @@ def main():
     pde_resampler = dde.callbacks.PDEPointResampler(period=50)
 
     # Define Neural Network Architecture and Model
-    # Define Neural Network Architecture and Model
     net = NormalizedNetwork(LAYER_SIZE, ACTIVATION, INITIALIZER, np.array([LENGTH, WIDTH, MAX_TIME]))
-
     model = dde.Model(data, net)
     model.compile(OPTIMIZER, LEARNING_RATE)  # Regularization
 
