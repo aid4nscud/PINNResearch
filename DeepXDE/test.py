@@ -35,7 +35,7 @@ bc_right = dde.DirichletBC(geom, lambda x: 100.0, lambda x, on_boundary: on_boun
 bc_top = dde.DirichletBC(geom, lambda x: 0.0, lambda x, on_boundary: on_boundary and np.isclose(x[1], PLATE_LENGTH))
 bc_bottom = dde.DirichletBC(geom, lambda x: 0.0, lambda x, on_boundary: on_boundary and np.isclose(x[1], 0))
 
-bcs = [bc_left, bc_right, bc_top, bc_bottom]
+conditions = [bc_left, bc_right, bc_top, bc_bottom, ic]
 
 # IC
 def ic(x):
@@ -46,7 +46,7 @@ def ic(x):
 data = dde.data.TimePDE(
     geomtime,
     pde,
-    bcs, ic,
+    conditions, 
     num_domain=NUM_X_POINTS * NUM_Y_POINTS,
     num_boundary=4 * NUM_X_POINTS + 4 * NUM_Y_POINTS,
     num_initial=NUM_X_POINTS * NUM_Y_POINTS,
