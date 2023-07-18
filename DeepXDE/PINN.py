@@ -55,7 +55,7 @@ def main():
     # Define Neural Network Architecture and Model
     net = dde.nn.FNN(LAYER_SIZE, ACTIVATION, INITIALIZER)
     model = dde.Model(data, net)
-    model.compile("L-BFGS-B", {"maxiter": 10000, "gtol": 1e-7, "ftol": 1e-6})
+    model.compile("L-BFGS-B", {"maxiter": 10000, "gtol": 1e-6, "ftol": 1e-7})
 
 
     # Train Model
@@ -80,9 +80,9 @@ def main():
     animate_solution(predicted_solution, 'pinn_solution.gif', 'Heat equation solution', 'Temperature (K)', t_data)
     animate_solution(residual, 'pinn_residual.gif', 'Residual plot', 'Residual', t_data)
 
-def animate_solution(data, filename, title, label, t_data):
+def animate_solution(data, filename, title, label, t_data, x_data, y_data):
     fig, ax = plt.subplots(figsize=(7, 7))
-    im = ax.imshow(data[:, :, 0], origin='lower', cmap='hot', interpolation="bilinear")
+    im = ax.imshow(data[:, :, 0], origin='lower', cmap='hot', interpolation="bilinear", extent=[x_data.min(), x_data.max(), y_data.min(), y_data.max()])
     plt.colorbar(im, ax=ax, label=label)
     ax.set_xlabel('x')
     ax.set_ylabel('y')
