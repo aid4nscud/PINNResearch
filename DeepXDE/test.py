@@ -24,7 +24,7 @@ def main():
     print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices("GPU")))
 
     # Define Domain
-    geom = dde.geometry.Rectangle([0, 0], [plate_length, plate_length])
+    geom = dde.geometry.Rectangle(0, 0, plate_length, plate_length)
     timedomain = dde.geometry.TimeDomain(0, t_final)
     geotime = dde.geometry.GeometryXTime(geom, timedomain)
 
@@ -37,20 +37,25 @@ def main():
         return du_t - diff_coef * (du_xx + du_yy)
 
     # Define Boundary Conditions
-    def bc_hot(x, on_boundary):
-        return on_boundary and dde.is_close(x[0], plate_length)
+    def bc_hot(_, on_boundary):
+        return on_boundary and dde.is_close(_, plate_length)
 
-    def bc_cold(x, on_boundary):
-        return on_boundary and not (dde.is_close(x[0], 0) or dde.is_close(x[0], plate_length))
+    def bc_cold(_, on_boundary):
+        return on_boundary and not (dde.is_close(_, 0) or dde.is_close(_, plate_length))
+
+    bc_right_edge = dde.DirichletBC(geotime, lambda X: 100.0, bc_hot)
+    bc_left = dde.NeumannBC(geotime, lambda X: 0.0, bc_cold)
+    bc_top = dde.NeumannBC(geotime, lambda X: 0.0, bc_cold)
+    bc_bottom = dde.NeumannBC(geotime, lambda X: 0.0, bc_cold)
+    bcs = [bc_right_edge, bc_left, bc_top, bc_bottom]
 
     # Define Training Data
     data = dde.data.TimePDE(
-        geotime, pde, [bc_hot], num_domain=density_collocation, num_boundary=density_boundary)
-    ic = dde.IC(geotime, func_ic, lambda _, on_initial: on_initial)
+        geotime, pde, bcs, num_domain=density_collocation, num_boundary=density_boundary)
 
     # Define Neural Network Architecture and Model
     net = dde.nn.FNN(layer_size, activation, initializer)
-    model = dde.Model(data, net, ic)
+    model = dde.Model(data, net)
     model.compile(optimizer, learning_rate)
 
     # Train Model
@@ -74,10 +79,6 @@ def main():
     # Plot and Save Solution
     animate_solution(predicted_solution, 'pinn_solution.gif', 'Heat equation solution', 'Temperature (K)', t_data)
     animate_solution(residual, 'pinn_residual.gif', 'Residual plot', 'Residual', t_data)
-
-
-def func_ic(x):
-    return np.zeros((len(x), 1))
 
 
 def animate_solution(data, filename, title, label, t_data):
