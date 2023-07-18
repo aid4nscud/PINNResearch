@@ -41,7 +41,7 @@ def main():
     def func_zero(x):
         return np.zeros_like(x)
 
-    bc_right_edge = dde.DirichletBC(geotime, func_bc_right_edge, lambda _, on_boundary: on_boundary)
+    bc_right_edge = dde.DirichletBC(geotime, func_bc_right_edge, lambda _, on_boundary: on_boundary, component=0, weight=10)
     bc_left = dde.NeumannBC(geotime, func_zero, lambda x, on_boundary: on_boundary and np.isclose(x[0], 0) and not np.isclose(x[1], 0) and not np.isclose(x[1], WIDTH))
     bc_top = dde.NeumannBC(geotime, func_zero, lambda x, on_boundary: on_boundary and np.isclose(x[1], WIDTH) and not np.isclose(x[0], 0) and not np.isclose(x[0], LENGTH))
     bc_bottom = dde.NeumannBC(geotime, func_zero, lambda x, on_boundary: on_boundary and np.isclose(x[1], 0) and not np.isclose(x[0], 0) and not np.isclose(x[0], LENGTH))
@@ -49,7 +49,7 @@ def main():
 
     # Define Training Data
     data = dde.data.TimePDE(geotime, pde, [bc_right_edge, bc_left, bc_top, bc_bottom, ic],
-                             num_domain=16000, num_boundary=6000, num_initial=8000, num_test=2000)
+                             num_domain=8000, num_boundary=3000, num_initial=4000, num_test=1000)
     
     pde_resampler = dde.callbacks.PDEPointResampler(period=50)
 
