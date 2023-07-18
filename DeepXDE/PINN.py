@@ -9,7 +9,7 @@ ALPHA = 1.0
 LENGTH = 1.0
 WIDTH = 1.0
 MAX_TIME = 1.0
-LAYER_SIZE = [3] + [96] * 8 + [1]
+LAYER_SIZE = [3] + [360] * 4 + [1]
 ACTIVATION = "relu"
 INITIALIZER = "Glorot uniform"
 OPTIMIZER = "L-BFGS"
@@ -50,6 +50,7 @@ def main():
     # Define Training Data
     data = dde.data.TimePDE(geotime, pde, [bc_right_edge, bc_left, bc_top, bc_bottom, ic],
                              num_domain=8000, num_boundary=2000, num_initial=3000, num_test=1000)
+    
     pde_resampler = dde.callbacks.PDEPointResampler(period=50)
 
     # Define Neural Network Architecture and Model
@@ -80,9 +81,9 @@ def main():
     animate_solution(predicted_solution, 'pinn_solution.gif', 'Heat equation solution', 'Temperature (K)', t_data)
     animate_solution(residual, 'pinn_residual.gif', 'Residual plot', 'Residual', t_data)
 
-def animate_solution(data, filename, title, label, t_data, x_data, y_data):
+def animate_solution(data, filename, title, label, t_data):
     fig, ax = plt.subplots(figsize=(7, 7))
-    im = ax.imshow(data[:, :, 0], origin='lower', cmap='hot', interpolation="bilinear", extent=[x_data.min(), x_data.max(), y_data.min(), y_data.max()])
+    im = ax.imshow(data[:, :, 0], origin='lower', cmap='hot', interpolation="bilinear", extent=[0, LENGTH, 0, LENGTH])
     plt.colorbar(im, ax=ax, label=label)
     ax.set_xlabel('x')
     ax.set_ylabel('y')
