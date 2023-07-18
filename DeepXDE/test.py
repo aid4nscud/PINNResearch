@@ -34,12 +34,13 @@ bc_left = dde.DirichletBC(geom, lambda x: 0.0, lambda x, on_boundary: on_boundar
 bc_right = dde.DirichletBC(geom, lambda x: 100.0, lambda x, on_boundary: on_boundary and np.isclose(x[0], PLATE_LENGTH))
 bc_top = dde.DirichletBC(geom, lambda x: 0.0, lambda x, on_boundary: on_boundary and np.isclose(x[1], PLATE_LENGTH))
 bc_bottom = dde.DirichletBC(geom, lambda x: 0.0, lambda x, on_boundary: on_boundary and np.isclose(x[1], 0))
-
-conditions = [bc_left, bc_right, bc_top, bc_bottom, ic]
-
 # IC
 def ic(x):
     return np.zeros((len(x), 1))
+
+conditions = [bc_left, bc_right, bc_top, bc_bottom, ic]
+
+
 
 
 # Define the problem
