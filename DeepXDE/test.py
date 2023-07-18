@@ -37,16 +37,16 @@ def main():
         return du_t - diff_coef * (du_xx + du_yy)
 
     # Define Boundary Conditions
-    def bc_hot(X, on_boundary):
-        return np.logical_and(on_boundary, np.isclose(X[:, 0], plate_length))
+    def bc_hot(x, on_boundary):
+        return np.logical_and(on_boundary, np.isclose(x[:, 0], plate_length))
 
-    def bc_cold(X, on_boundary):
-        return np.logical_and(on_boundary, ~np.logical_or(np.isclose(X[:, 0], 0), np.isclose(X[:, 0], plate_length)))
+    def bc_cold(x, on_boundary):
+        return np.logical_and(on_boundary, ~np.logical_or(np.isclose(x[:, 0], 0), np.isclose(x[:, 0], plate_length)))
 
-    bc_right_edge = dde.DirichletBC(geotime, lambda X: 100.0, bc_hot)
-    bc_left = dde.NeumannBC(geotime, lambda X: 0.0, bc_cold)
-    bc_top = dde.NeumannBC(geotime, lambda X: 0.0, bc_cold)
-    bc_bottom = dde.NeumannBC(geotime, lambda X: 0.0, bc_cold)
+    bc_right_edge = dde.DirichletBC(geotime, lambda x: 100.0, bc_hot)
+    bc_left = dde.NeumannBC(geotime, lambda x: 0.0, bc_cold)
+    bc_top = dde.NeumannBC(geotime, lambda x: 0.0, bc_cold)
+    bc_bottom = dde.NeumannBC(geotime, lambda x: 0.0, bc_cold)
     bcs = [bc_right_edge, bc_left, bc_top, bc_bottom]
 
     # Define Training Data
