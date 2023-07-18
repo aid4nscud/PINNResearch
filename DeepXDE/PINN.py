@@ -55,7 +55,8 @@ def main():
     # Define Neural Network Architecture and Model
     net = dde.nn.FNN(LAYER_SIZE, ACTIVATION, INITIALIZER)
     model = dde.Model(data, net)
-    model.compile(OPTIMIZER, LEARNING_RATE)
+    model.compile("L-BFGS-B", {"maxiter": 10000, "gtol": 1e-6, "ftol": 1e-6})
+
 
     # Train Model
     model.train(iterations=ITERATIONS, callbacks=[pde_resampler])
