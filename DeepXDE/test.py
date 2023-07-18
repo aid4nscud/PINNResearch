@@ -24,7 +24,7 @@ def main():
     print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices("GPU")))
 
     # Define Domain
-    geom = dde.geometry.Rectangle(0, 0, plate_length, plate_length)
+    geom = dde.geometry.Rectangle([0, 0], [plate_length, plate_length])
     timedomain = dde.geometry.TimeDomain(0, t_final)
     geotime = dde.geometry.GeometryXTime(geom, timedomain)
 
