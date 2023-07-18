@@ -14,7 +14,7 @@ ACTIVATION = "relu"
 INITIALIZER = "Glorot uniform"
 OPTIMIZER = "adam"
 LEARNING_RATE = 5e-4
-ITERATIONS = 10000
+ITERATIONS = 100000
 
 def main():
     # Check GPU Availability
