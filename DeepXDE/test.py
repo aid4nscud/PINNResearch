@@ -38,10 +38,10 @@ def main():
 
     # Define Boundary Conditions
     def bc_hot(_, on_boundary):
-        return on_boundary and dde.is_close(_, plate_length)
+        return on_boundary and np.isclose(_, plate_length)
 
     def bc_cold(_, on_boundary):
-        return on_boundary and not (dde.is_close(_, 0) or dde.is_close(_, plate_length))
+        return on_boundary and not (np.isclose(_, 0) or np.isclose(_, plate_length))
 
     bc_right_edge = dde.DirichletBC(geotime, lambda X: 100.0, bc_hot)
     bc_left = dde.NeumannBC(geotime, lambda X: 0.0, bc_cold)
