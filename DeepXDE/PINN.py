@@ -9,8 +9,8 @@ ALPHA = 1.0
 LENGTH = 1.0
 WIDTH = 1.0
 MAX_TIME = 1.0
-LAYER_SIZE = [3] + [96] * 8 + [1]
-ACTIVATION = "relu"
+LAYER_SIZE = [3] + [350] * 4 + [1]
+ACTIVATION = "sin"
 INITIALIZER = "Glorot uniform"
 OPTIMIZER = "L-BFGS"
 LEARNING_RATE = 1e-4
@@ -95,8 +95,6 @@ def main():
         num_boundary=8000,
         num_initial=4000,
         num_test=2000,
-        train_distribution="pseudo",
-        apply_transform=True,
     )
 
     pde_resampler = dde.callbacks.PDEPointResampler(period=50)
