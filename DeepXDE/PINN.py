@@ -9,10 +9,10 @@ ALPHA = 1.0
 LENGTH = 1.0
 WIDTH = 1.0
 MAX_TIME = 1.0
-LAYER_SIZE = [3] + [64] * 16 + [1]
-ACTIVATION = "relu"
+LAYER_SIZE = [3] + [32] * 4 + [1]
+ACTIVATION = "tanh"
 INITIALIZER = "Glorot uniform"
-OPTIMIZER = "L-BFGS"
+OPTIMIZER = "adam"
 LEARNING_RATE = 1e-3
 ITERATIONS = 10000
 
@@ -56,7 +56,7 @@ def main():
     # Define Neural Network Architecture and Model
     net = dde.nn.FNN(LAYER_SIZE, ACTIVATION, INITIALIZER)
     model = dde.Model(data, net)
-    model.compile("L-BFGS-B", {"maxiter": 1000, "gtol": 1e-6, "ftol": 1e-6})
+    model.compile(OPTIMIZER, LEARNING_RATE)
 
 
     # Train Model
