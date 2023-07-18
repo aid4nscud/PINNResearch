@@ -49,7 +49,7 @@ def main():
 
     # Define Training Data
     data = dde.data.TimePDE(geotime, pde, [bc_right_edge, bc_left, bc_top, bc_bottom, ic],
-                             num_domain=8000, num_boundary=4000, num_initial=2000, num_test=1000)
+                             num_domain=16000, num_boundary=6000, num_initial=8000, num_test=2000)
     
     pde_resampler = dde.callbacks.PDEPointResampler(period=50)
 
