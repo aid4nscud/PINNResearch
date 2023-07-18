@@ -16,4 +16,4 @@ export DDE_BACKEND=tensorflow
 conda activate tf-gpu
 
 # Run the Python script
-python3 FDM.py
+python3 PINN.py
