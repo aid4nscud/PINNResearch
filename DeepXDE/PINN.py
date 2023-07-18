@@ -9,7 +9,7 @@ ALPHA = 1.0
 LENGTH = 1.0
 WIDTH = 1.0
 MAX_TIME = 1.0
-LAYER_SIZE = [3] + [112] * 8 + [1]
+LAYER_SIZE = [3] + [96] * 8 + [1]
 ACTIVATION = "relu"
 INITIALIZER = "Glorot uniform"
 OPTIMIZER = "L-BFGS"
@@ -18,7 +18,7 @@ ITERATIONS = 10000
 
 # L-BFGS config
 dde.config.set_default_float("float32")
-dde.optimizers.config.set_LBFGS_options(maxcor=100, ftol=0, gtol=1e-12, maxiter=1000, maxfun=None)
+dde.optimizers.config.set_LBFGS_options(maxcor=200, ftol=0, gtol=1e-12, maxiter=1000, maxfun=None)
 
 
 def main():
