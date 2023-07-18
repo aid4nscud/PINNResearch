@@ -32,7 +32,6 @@ def main():
         du_xx = tf.gradients(du_x, X)[0][:, 0:1]
         du_yy = tf.gradients(du_y, X)[0][:, 1:2]
         return du_t - ALPHA * (du_xx + du_yy)
-    
 
     # Define Boundary Conditions
     def func_bc_right_edge(x):
@@ -43,14 +42,14 @@ def main():
         return np.zeros_like(x)
 
     bc_right_edge = dde.DirichletBC(geotime, func_bc_right_edge, lambda _, on_boundary: on_boundary)
-    bc_left = dde.NeumannBC(geotime, func_zero, lambda x, on_boundary: on_boundary and np.isclose(x[0], 0))
-    bc_top = dde.NeumannBC(geotime, func_zero, lambda x, on_boundary: on_boundary and np.isclose(x[1], WIDTH))
-    bc_bottom = dde.NeumannBC(geotime, func_zero, lambda x, on_boundary: on_boundary and np.isclose(x[1], 0))
+    bc_left = dde.NeumannBC(geotime, func_zero, lambda x, on_boundary: on_boundary and np.isclose(x[0], 0) and not np.isclose(x[1], 0) and not np.isclose(x[1], WIDTH))
+    bc_top = dde.NeumannBC(geotime, func_zero, lambda x, on_boundary: on_boundary and np.isclose(x[1], WIDTH) and not np.isclose(x[0], 0) and not np.isclose(x[0], LENGTH))
+    bc_bottom = dde.NeumannBC(geotime, func_zero, lambda x, on_boundary: on_boundary and np.isclose(x[1], 0) and not np.isclose(x[0], 0) and not np.isclose(x[0], LENGTH))
     ic = dde.IC(geotime, func_ic, lambda _, on_initial: on_initial)
 
     # Define Training Data
     data = dde.data.TimePDE(geotime, pde, [bc_right_edge, bc_left, bc_top, bc_bottom, ic],
-                             num_domain=20000, num_boundary=10000, num_initial=5000, num_test=20000, exclusions=geotime.vertices)
+                             num_domain=20000, num_boundary=10000, num_initial=5000, num_test=20000)
     pde_resampler = dde.callbacks.PDEPointResampler(period=50)
 
     # Define Neural Network Architecture and Model
