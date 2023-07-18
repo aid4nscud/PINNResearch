@@ -12,7 +12,7 @@ MAX_TIME = 1.0
 LAYER_SIZE = [3] + [32] * 8 + [1]
 ACTIVATION = "tanh"
 INITIALIZER = "Glorot uniform"
-OPTIMIZER = "adam"
+OPTIMIZER = "L-BFGS"
 LEARNING_RATE = 1e-3
 ITERATIONS = 10000
 
