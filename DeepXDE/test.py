@@ -4,22 +4,19 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import tensorflow as tf
 
-FLAGS = tf.app.flags.FLAGS
-
 # Configuration Parameters
-FLAGS.diff_coef = 1.0
-FLAGS.plate_length = 1.0
-FLAGS.t_final = 1.0
-FLAGS.density_collocation = 20000
-FLAGS.density_boundary = 10000
-FLAGS.density_initial = 5000
-FLAGS.density_test = 20000
-FLAGS.layer_size = [3] + [32] * 8 + [1]
-FLAGS.activation = "tanh"
-FLAGS.initializer = "Glorot uniform"
-FLAGS.optimizer = "adam"
-FLAGS.learning_rate = 1e-3
-FLAGS.iterations = 10000
+diff_coef = 1.0
+plate_length = 1.0
+t_final = 1.0
+density_collocation = 20000
+density_boundary = 10000
+
+layer_size = [3] + [32] * 8 + [1]
+activation = "tanh"
+initializer = "Glorot uniform"
+optimizer = "adam"
+learning_rate = 1e-3
+iterations = 10000
 
 
 def main():
@@ -27,8 +24,8 @@ def main():
     print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices("GPU")))
 
     # Define Domain
-    geom = dde.geometry.Rectangle(0, 0, FLAGS.plate_length, FLAGS.plate_length)
-    timedomain = dde.geometry.TimeDomain(0, FLAGS.t_final)
+    geom = dde.geometry.Rectangle(0, 0, plate_length, plate_length)
+    timedomain = dde.geometry.TimeDomain(0, t_final)
     geotime = dde.geometry.GeometryXTime(geom, timedomain)
 
     # Define PDE
@@ -37,32 +34,32 @@ def main():
         du_x, du_y, du_t = du_X[:, 0:1], du_X[:, 1:2], du_X[:, 2:3]
         du_xx = tf.gradients(du_x, X)[0][:, 0:1]
         du_yy = tf.gradients(du_y, X)[0][:, 1:2]
-        return du_t - FLAGS.diff_coef * (du_xx + du_yy)
+        return du_t - diff_coef * (du_xx + du_yy)
 
     # Define Boundary Conditions
     def bc_hot(x, on_boundary):
-        return on_boundary and dde.is_close(x[0], FLAGS.plate_length)
+        return on_boundary and dde.is_close(x[0], plate_length)
 
     def bc_cold(x, on_boundary):
-        return on_boundary and not (dde.is_close(x[0], 0) or dde.is_close(x[0], FLAGS.plate_length))
+        return on_boundary and not (dde.is_close(x[0], 0) or dde.is_close(x[0], plate_length))
 
     # Define Training Data
     data = dde.data.TimePDE(
-        geotime, pde, [bc_hot], num_domain=FLAGS.density_collocation, num_boundary=FLAGS.density_boundary)
+        geotime, pde, [bc_hot], num_domain=density_collocation, num_boundary=density_boundary)
     ic = dde.IC(geotime, func_ic, lambda _, on_initial: on_initial)
 
     # Define Neural Network Architecture and Model
-    net = dde.nn.FNN(FLAGS.layer_size, FLAGS.activation, FLAGS.initializer)
+    net = dde.nn.FNN(layer_size, activation, initializer)
     model = dde.Model(data, net, ic)
-    model.compile(FLAGS.optimizer, FLAGS.learning_rate)
+    model.compile(optimizer, learning_rate)
 
     # Train Model
-    model.train(iterations=FLAGS.iterations)
+    model.train(iterations=iterations)
 
     # Generate Test Data
-    x_data = np.linspace(0, FLAGS.plate_length, num=100)
-    y_data = np.linspace(0, FLAGS.plate_length, num=100)
-    t_data = np.linspace(0, FLAGS.t_final, num=100)
+    x_data = np.linspace(0, plate_length, num=100)
+    y_data = np.linspace(0, plate_length, num=100)
+    t_data = np.linspace(0, t_final, num=100)
     test_x, test_y, test_t = np.meshgrid(x_data, y_data, t_data)
     test_domain = np.vstack((np.ravel(test_x), np.ravel(test_y), np.ravel(test_t))).T
 
