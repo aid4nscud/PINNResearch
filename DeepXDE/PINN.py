@@ -16,7 +16,6 @@ INITIALIZER = "Glorot uniform"
 OPTIMIZER = "adam"
 LEARNING_RATE = 1e-4
 ITERATIONS = 10000
-L2_REG = 1e-4  # Regularization factor
 
 def normalize(data, max_value, min_value=0):
     return (data - min_value) / (max_value - min_value)
@@ -61,7 +60,7 @@ def main():
 
     # Define Neural Network Architecture and Model
 # Define Neural Network Architecture and Model
-    net = dde.nn.FNN(LAYER_SIZE, ACTIVATION, INITIALIZER, regularization="l2", regularizer_kwargs={"scale": L2_REG})
+    net = dde.nn.FNN(LAYER_SIZE, ACTIVATION, INITIALIZER, regularization="l2")
 
     model = dde.Model(data, net)
     model.compile(OPTIMIZER, LEARNING_RATE)  # Regularization
