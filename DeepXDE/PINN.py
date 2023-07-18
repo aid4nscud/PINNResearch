@@ -9,11 +9,11 @@ ALPHA = 1.0
 LENGTH = 1.0
 WIDTH = 1.0
 MAX_TIME = 1.0
-LAYER_SIZE = [3] + [96] * 8 + [1]
+LAYER_SIZE = [3] + [64] * 8 + [1]
 ACTIVATION = "relu"
 INITIALIZER = "Glorot uniform"
 OPTIMIZER = "L-BFGS"
-LEARNING_RATE = 1e-4
+LEARNING_RATE = 1e-3
 ITERATIONS = 10000
 
 def main():
