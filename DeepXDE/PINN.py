@@ -14,7 +14,7 @@ ACTIVATION = "relu"
 INITIALIZER = "Glorot uniform"
 OPTIMIZER = "adam"
 LEARNING_RATE = 1e-4
-ITERATIONS = 100000
+ITERATIONS = 10000
 
 def main():
     # Check GPU Availability
@@ -49,7 +49,7 @@ def main():
 
     # Define Training Data
     data = dde.data.TimePDE(geotime, pde, [bc_right_edge, bc_left, bc_top, bc_bottom, ic],
-                             num_domain=8000, num_boundary=2000, num_initial=3000, num_test=1000)
+                             num_domain=8000, num_boundary=4000, num_initial=2000, num_test=1000)
     
     pde_resampler = dde.callbacks.PDEPointResampler(period=50)
 
