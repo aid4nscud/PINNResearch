@@ -9,7 +9,7 @@ ALPHA = 1.0
 LENGTH = 1.0
 WIDTH = 1.0
 MAX_TIME = 1.0
-LAYER_SIZE = [3] + [128] * 8 + [1]
+LAYER_SIZE = [3] + [100] * 4 + [1]
 ACTIVATION = "tanh"
 INITIALIZER = "Glorot uniform"
 OPTIMIZER = "adam"
@@ -28,7 +28,7 @@ LOSS WEIGHTS
 
 """
 
-LOSS_WEIGHTS = [1, 10, 1, 1, 1, 1]
+LOSS_WEIGHTS = [1, 10, 1, 1, 1, 10]
 
 
 def main():
