@@ -115,8 +115,8 @@ def main():
 
 
     # Train Model
-    early_stopping = dde.callbacks.EarlyStopping(min_delta=5e-8, patience=1000)
-    model.train(iterations=ITERATIONS, callbacks=[pde_resampler, early_stopping])
+    # early_stopping = dde.callbacks.EarlyStopping(min_delta=5e-8, patience=1000)
+    model.train(iterations=ITERATIONS, callbacks=[pde_resampler])
 
 
     # Generate Test Data
