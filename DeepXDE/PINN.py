@@ -10,7 +10,7 @@ LENGTH = 1.0
 WIDTH = 1.0
 MAX_TIME = 1.0
 LAYER_SIZE = [3] + [128] * 8 + [1]
-ACTIVATION = "swish"
+ACTIVATION = "tanh"
 INITIALIZER = "Glorot uniform"
 OPTIMIZER = "adam"
 LEARNING_RATE = 1e-4
@@ -96,10 +96,14 @@ def main():
     # Define Neural Network Architecture and Model
     net = dde.nn.FNN(LAYER_SIZE, ACTIVATION, INITIALIZER)
     model = dde.Model(data, net)
-    model.compile(OPTIMIZER, LEARNING_RATE)
+    model = dde.Model(data, net)
+    model.compile(OPTIMIZER, LEARNING_RATE, loss_weights=[1, 10, 10, 0, 1])
+
 
     # Train Model
-    model.train(iterations=ITERATIONS, callbacks=[pde_resampler])
+    early_stopping = dde.callbacks.EarlyStopping(min_delta=1e-7, patience=1000)
+    model.train(iterations=ITERATIONS, callbacks=[pde_resampler, early_stopping])
+
 
     # Generate Test Data
     x_data = np.linspace(0, LENGTH, num=100)
