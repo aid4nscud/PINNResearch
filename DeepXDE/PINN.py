@@ -16,6 +16,20 @@ OPTIMIZER = "adam"
 LEARNING_RATE = 1e-4
 ITERATIONS = 5000
 
+"""
+LOSS WEIGHTS
+
+1. Weight for loss on domain points, ensuring PDE is satisfied.
+2. Weight for loss on right edge boundary condition (temperature = 100 Kelvin).
+3. Weight for loss on left edge boundary condition (zero gradient).
+4. Weight for loss on top edge boundary condition (zero gradient).
+5. Weight for loss on bottom edge boundary condition (zero gradient).
+6. Weight for loss on initial condition points, enforcing initial system conditions.
+
+"""
+
+LOSS_WEIGHTS = [1, 10, 1, 1, 1, 1]
+
 
 def main():
     # Check GPU Availability
@@ -85,10 +99,10 @@ def main():
         geotime,
         pde,
         [bc_right_edge, bc_left, bc_top, bc_bottom, ic],
-        num_domain=16000,
-        num_boundary=8000,
-        num_initial=8000,
-        num_test=2000,
+        num_domain=1000,
+        num_boundary=400,
+        num_initial=300,
+        num_test=100,
     )
 
     pde_resampler = dde.callbacks.PDEPointResampler(period=50)
@@ -97,7 +111,7 @@ def main():
     net = dde.nn.FNN(LAYER_SIZE, ACTIVATION, INITIALIZER)
     model = dde.Model(data, net)
     model = dde.Model(data, net)
-    model.compile(OPTIMIZER, LEARNING_RATE, loss_weights=[1, 10, 10, 0, 1])
+    model.compile(OPTIMIZER, LEARNING_RATE, loss_weights=LOSS_WEIGHTS)
 
 
     # Train Model
