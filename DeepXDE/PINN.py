@@ -12,7 +12,7 @@ WIDTH = 1.0
 MAX_TIME = 1.0
 LAYER_SIZE = [3] + [64] * 3 + [1]
 ACTIVATION = "tanh"
-INITIALIZER = [tf.keras.initializers.GlorotUniform(seed=1) for _ in range(len(LAYER_SIZE))]
+INITIALIZER = tf.keras.initializers.GlorotUniform(seed=1)
 OPTIMIZER = "adam"
 LEARNING_RATE = 5e-4
 ITERATIONS = 10000
