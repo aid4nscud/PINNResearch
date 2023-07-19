@@ -110,8 +110,9 @@ def main():
         num_domain=10000,
         num_boundary=500,
         num_initial=2000,
-        num_test=10000,
         solution=solution,
+        num_test=10000,
+        
     )
 
     pde_resampler = dde.callbacks.PDEPointResampler(period=10)
@@ -120,7 +121,7 @@ def main():
     net = dde.nn.FNN(LAYER_SIZE, ACTIVATION, INITIALIZER)
     model = dde.Model(data, net)
     model = dde.Model(data, net)
-    model.compile(OPTIMIZER, LEARNING_RATE, loss_weights=LOSS_WEIGHTS, metrics=['l2 error'])
+    model.compile(OPTIMIZER, LEARNING_RATE, loss_weights=LOSS_WEIGHTS, metrics=["l2 relative error"])
 
     # Train Model
     # early_stopping = dde.callbacks.EarlyStopping(min_delta=5e-8, patience=1000)
