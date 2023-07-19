@@ -52,14 +52,6 @@ def main():
         return du_t - ALPHA * (du_xx + du_yy)
 
     # Define Boundary Conditions
-    def func_bc_right_edge(x):
-        return np.where(np.isclose(x[:, 0], LENGTH), 100.0, 0.0)[:, None]
-
-    def func_ic(x):
-        return np.zeros((len(x), 1))
-
-    def func_zero(x):
-        return np.zeros_like(x)
 
     def solution(x):
         return fdm_solution[
@@ -67,46 +59,68 @@ def main():
             np.floor(x[:, 1] * (NY - 1)).astype(int),
             np.floor(x[:, 2] * (NT - 1)).astype(int),
         ][:, None]
+    
+    def output_transform(x, y):
+        # Apply initial condition: Set all values to zero at t=0
+        if np.isclose(x[0, 2], 0.0):
+            return np.zeros_like(y)
 
-    bc_right_edge = dde.DirichletBC(
-        geotime,
-        func_bc_right_edge,
-        lambda x, on_boundary: on_boundary
-        and np.isclose(x[0], LENGTH)
-        and not np.isclose(x[1], 0)
-        and not np.isclose(x[1], WIDTH),
-    )
-    bc_left = dde.NeumannBC(
-        geotime,
-        func_zero,
-        lambda x, on_boundary: on_boundary
-        and np.isclose(x[0], 0)
-        and not np.isclose(x[1], 0)
-        and not np.isclose(x[1], WIDTH),
-    )
-    bc_top = dde.NeumannBC(
-        geotime,
-        func_zero,
-        lambda x, on_boundary: on_boundary
-        and np.isclose(x[1], WIDTH)
-        and not np.isclose(x[0], 0)
-        and not np.isclose(x[0], LENGTH),
-    )
-    bc_bottom = dde.NeumannBC(
-        geotime,
-        func_zero,
-        lambda x, on_boundary: on_boundary
-        and np.isclose(x[1], 0)
-        and not np.isclose(x[0], 0)
-        and not np.isclose(x[0], LENGTH),
-    )
-    ic = dde.IC(geotime, func_ic, lambda _, on_initial: on_initial)
+        # Apply boundary conditions
+        x_min, x_max = np.min(x[:, 0]), np.max(x[:, 0])
+        y_min, y_max = np.min(x[:, 1]), np.max(x[:, 1])
+        t = x[0, 2]
+
+        # Right edge boundary condition (temperature = 100 Kelvin)
+        if np.isclose(x_max, LENGTH):
+            return np.full_like(y, 100.0)
+
+        # Left, top, and bottom edges (zero gradient)
+        if np.isclose(x_min, 0.0) or np.isclose(x_max, 0.0) or np.isclose(y_min, 0.0) or np.isclose(y_max, 0.0):
+            return np.zeros_like(y)
+
+        # For interior points, return the network output
+        return y
+
+
+    # bc_right_edge = dde.DirichletBC(
+    #     geotime,
+    #     func_bc_right_edge,
+    #     lambda x, on_boundary: on_boundary
+    #     and np.isclose(x[0], LENGTH)
+    #     and not np.isclose(x[1], 0)
+    #     and not np.isclose(x[1], WIDTH),
+    # )
+    # bc_left = dde.NeumannBC(
+    #     geotime,
+    #     func_zero,
+    #     lambda x, on_boundary: on_boundary
+    #     and np.isclose(x[0], 0)
+    #     and not np.isclose(x[1], 0)
+    #     and not np.isclose(x[1], WIDTH),
+    # )
+    # bc_top = dde.NeumannBC(
+    #     geotime,
+    #     func_zero,
+    #     lambda x, on_boundary: on_boundary
+    #     and np.isclose(x[1], WIDTH)
+    #     and not np.isclose(x[0], 0)
+    #     and not np.isclose(x[0], LENGTH),
+    # )
+    # bc_bottom = dde.NeumannBC(
+    #     geotime,
+    #     func_zero,
+    #     lambda x, on_boundary: on_boundary
+    #     and np.isclose(x[1], 0)
+    #     and not np.isclose(x[0], 0)
+    #     and not np.isclose(x[0], LENGTH),
+    # )
+    # ic = dde.IC(geotime, func_ic, lambda _, on_initial: on_initial)
 
     # Define Training Data
     data = dde.data.TimePDE(
         geotime,
         pde,
-        [bc_right_edge, bc_left, bc_top, bc_bottom, ic],
+        [],
         num_domain=10000,
         num_boundary=500,
         num_initial=2000,
@@ -119,7 +133,7 @@ def main():
 
     # Define Neural Network Architecture and Model
     net = dde.nn.FNN(LAYER_SIZE, ACTIVATION, INITIALIZER)
-    model = dde.Model(data, net)
+    net.apply_output_transform(output_transform)
     model = dde.Model(data, net)
     model.compile(OPTIMIZER, LEARNING_RATE, loss_weights=LOSS_WEIGHTS, metrics=["l2 relative error"])
 
