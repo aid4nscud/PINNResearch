@@ -27,7 +27,9 @@ NT = 100  # Number of time steps
 fdm_solver = HeatEquationFDM(ALPHA, LENGTH, MAX_TIME, NX, NY, NT)
 
 # Solve FDM
+print("Solving exactly using FDM\n")
 fdm_solution = fdm_solver.solve()
+print("Finished solving with FDM\n")
 
 
 def main():
