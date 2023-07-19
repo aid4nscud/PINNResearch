@@ -61,25 +61,20 @@ def main():
         ][:, None]
     
     def output_transform(x, y):
-        # Apply initial condition: Set all values to zero at t=0
-        if np.isclose(x[0, 2], 0.0):
-            return np.zeros_like(y)
+        t = x[:, 2]  # Extract the time values from the input tensor
+        mask_right_edge = tf.math.logical_and(tf.math.is_close(x[:, 0], LENGTH), tf.math.is_close(x[:, 1], WIDTH))
+        mask_left_edge = tf.math.logical_and(tf.math.is_close(x[:, 0], 0.0), tf.math.not_equal(x[:, 1], 0.0))
+        mask_top_edge = tf.math.logical_and(tf.math.is_close(x[:, 1], WIDTH), tf.math.not_equal(x[:, 0], 0.0))
+        mask_bottom_edge = tf.math.logical_and(tf.math.is_close(x[:, 1], 0.0), tf.math.not_equal(x[:, 0], 0.0))
+        mask_initial_condition = tf.math.is_close(t, 0.0)
 
-        # Apply boundary conditions
-        x_min, x_max = np.min(x[:, 0]), np.max(x[:, 0])
-        y_min, y_max = np.min(x[:, 1]), np.max(x[:, 1])
-        t = x[0, 2]
+        y_transformed = tf.where(mask_right_edge, 100.0, y)
+        y_transformed = tf.where(mask_left_edge, 0.0, y_transformed)
+        y_transformed = tf.where(mask_top_edge, 0.0, y_transformed)
+        y_transformed = tf.where(mask_bottom_edge, 0.0, y_transformed)
+        y_transformed = tf.where(mask_initial_condition, 0.0, y_transformed)
 
-        # Right edge boundary condition (temperature = 100 Kelvin)
-        if np.isclose(x_max, LENGTH):
-            return np.full_like(y, 100.0)
-
-        # Left, top, and bottom edges (zero gradient)
-        if np.isclose(x_min, 0.0) or np.isclose(x_max, 0.0) or np.isclose(y_min, 0.0) or np.isclose(y_max, 0.0):
-            return np.zeros_like(y)
-
-        # For interior points, return the network output
-        return y
+        return y_transformed
 
 
     # bc_right_edge = dde.DirichletBC(
