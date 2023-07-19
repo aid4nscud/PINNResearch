@@ -47,11 +47,14 @@ plt.title('Heat equation solution')
 plt.xlabel('x')
 plt.ylabel('y')
 
+# Adding text field for time
+time_text = plt.text(0.1, 0.9, '', transform=plt.gca().transAxes)
 # Define animation update function
 def updatefig(k):
     im.set_array(u[:, :, k])
-    return im,
-
+    current_time = k * T / Nt
+    time_text.set_text('Time = %.2f' % current_time)
+    return im, time_text,
 # Create animation
 ani = animation.FuncAnimation(fig, updatefig, frames=range(Nt), interval=50, blit=True)
 
