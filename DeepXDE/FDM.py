@@ -5,9 +5,9 @@ import matplotlib.animation as animation
 # Parameters
 alpha = 1.0  # Diffusivity
 L = 1.0  # Length of domain
-T = 1  # Time to solve until
-Nx = 100  # Number of spatial points in grid
-Ny = 100
+T = 1.0  # Time to solve until (in seconds)
+Nx = 100  # Number of spatial points in x-direction
+Ny = 100  # Number of spatial points in y-direction
 Nt = 100  # Number of time steps
 
 dx = L / (Nx - 1)  # Spatial step size
@@ -19,48 +19,49 @@ x = np.linspace(0, L, Nx)  # x grid
 y = np.linspace(0, L, Ny)  # y grid
 t = np.linspace(0, T, Nt)  # time grid
 
-# Initialize solution arrays
-u = np.zeros((Nx, Ny, Nt))  
+# Initialize solution array
+u = np.zeros((Nx, Ny, Nt))
 
 # Initial condition
 u[:, :, 0] = np.zeros((Nx, Ny))
 
 # Boundary conditions
-u[:, 0, :] = 0  # left edge
-u[:, -1, :] = 100  # right edge
-u[0, :, :] = 0  # bottom edge
-u[-1, :, :] = 0  # top edge
+u[:, -1, :] = 100  # Right edge
+u[:, 0, :] = 0  # Bottom edge
+u[0, :, :] = 0  # Left edge
+u[-1, :, :] = 0  # Top edge
 
 # Finite difference scheme
-for k in range(0, Nt - 1):
+for k in range(Nt - 1):
     for i in range(1, Nx - 1):
         for j in range(1, Ny - 1):
             u[i, j, k + 1] = (u[i, j, k] +
-                              alpha * dt * ((u[i + 1, j, k] - 2 * u[i, j, k] + u[i - 1, j, k]) / dx ** 2 +
-                                            (u[i, j + 1, k] - 2 * u[i, j, k] + u[i, j - 1, k]) / dy ** 2))
+                              alpha * dt * ((u[i + 1, j, k] - 2 * u[i, j, k] + u[i - 1, j, k]) / dx**2 +
+                                            (u[i, j + 1, k] - 2 * u[i, j, k] + u[i, j - 1, k]) / dy**2))
 
 # Plot solution
 fig = plt.figure(figsize=(7, 7))
 im = plt.imshow(u[:, :, 0], extent=[0, L, 0, L], origin='lower', cmap='hot', interpolation="bilinear")
 plt.colorbar(label="Temperature (K)")
-plt.title('Heat equation solution at t = 0')
+plt.title('Heat Equation Solution')
 plt.xlabel('x')
 plt.ylabel('y')
 
 # Adding text field for time
-time_text = plt.text(0.5, 1.05, '', transform=plt.gca().transAxes, ha='center')
-plt.subplots_adjust(top=0.85)  # Adjust top margin to make space for the time text
+time_text = plt.text(0.1, 0.9, '', transform=plt.gca().transAxes)
 
 # Define animation update function
 def updatefig(k):
     im.set_array(u[:, :, k])
-    current_time = k * dt  # Update time step based on dt
-    time_text.set_text('Time step = %.4f' % current_time)
-    plt.title('Heat equation solution at t = %.4f' % current_time)  # Update title with time step
+    current_time = k * dt
+    time_text.set_text('Time = %.2f seconds' % current_time)
     return im, time_text
 
 # Create animation
-ani = animation.FuncAnimation(fig, updatefig, frames=range(Nt), interval=50, blit=True)
+ani = animation.FuncAnimation(fig, updatefig, frames=Nt, interval=50, blit=True)
 
 # Save as gif
 ani.save('fdm_solution.gif', writer='pillow')
+
+# Show plot
+plt.show()
