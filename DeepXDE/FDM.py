@@ -17,7 +17,7 @@ dt = min(dx**2/(4*alpha), dy**2/(4*alpha))  # Time step size
 # Grids
 x = np.linspace(0, L, Nx)  # x grid
 y = np.linspace(0, L, Ny)  # y grid
-t = np.linspace(0, T, Nt)  # time grid
+t_data = np.linspace(0, T, Nt)  # time grid
 
 # Initialize solution array
 u = np.zeros((Nx, Ny, Nt))
@@ -39,29 +39,32 @@ for k in range(Nt - 1):
                               alpha * dt * ((u[i + 1, j, k] - 2 * u[i, j, k] + u[i - 1, j, k]) / dx**2 +
                                             (u[i, j + 1, k] - 2 * u[i, j, k] + u[i, j - 1, k]) / dy**2))
 
-# Plot solution
-fig = plt.figure(figsize=(7, 7))
-im = plt.imshow(u[:, :, 0], extent=[0, L, 0, L], origin='lower', cmap='hot', interpolation="bilinear")
-plt.colorbar(label="Temperature (K)")
-plt.title('Heat Equation Solution')
-plt.xlabel('x')
-plt.ylabel('y')
+# Function to animate and save the solution
+def animate_solution(data, filename, title, label, t_data):
+    fig, ax = plt.subplots(figsize=(7, 7))
+    im = ax.imshow(
+        data[:, :, 0],
+        origin="lower",
+        cmap="hot",
+        interpolation="bilinear",
+        extent=[0, L, 0, L],
+    )
+    plt.colorbar(im, ax=ax, label=label)
+    ax.set_xlabel("x")
+    ax.set_ylabel("y")
 
-# Adding text field for time
-time_text = plt.text(0.1, 0.9, '', transform=plt.gca().transAxes)
+    def updatefig(k):
+        im.set_array(data[:, :, k])
+        ax.set_title(f"{title}, t = {t_data[k]:.2f} seconds")  # Update the title with current time step
+        return [im]
 
-# Define animation update function
-def updatefig(k):
-    im.set_array(u[:, :, k])
-    current_time = k * dt
-    time_text.set_text('Time = %.2f seconds' % current_time)
-    return im, time_text
+    ani = animation.FuncAnimation(
+        fig, updatefig, frames=range(data.shape[2]), interval=50, blit=True
+    )
+    ani.save(filename, writer="pillow")
 
-# Create animation
-ani = animation.FuncAnimation(fig, updatefig, frames=Nt, interval=50, blit=True)
-
-# Save as gif
-ani.save('fdm_solution.gif', writer='pillow')
+# Call the function to animate and save the solution
+animate_solution(u, "fdm_solution.gif", "Heat equation solution", "Temperature (K)", t_data)
 
 # Show plot
 plt.show()

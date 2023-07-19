@@ -1,67 +1,165 @@
+import deepxde as dde
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+import tensorflow as tf
 
-# Parameters
-alpha = 1.0  # Diffusivity
-L = 1.0  # Length of domain
-T = 1.0  # Time to solve until (in seconds)
-Nx = 100  # Number of spatial points in x-direction
-Ny = 100  # Number of spatial points in y-direction
-Nt = 100  # Number of time steps
+# Configuration Parameters
+ALPHA = 1.0
+LENGTH = 1.0
+WIDTH = 1.0
+MAX_TIME = 1.0
+LAYER_SIZE = [3] + [350] * 3 + [1]
+ACTIVATION = "sin"
+INITIALIZER = "Glorot uniform"
+OPTIMIZER = "adam"
+LEARNING_RATE = 1e-4
+ITERATIONS = 50000
 
-dx = L / (Nx - 1)  # Spatial step size
-dy = L / (Ny - 1)
-dt = min(dx**2/(4*alpha), dy**2/(4*alpha))  # Time step size
+# L-BFGS config
+dde.config.set_default_float("float32")
+dde.optimizers.config.set_LBFGS_options(
+    maxcor=100, ftol=0, gtol=1e-12, maxiter=1000, maxfun=None
+)
 
-# Grids
-x = np.linspace(0, L, Nx)  # x grid
-y = np.linspace(0, L, Ny)  # y grid
-t = np.linspace(0, T, Nt)  # time grid
 
-# Initialize solution array
-u = np.zeros((Nx, Ny, Nt))
+def main():
+    # Check GPU Availability
+    print(
+        "Num GPUs Available: ", len(tf.config.experimental.list_physical_devices("GPU"))
+    )
 
-# Initial condition
-u[:, :, 0] = np.zeros((Nx, Ny))
+    # Define Domain
+    geom = dde.geometry.Rectangle([0, 0], [LENGTH, WIDTH])
+    timedomain = dde.geometry.TimeDomain(0, MAX_TIME)
+    geotime = dde.geometry.GeometryXTime(geom, timedomain)
 
-# Boundary conditions
-u[:, -1, :] = 100  # Right edge
-u[:, 0, :] = 0  # Bottom edge
-u[0, :, :] = 0  # Left edge
-u[-1, :, :] = 0  # Top edge
+    # Define PDE
+    def pde(X, u):
+        du_X = tf.gradients(u, X)[0]
+        du_x, du_y, du_t = du_X[:, 0:1], du_X[:, 1:2], du_X[:, 2:3]
+        du_xx = tf.gradients(du_x, X)[0][:, 0:1]
+        du_yy = tf.gradients(du_y, X)[0][:, 1:2]
+        return du_t - ALPHA * (du_xx + du_yy)
 
-# Finite difference scheme
-for k in range(Nt - 1):
-    for i in range(1, Nx - 1):
-        for j in range(1, Ny - 1):
-            u[i, j, k + 1] = (u[i, j, k] +
-                              alpha * dt * ((u[i + 1, j, k] - 2 * u[i, j, k] + u[i - 1, j, k]) / dx**2 +
-                                            (u[i, j + 1, k] - 2 * u[i, j, k] + u[i, j - 1, k]) / dy**2))
+    # Define Boundary Conditions
+    def func_bc_right_edge(x):
+        return np.where(np.isclose(x[:, 0], LENGTH), 100.0, 0.0)[:, None]
 
-# Plot solution
-fig = plt.figure(figsize=(7, 7))
-im = plt.imshow(u[:, :, 0], extent=[0, L, 0, L], origin='lower', cmap='hot', interpolation="bilinear")
-plt.colorbar(label="Temperature (K)")
-plt.title('Heat Equation Solution')
-plt.xlabel('x')
-plt.ylabel('y')
+    def func_ic(x):
+        return np.zeros((len(x), 1))
 
-# Adding text field for time
-time_text = plt.text(0.1, 0.9, '', transform=plt.gca().transAxes)
+    def func_zero(x):
+        return np.zeros_like(x)
 
-# Define animation update function
-def updatefig(k):
-    im.set_array(u[:, :, k])
-    current_time = k * dt
-    time_text.set_text('Time = %.2f seconds' % current_time)
-    return im, time_text
+    bc_right_edge = dde.DirichletBC(
+        geotime,
+        func_bc_right_edge,
+        lambda x, on_boundary: on_boundary
+        and np.isclose(x[0], LENGTH)
+        and not np.isclose(x[1], 0)
+        and not np.isclose(x[1], WIDTH),
+    )
+    bc_left = dde.NeumannBC(
+        geotime,
+        func_zero,
+        lambda x, on_boundary: on_boundary
+        and np.isclose(x[0], 0)
+        and not np.isclose(x[1], 0)
+        and not np.isclose(x[1], WIDTH),
+    )
+    bc_top = dde.NeumannBC(
+        geotime,
+        func_zero,
+        lambda x, on_boundary: on_boundary
+        and np.isclose(x[1], WIDTH)
+        and not np.isclose(x[0], 0)
+        and not np.isclose(x[0], LENGTH),
+    )
+    bc_bottom = dde.NeumannBC(
+        geotime,
+        func_zero,
+        lambda x, on_boundary: on_boundary
+        and np.isclose(x[1], 0)
+        and not np.isclose(x[0], 0)
+        and not np.isclose(x[0], LENGTH),
+    )
+    ic = dde.IC(geotime, func_ic, lambda _, on_initial: on_initial)
 
-# Create animation
-ani = animation.FuncAnimation(fig, updatefig, frames=Nt, interval=50, blit=True)
+    # Define Training Data
+    data = dde.data.TimePDE(
+        geotime,
+        pde,
+        [bc_right_edge, bc_left, bc_top, bc_bottom, ic],
+        num_domain=16000,
+        num_boundary=8000,
+        num_initial=4000,
+        num_test=2000,
+    )
 
-# Save as gif
-ani.save('fdm_solution.gif', writer='pillow')
+    pde_resampler = dde.callbacks.PDEPointResampler(period=50)
 
-# Show plot
-plt.show()
+    # Define Neural Network Architecture and Model
+    net = dde.nn.FNN(LAYER_SIZE, ACTIVATION, INITIALIZER)
+    model = dde.Model(data, net)
+    model.compile(OPTIMIZER, LEARNING_RATE)
+
+    # Train Model
+    model.train(iterations=ITERATIONS, callbacks=[pde_resampler])
+
+    # Generate Test Data
+    x_data = np.linspace(0, LENGTH, num=100)
+    y_data = np.linspace(0, WIDTH, num=100)
+    t_data = np.linspace(0, 1, num=100)
+    test_x, test_y, test_t = np.meshgrid(x_data, y_data, t_data)
+    test_domain = np.vstack((np.ravel(test_x), np.ravel(test_y), np.ravel(test_t))).T
+
+    # Predict Solution
+    predicted_solution = model.predict(test_domain)
+    residual = model.predict(test_domain, operator=pde)
+
+    # Reshape Solution
+    predicted_solution = predicted_solution.reshape(
+        test_x.shape[0], test_y.shape[1], test_t.shape[2]
+    )
+    residual = residual.reshape(test_x.shape[0], test_y.shape[1], test_t.shape[2])
+
+    # Plot and Save Solution
+    animate_solution(
+        predicted_solution,
+        "pinn_solution.gif",
+        "Heat equation solution",
+        "Temperature (K)",
+        t_data,
+    )
+    animate_solution(residual, "pinn_residual.gif", "Residual plot", "Residual", t_data)
+
+
+def animate_solution(data, filename, title, label, t_data):
+    fig, ax = plt.subplots(figsize=(7, 7))
+    im = ax.imshow(
+        data[:, :, 0],
+        origin="lower",
+        cmap="hot",
+        interpolation="bilinear",
+        extent=[0, LENGTH, 0, LENGTH],
+    )
+    plt.colorbar(im, ax=ax, label=label)
+    ax.set_xlabel("x")
+    ax.set_ylabel("y")
+
+    def updatefig(k):
+        im.set_array(data[:, :, k])
+        ax.set_title(
+            f"{title}, t = {t_data[k]:.2f}"
+        )  # Update the title with current time step
+        return [im]
+
+    ani = animation.FuncAnimation(
+        fig, updatefig, frames=range(data.shape[2]), interval=50, blit=True
+    )
+    ani.save(filename, writer="pillow")
+
+
+if __name__ == "__main__":
+    main()
