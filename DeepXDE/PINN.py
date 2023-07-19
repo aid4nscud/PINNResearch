@@ -14,7 +14,7 @@ ACTIVATION = "sin"
 INITIALIZER = "Glorot uniform"
 OPTIMIZER = "adam"
 LEARNING_RATE = 1e-4
-ITERATIONS = 50000
+ITERATIONS = 10000
 
 # L-BFGS config
 dde.config.set_default_float("float32")
