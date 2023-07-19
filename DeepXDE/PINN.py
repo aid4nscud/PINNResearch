@@ -10,7 +10,7 @@ LENGTH = 1.0
 WIDTH = 1.0
 MAX_TIME = 1.0
 LAYER_SIZE = [3] + [360] * 3 + [1]
-ACTIVATION = "relu"
+ACTIVATION = "tanh"
 INITIALIZER = "Glorot uniform"
 OPTIMIZER = "adam"
 LEARNING_RATE = 1e-4
@@ -28,7 +28,7 @@ LOSS WEIGHTS
 
 """
 
-LOSS_WEIGHTS = [1, 10, 1, 1, 1, 10]
+LOSS_WEIGHTS = [1, 5, 1, 1, 1, 10]
 
 
 def main():
