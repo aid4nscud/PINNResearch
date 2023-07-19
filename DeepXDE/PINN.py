@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import tensorflow as tf
+from deepxde.data import PointsData
 
 # Configuration Parameters
 ALPHA = 1.0
@@ -99,7 +100,10 @@ def main():
     model.compile(OPTIMIZER, LEARNING_RATE)
 
     # Train Model
-    model.train(iterations=ITERATIONS, callbacks=[pde_resampler])
+    for i in range(ITERATIONS):
+        model.train_on_batch(data)
+        if (i + 1) % pde_resampler.period == 0:
+            pde_resampler(model, data)
 
     # Generate Test Data
     x_data = np.linspace(0, LENGTH, num=100)
