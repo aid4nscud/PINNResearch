@@ -61,18 +61,18 @@ def main():
         ][:, None]
     
     def output_transform(x, y):
-        t = x[:, 2]  # Extract the time values from the input tensor
-        mask_right_edge = tf.math.logical_and(tf.math.is_close(x[:, 0], LENGTH), tf.math.is_close(x[:, 1], WIDTH))
-        mask_left_edge = tf.math.logical_and(tf.math.is_close(x[:, 0], 0.0), tf.math.not_equal(x[:, 1], 0.0))
-        mask_top_edge = tf.math.logical_and(tf.math.is_close(x[:, 1], WIDTH), tf.math.not_equal(x[:, 0], 0.0))
-        mask_bottom_edge = tf.math.logical_and(tf.math.is_close(x[:, 1], 0.0), tf.math.not_equal(x[:, 0], 0.0))
-        mask_initial_condition = tf.math.is_close(t, 0.0)
+        mask_right_edge = tf.experimental.numpy.isclose(x[:, 0], LENGTH)
+        mask_bottom_edge = tf.experimental.numpy.isclose(x[:, 1], 0.0)
+        mask_top_edge = tf.experimental.numpy.isclose(x[:, 1], WIDTH)
+        mask_initial_condition = tf.experimental.numpy.isclose(x[:, 2], 0.0)
 
+        t = x[0, 2]
+        
         y_transformed = tf.where(mask_right_edge, 100.0, y)
-        y_transformed = tf.where(mask_left_edge, 0.0, y_transformed)
-        y_transformed = tf.where(mask_top_edge, 0.0, y_transformed)
         y_transformed = tf.where(mask_bottom_edge, 0.0, y_transformed)
+        y_transformed = tf.where(mask_top_edge, 0.0, y_transformed)
         y_transformed = tf.where(mask_initial_condition, 0.0, y_transformed)
+        y_transformed = tf.where(t == 0.0, 0.0, y_transformed)
 
         return y_transformed
 
