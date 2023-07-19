@@ -10,9 +10,9 @@ ALPHA = 1.0
 LENGTH = 1.0
 WIDTH = 1.0
 MAX_TIME = 1.0
-LAYER_SIZE = [3] + [64] * 3 + [1]
+LAYER_SIZE = [3] + [360] * 6 + [1]
 ACTIVATION = "tanh"
-INITIALIZER = tf.keras.initializers.GlorotUniform(seed=1)
+INITIALIZER = "Glorot uniform"
 OPTIMIZER = "adam"
 LEARNING_RATE = 5e-4
 ITERATIONS = 10000
@@ -52,6 +52,14 @@ def main():
         return du_t - ALPHA * (du_xx + du_yy)
 
     # Define Boundary Conditions
+    def func_bc_right_edge(x):
+        return np.where(np.isclose(x[:, 0], LENGTH), 100.0, 0.0)[:, None]
+
+    def func_ic(x):
+        return np.zeros((len(x), 1))
+
+    def func_zero(x):
+        return np.zeros_like(x)
 
     def solution(x):
         return fdm_solution[
@@ -59,62 +67,46 @@ def main():
             np.floor(x[:, 1] * (NY - 1)).astype(int),
             np.floor(x[:, 2] * (NT - 1)).astype(int),
         ][:, None]
-    
-    def output_transform(x, y):
-        mask_right_edge = tf.experimental.numpy.isclose(x[:, 0], LENGTH)
-        mask_bottom_edge = tf.experimental.numpy.isclose(x[:, 1], 0.0)
-        mask_top_edge = tf.experimental.numpy.isclose(x[:, 1], WIDTH)
-        mask_initial_condition = tf.experimental.numpy.isclose(x[:, 2], 0.0)
 
-        t = x[0, 2]
-        
-        y_transformed = tf.where(mask_right_edge, 100.0, y)
-        y_transformed = tf.where(mask_bottom_edge, 0.0, y_transformed)
-        y_transformed = tf.where(mask_top_edge, 0.0, y_transformed)
-        y_transformed = tf.where(mask_initial_condition, 0.0, y_transformed)
-        y_transformed = tf.where(t == 0.0, 0.0, y_transformed)
-
-        return y_transformed
-
-    # bc_right_edge = dde.DirichletBC(
-    #     geotime,
-    #     func_bc_right_edge,
-    #     lambda x, on_boundary: on_boundary
-    #     and np.isclose(x[0], LENGTH)
-    #     and not np.isclose(x[1], 0)
-    #     and not np.isclose(x[1], WIDTH),
-    # )
-    # bc_left = dde.NeumannBC(
-    #     geotime,
-    #     func_zero,
-    #     lambda x, on_boundary: on_boundary
-    #     and np.isclose(x[0], 0)
-    #     and not np.isclose(x[1], 0)
-    #     and not np.isclose(x[1], WIDTH),
-    # )
-    # bc_top = dde.NeumannBC(
-    #     geotime,
-    #     func_zero,
-    #     lambda x, on_boundary: on_boundary
-    #     and np.isclose(x[1], WIDTH)
-    #     and not np.isclose(x[0], 0)
-    #     and not np.isclose(x[0], LENGTH),
-    # )
-    # bc_bottom = dde.NeumannBC(
-    #     geotime,
-    #     func_zero,
-    #     lambda x, on_boundary: on_boundary
-    #     and np.isclose(x[1], 0)
-    #     and not np.isclose(x[0], 0)
-    #     and not np.isclose(x[0], LENGTH),
-    # )
-    # ic = dde.IC(geotime, func_ic, lambda _, on_initial: on_initial)
+    bc_right_edge = dde.DirichletBC(
+        geotime,
+        func_bc_right_edge,
+        lambda x, on_boundary: on_boundary
+        and np.isclose(x[0], LENGTH)
+        and not np.isclose(x[1], 0)
+        and not np.isclose(x[1], WIDTH),
+    )
+    bc_left = dde.NeumannBC(
+        geotime,
+        func_zero,
+        lambda x, on_boundary: on_boundary
+        and np.isclose(x[0], 0)
+        and not np.isclose(x[1], 0)
+        and not np.isclose(x[1], WIDTH),
+    )
+    bc_top = dde.NeumannBC(
+        geotime,
+        func_zero,
+        lambda x, on_boundary: on_boundary
+        and np.isclose(x[1], WIDTH)
+        and not np.isclose(x[0], 0)
+        and not np.isclose(x[0], LENGTH),
+    )
+    bc_bottom = dde.NeumannBC(
+        geotime,
+        func_zero,
+        lambda x, on_boundary: on_boundary
+        and np.isclose(x[1], 0)
+        and not np.isclose(x[0], 0)
+        and not np.isclose(x[0], LENGTH),
+    )
+    ic = dde.IC(geotime, func_ic, lambda _, on_initial: on_initial)
 
     # Define Training Data
     data = dde.data.TimePDE(
         geotime,
         pde,
-        [],
+        [bc_right_edge, bc_left, bc_top, bc_bottom, ic],
         num_domain=10000,
         num_boundary=500,
         num_initial=2000,
@@ -127,7 +119,7 @@ def main():
 
     # Define Neural Network Architecture and Model
     net = dde.nn.FNN(LAYER_SIZE, ACTIVATION, INITIALIZER)
-    net.apply_output_transform(output_transform)
+    model = dde.Model(data, net)
     model = dde.Model(data, net)
     model.compile(OPTIMIZER, LEARNING_RATE, loss_weights=LOSS_WEIGHTS, metrics=["l2 relative error"])
 
