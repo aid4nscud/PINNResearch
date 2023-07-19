@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import tensorflow as tf
+from FDM import HeatEquationFDM
 
 # Configuration Parameters
 ALPHA = 1.0
@@ -15,20 +16,18 @@ INITIALIZER = "Glorot uniform"
 OPTIMIZER = "adam"
 LEARNING_RATE = 5e-4
 ITERATIONS = 100000
+LOSS_WEIGHTS = [1, 10, 1, 1, 1, 1]
 
-"""
-LOSS WEIGHTS
+# FDM Parameters
+NX = 100  # Number of spatial points in x-direction
+NY = 100  # Number of spatial points in y-direction
+NT = 100  # Number of time steps
 
-1. Weight for loss on domain points, ensuring PDE is satisfied.
-2. Weight for loss on right edge boundary condition (temperature = 100 Kelvin).
-3. Weight for loss on left edge boundary condition (zero gradient).
-4. Weight for loss on top edge boundary condition (zero gradient).
-5. Weight for loss on bottom edge boundary condition (zero gradient).
-6. Weight for loss on initial condition points, enforcing initial system conditions.
+# Create FDM solver
+fdm_solver = HeatEquationFDM(ALPHA, LENGTH, MAX_TIME, NX, NY, NT)
 
-"""
-
-LOSS_WEIGHTS = [5, 10, 1, 1, 1, 10]
+# Solve FDM
+fdm_solution = fdm_solver.solve()
 
 
 def main():
@@ -59,6 +58,13 @@ def main():
 
     def func_zero(x):
         return np.zeros_like(x)
+
+    def solution(x):
+        return fdm_solution[
+            np.floor(x[:, 0] * (NX - 1)).astype(int),
+            np.floor(x[:, 1] * (NY - 1)).astype(int),
+            np.floor(x[:, 2] * (NT - 1)).astype(int),
+        ][:, None]
 
     bc_right_edge = dde.DirichletBC(
         geotime,
@@ -103,6 +109,7 @@ def main():
         num_boundary=500,
         num_initial=2000,
         num_test=10000,
+        solution=solution,
     )
 
     pde_resampler = dde.callbacks.PDEPointResampler(period=10)
@@ -113,11 +120,9 @@ def main():
     model = dde.Model(data, net)
     model.compile(OPTIMIZER, LEARNING_RATE, loss_weights=LOSS_WEIGHTS)
 
-
     # Train Model
     # early_stopping = dde.callbacks.EarlyStopping(min_delta=5e-8, patience=1000)
     model.train(iterations=ITERATIONS, callbacks=[pde_resampler])
-
 
     # Generate Test Data
     x_data = np.linspace(0, LENGTH, num=100)
@@ -164,7 +169,7 @@ def animate_solution(data, filename, title, label, t_data):
         im.set_array(data[:, :, k])
         ax.set_title(
             f"{title}, t = {t_data[k]:.2f}"
-        )  # Update the title with current time step
+        )  # Update the title with the current time step
         return [im]
 
     ani = animation.FuncAnimation(

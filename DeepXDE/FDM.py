@@ -1,70 +1,62 @@
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.animation as animation
 
-# Parameters
-alpha = 1.0  # Diffusivity
-L = 1.0  # Length of domain
-T = 1.0  # Time to solve until (in seconds)
-Nx = 100  # Number of spatial points in x-direction
-Ny = 100  # Number of spatial points in y-direction
-Nt = 100  # Number of time steps
+class HeatEquationFDM:
+    def __init__(self, alpha, L, T, Nx, Ny, Nt):
+        """
+        Initializes the finite difference method solver with the given parameters.
 
-dx = L / (Nx - 1)  # Spatial step size
-dy = L / (Ny - 1)
-dt = min(dx**2/(4*alpha), dy**2/(4*alpha))  # Time step size
+        Parameters:
+        alpha (float): Diffusivity
+        L (float): Length of the domain
+        T (float): Time to solve until (in seconds)
+        Nx (int): Number of spatial points in x-direction
+        Ny (int): Number of spatial points in y-direction
+        Nt (int): Number of time steps
+        """
+        self.alpha = alpha
+        self.L = L
+        self.T = T
+        self.Nx = Nx
+        self.Ny = Ny
+        self.Nt = Nt
+        self.dx = L / (Nx - 1)
+        self.dy = L / (Ny - 1)
+        self.dt = min(self.dx**2/(4*alpha), self.dy**2/(4*alpha))
+        self.u = np.zeros((Nx, Ny, Nt))
 
-# Grids
-x = np.linspace(0, L, Nx)  # x grid
-y = np.linspace(0, L, Ny)  # y grid
-t_data = np.linspace(0, T, Nt)  # time grid
+    def solve(self):
+        """
+        Solves the heat equation using finite difference method.
 
-# Initialize solution array
-u = np.zeros((Nx, Ny, Nt))
+        Returns:
+        ndarray: Solved temperature distribution in 3D (x, y, time).
+        """
+        # Initial condition
+        self.u[:, :, 0] = np.zeros((self.Nx, self.Ny))
 
-# Initial condition
-u[:, :, 0] = np.zeros((Nx, Ny))
+        # Boundary conditions
+        self.u[:, -1, :] = 100  # Right edge
+        self.u[:, 0, :] = 0  # Bottom edge
+        self.u[0, :, :] = 0  # Left edge
+        self.u[-1, :, :] = 0  # Top edge
 
-# Boundary conditions
-u[:, -1, :] = 100  # Right edge
-u[:, 0, :] = 0  # Bottom edge
-u[0, :, :] = 0  # Left edge
-u[-1, :, :] = 0  # Top edge
+        # Finite difference scheme
+        for k in range(self.Nt - 1):
+            for i in range(1, self.Nx - 1):
+                for j in range(1, self.Ny - 1):
+                    self.u[i, j, k + 1] = (self.u[i, j, k] +
+                        self.alpha * self.dt * ((self.u[i + 1, j, k] - 2 * self.u[i, j, k] + self.u[i - 1, j, k]) / self.dx**2 +
+                        (self.u[i, j + 1, k] - 2 * self.u[i, j, k] + self.u[i, j - 1, k]) / self.dy**2))
+        return self.u
 
-# Finite difference scheme
-for k in range(Nt - 1):
-    for i in range(1, Nx - 1):
-        for j in range(1, Ny - 1):
-            u[i, j, k + 1] = (u[i, j, k] +
-                              alpha * dt * ((u[i + 1, j, k] - 2 * u[i, j, k] + u[i - 1, j, k]) / dx**2 +
-                                            (u[i, j + 1, k] - 2 * u[i, j, k] + u[i, j - 1, k]) / dy**2))
+    def get_xyt_grids(self):
+        """
+        Generates the spatial and temporal grids.
 
-# Function to animate and save the solution
-def animate_solution(data, filename, title, label, t_data):
-    fig, ax = plt.subplots(figsize=(7, 7))
-    im = ax.imshow(
-        data[:, :, 0],
-        origin="lower",
-        cmap="hot",
-        interpolation="bilinear",
-        extent=[0, L, 0, L],
-    )
-    plt.colorbar(im, ax=ax, label=label)
-    ax.set_xlabel("x")
-    ax.set_ylabel("y")
-
-    def updatefig(k):
-        im.set_array(data[:, :, k])
-        ax.set_title(f"{title}, t = {t_data[k]:.2f} seconds")  # Update the title with current time step
-        return [im]
-
-    ani = animation.FuncAnimation(
-        fig, updatefig, frames=range(data.shape[2]), interval=50, blit=True
-    )
-    ani.save(filename, writer="pillow")
-
-# Call the function to animate and save the solution
-animate_solution(u, "fdm_solution.gif", "Heat equation solution", "Temperature (K)", t_data)
-
-# Show plot
-plt.show()
+        Returns:
+        tuple: x, y, and t grids as numpy arrays.
+        """
+        x_data = np.linspace(0, self.L, self.Nx)
+        y_data = np.linspace(0, self.L, self.Ny)
+        t_data = np.linspace(0, self.T, self.Nt)
+        return x_data, y_data, t_data
