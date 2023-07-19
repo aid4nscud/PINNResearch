@@ -118,7 +118,7 @@ def main():
     net = dde.nn.FNN(LAYER_SIZE, ACTIVATION, INITIALIZER)
     model = dde.Model(data, net)
     model = dde.Model(data, net)
-    model.compile(OPTIMIZER, LEARNING_RATE, loss_weights=LOSS_WEIGHTS)
+    model.compile(OPTIMIZER, LEARNING_RATE, loss_weights=LOSS_WEIGHTS, metrics=['l2 error'])
 
     # Train Model
     # early_stopping = dde.callbacks.EarlyStopping(min_delta=5e-8, patience=1000)
