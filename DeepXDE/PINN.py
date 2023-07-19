@@ -9,7 +9,7 @@ ALPHA = 1.0
 LENGTH = 1.0
 WIDTH = 1.0
 MAX_TIME = 1.0
-LAYER_SIZE = [3] + [360] * 3 + [1]
+LAYER_SIZE = [3] + [128] * 3 + [1]
 ACTIVATION = "tanh"
 INITIALIZER = "Glorot uniform"
 OPTIMIZER = "adam"
@@ -105,7 +105,7 @@ def main():
         num_test=100,
     )
 
-    pde_resampler = dde.callbacks.PDEPointResampler(period=50)
+    pde_resampler = dde.callbacks.PDEPointResampler(period=10)
 
     # Define Neural Network Architecture and Model
     net = dde.nn.FNN(LAYER_SIZE, ACTIVATION, INITIALIZER)
