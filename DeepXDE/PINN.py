@@ -10,12 +10,12 @@ ALPHA = 1.0
 LENGTH = 1.0
 WIDTH = 1.0
 MAX_TIME = 1.0
-LAYER_SIZE = [3] + [128] * 3 + [1]
+LAYER_SIZE = [3] + [64] * 3 + [1]
 ACTIVATION = "tanh"
 INITIALIZER = "Glorot uniform"
 OPTIMIZER = "adam"
 LEARNING_RATE = 5e-4
-ITERATIONS = 100000
+ITERATIONS = 10000
 LOSS_WEIGHTS = [1, 10, 1, 1, 1, 1]
 
 # FDM Parameters
