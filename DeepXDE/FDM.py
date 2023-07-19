@@ -43,22 +43,24 @@ for k in range(0, Nt - 1):
 fig = plt.figure(figsize=(7, 7))
 im = plt.imshow(u[:, :, 0], extent=[0, L, 0, L], origin='lower', cmap='hot', interpolation="bilinear")
 plt.colorbar(label="Temperature (K)")
-plt.title('Heat equation solution')
+plt.title('Heat equation solution at t = 0')
 plt.xlabel('x')
 plt.ylabel('y')
 
 # Adding text field for time
-time_text = plt.text(0.1, 0.9, '', transform=plt.gca().transAxes)
+time_text = plt.text(0.5, 1.05, '', transform=plt.gca().transAxes, ha='center')
+plt.subplots_adjust(top=0.85)  # Adjust top margin to make space for the time text
+
 # Define animation update function
 def updatefig(k):
     im.set_array(u[:, :, k])
-    current_time = k * T / Nt
-    time_text.set_text('Time = %.2f' % current_time)
-    return im, time_text,
+    current_time = k * dt  # Update time step based on dt
+    time_text.set_text('Time step = %.4f' % current_time)
+    plt.title('Heat equation solution at t = %.4f' % current_time)  # Update title with time step
+    return im, time_text
+
 # Create animation
 ani = animation.FuncAnimation(fig, updatefig, frames=range(Nt), interval=50, blit=True)
 
 # Save as gif
 ani.save('fdm_solution.gif', writer='pillow')
-
-
