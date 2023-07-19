@@ -28,7 +28,7 @@ LOSS WEIGHTS
 
 """
 
-LOSS_WEIGHTS = [1, 5, 1, 1, 1, 10]
+LOSS_WEIGHTS = [10, 5, 1, 1, 1, 5]
 
 
 def main():
