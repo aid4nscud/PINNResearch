@@ -13,8 +13,8 @@ LAYER_SIZE = [3] + [128] * 3 + [1]
 ACTIVATION = "tanh"
 INITIALIZER = "Glorot uniform"
 OPTIMIZER = "adam"
-LEARNING_RATE = 1e-4
-ITERATIONS = 20000
+LEARNING_RATE = 5e-4
+ITERATIONS = 100000
 
 """
 LOSS WEIGHTS
@@ -115,7 +115,7 @@ def main():
 
 
     # Train Model
-    early_stopping = dde.callbacks.EarlyStopping(min_delta=1e-7, patience=1000)
+    early_stopping = dde.callbacks.EarlyStopping(min_delta=5e-8, patience=1000)
     model.train(iterations=ITERATIONS, callbacks=[pde_resampler, early_stopping])
 
 
