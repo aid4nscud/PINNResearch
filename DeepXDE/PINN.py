@@ -16,6 +16,7 @@ INITIALIZER = "Glorot uniform"
 OPTIMIZER = "adam"
 LEARNING_RATE = 1e-4
 ITERATIONS = 5000
+BATCH_SIZE = 32
 
 
 def main():
@@ -101,9 +102,10 @@ def main():
 
     # Train Model
     for i in range(ITERATIONS):
-        model.train_on_batch(data)
+        batch_data = data.sample_batch(BATCH_SIZE)  # Sample a batch of data
+        model.train(batch_data)
         if (i + 1) % pde_resampler.period == 0:
-            pde_resampler(model, data)
+            pde_resampler(model, batch_data)
 
     # Generate Test Data
     x_data = np.linspace(0, LENGTH, num=100)
