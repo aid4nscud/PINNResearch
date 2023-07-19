@@ -85,7 +85,7 @@ def main():
         geotime,
         pde,
         [bc_right_edge, bc_left, bc_top, bc_bottom, ic],
-        num_domain=16000,
+        num_domain=10000,
         num_boundary=8000,
         num_initial=4000,
         num_test=2000,
