@@ -28,7 +28,7 @@ LOSS WEIGHTS
 
 """
 
-LOSS_WEIGHTS = [10, 5, 1, 1, 1, 5]
+LOSS_WEIGHTS = [10, 10, 1, 1, 1, 5]
 
 
 def main():
@@ -99,10 +99,10 @@ def main():
         geotime,
         pde,
         [bc_right_edge, bc_left, bc_top, bc_bottom, ic],
-        num_domain=1000,
-        num_boundary=400,
-        num_initial=300,
-        num_test=100,
+        num_domain=10000,
+        num_boundary=500,
+        num_initial=2000,
+        num_test=10000,
     )
 
     pde_resampler = dde.callbacks.PDEPointResampler(period=10)
