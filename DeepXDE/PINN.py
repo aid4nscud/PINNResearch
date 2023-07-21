@@ -14,7 +14,7 @@ LAYER_SIZE = [3] + [20] * 9 + [1]
 ACTIVATION = "tanh"
 INITIALIZER = "Glorot uniform"
 OPTIMIZER = "adam"
-LEARNING_RATE = 1e-3
+LEARNING_RATE = 5e-4
 ITERATIONS = 20000
 LOSS_WEIGHTS = [1, 20, 1, 1, 1, 10]
 
