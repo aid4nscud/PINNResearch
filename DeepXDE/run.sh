@@ -17,4 +17,4 @@ export TF_GPU_ALLOCATOR=cuda_malloc_async
 conda activate tf-gpu
 
 # Run the Python script
-python3 FDM.py
+python3 PINN.py
