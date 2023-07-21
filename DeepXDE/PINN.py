@@ -111,7 +111,6 @@ def main():
 
     # Define Neural Network Architecture and Model
     net = dde.nn.FNN(LAYER_SIZE, ACTIVATION, INITIALIZER)
-    net.apply_output_transform(lambda x, y: abs(y))
     model = dde.Model(data, net)
     model.compile(
         OPTIMIZER,
