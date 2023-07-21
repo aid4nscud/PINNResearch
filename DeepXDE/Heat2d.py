@@ -92,7 +92,7 @@ bc_up = dde.NeumannBC(geomtime, func_zero, up_boundary)
 bc_low = dde.NeumannBC(geomtime, func_zero, down_boundary)
 bc_left = dde.NeumannBC(
     geomtime, func_zero, l_boundary
-)  # New Neumann condition for left boundary
+) 
 ic = dde.IC(geomtime, init_func, boundary_initial)
 
 
@@ -165,7 +165,7 @@ def plotheatmap(T, time):
     plt.title(f"Temperature at t = {time*delta_t} unit time")
     plt.xlabel("x")
     plt.ylabel("y")
-    plt.pcolor(xx, yy, T, cmap="RdBu_r")
+    plt.pcolor(xx, yy, T, cmap="hot")
     plt.colorbar()
     return plt
 
