@@ -105,7 +105,7 @@ model.compile("L-BFGS-B")
 
 
 
-fig = plt.subplots()
+fig, ax = plt.subplots()
 
 ax = fig.add_subplot(111)
 nelx = 100
