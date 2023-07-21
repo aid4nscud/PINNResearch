@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+
+
 class HeatEquationFDM:
     def __init__(self, alpha, L, T, Nx, Ny, Nt):
         """
@@ -22,7 +24,7 @@ class HeatEquationFDM:
         self.Nt = Nt
         self.dx = L / (Nx - 1)
         self.dy = L / (Ny - 1)
-        self.dt = min(self.dx**2/(4*alpha), self.dy**2/(4*alpha))
+        self.dt = min(self.dx**2 / (4 * alpha), self.dy**2 / (4 * alpha))
         self.u = np.zeros((Nx, Ny, Nt))
 
     def solve(self):
@@ -45,9 +47,20 @@ class HeatEquationFDM:
         for k in range(self.Nt - 1):
             for i in range(1, self.Nx - 1):
                 for j in range(1, self.Ny - 1):
-                    self.u[i, j, k + 1] = (self.u[i, j, k] +
-                        self.alpha * self.dt * ((self.u[i + 1, j, k] - 2 * self.u[i, j, k] + self.u[i - 1, j, k]) / self.dx**2 +
-                        (self.u[i, j + 1, k] - 2 * self.u[i, j, k] + self.u[i, j - 1, k]) / self.dy**2))
+                    self.u[i, j, k + 1] = self.u[i, j, k] + self.alpha * self.dt * (
+                        (
+                            self.u[i + 1, j, k]
+                            - 2 * self.u[i, j, k]
+                            + self.u[i - 1, j, k]
+                        )
+                        / self.dx**2
+                        + (
+                            self.u[i, j + 1, k]
+                            - 2 * self.u[i, j, k]
+                            + self.u[i, j - 1, k]
+                        )
+                        / self.dy**2
+                    )
         return self.u
 
     def get_xyt_grids(self):
@@ -61,25 +74,25 @@ class HeatEquationFDM:
         y_data = np.linspace(0, self.L, self.Ny)
         t_data = np.linspace(0, self.T, self.Nt)
         return x_data, y_data, t_data
-    
+
     def animate_solution(self):
         """
         Creates an animated heat map of the solution.
         """
         fig = plt.figure()
-        im = plt.imshow(self.u[:,:,0], animated=True)
+        im = plt.imshow(self.u[:, :, 0], animated=True, origin='lower', extent=[0, self.L, 0, self.L], cmap='hot')
 
         def updatefig(i):
-            im.set_array(self.u[:,:,i])
-            return im,
+            im.set_array(self.u[:, :, i])
+            return (im,)
 
-        ani = animation.FuncAnimation(fig, updatefig, frames=self.Nt, interval=50, blit=True)
+        ani = animation.FuncAnimation(
+            fig, updatefig, frames=self.Nt, interval=50, blit=True
+        )
         ani.save("FDM_Solution.gif")
-  
 
 
-
-if __name__== "__main__":
+if __name__ == "__main__":
     heat_solver = HeatEquationFDM(alpha=1.0, L=1.0, T=1.0, Nx=100, Ny=100, Nt=101)
     heat_solver.solve()
     heat_solver.animate_solution()
