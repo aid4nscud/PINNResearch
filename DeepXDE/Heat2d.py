@@ -60,7 +60,7 @@ def init_func(X):
 num_domain = 30000
 num_boundary = 8000
 num_initial = 20000
-layer_size = [3] + [60] * 5 + [1]
+layer_size = [3] + [120] * 5 + [1]
 activation_func = "tanh"
 initializer = "Glorot uniform"
 lr = 1e-3
@@ -97,13 +97,8 @@ net.apply_output_transform(lambda _, y: abs(y))
 model = dde.Model(data, net)
 
 model.compile(optimizer, lr=lr, loss_weights=loss_weights)
-# To save the best model every 1000 epochs
-checker = dde.callbacks.ModelCheckpoint(
-    "model/model1.ckpt", save_better_only=True, period=1000
-)
-losshistory, trainstate = model.train(
-    epochs=epochs, batch_size=batch_size_, callbacks=[checker]
-)
+
+losshistory, trainstate = model.train(epochs=epochs, batch_size=batch_size_)
 model.compile("L-BFGS-B")
 dde.optimizers.set_LBFGS_options(
     maxcor=50,
