@@ -93,7 +93,7 @@ def main():
         and not np.isclose(x[0], 0)
         and not np.isclose(x[0], LENGTH),
     )
-    ic = dde.IC(geotime, func_ic, lambda _, on_initial: on_initial)
+    ic = dde.IC(geotime, func_zero, lambda _, on_initial: on_initial)
 
     # Define Training Data
     data = dde.data.TimePDE(
