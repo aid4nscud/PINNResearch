@@ -109,7 +109,7 @@ dde.optimizers.set_LBFGS_options(
     maxcor=50,
 )
 dde.saveplot(losshistory, trainstate, issave=True, isplot=True)
-
+fig = plt.figure()
 ax = fig.add_subplot(111)
 nelx = 100
 nely = 100
