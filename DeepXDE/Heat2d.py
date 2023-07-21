@@ -98,12 +98,12 @@ checker = dde.callbacks.ModelCheckpoint(
     "model/model1.ckpt", save_better_only=True, period=1000
 )
 losshistory, trainstate = model.train(epochs=epochs,batch_size = batch_size_,callbacks = [checker])
-model.compile("L-BFGS-B")
 dde.optimizers.set_LBFGS_options(
     maxcor=50,
 )
-losshistory, train_state = model.train(epochs = epochs, batch_size = batch_size_)
-dde.saveplot(losshistory, trainstate, issave=True, isplot=True)
+model.compile("L-BFGS-B")
+
+
 
 fig = plt.subplots()
 

@@ -10,7 +10,7 @@ ALPHA = 1.0
 LENGTH = 1.0
 WIDTH = 1.0
 MAX_TIME = 1.0
-LAYER_SIZE = [3] + [60] * 8 + [1]
+LAYER_SIZE = [3] + [60] * 5 + [1]
 ACTIVATION = "tanh"
 INITIALIZER = "Glorot uniform"
 OPTIMIZER = "adam"
@@ -54,16 +54,13 @@ def main():
 
     # Define Boundary Conditions
     def func_bc_right_edge(x):
-        return np.where(np.isclose(x[:, 0], LENGTH), 100.0, 0.0)[:, None]
+        return np.where(np.isclose(x[:, 0], LENGTH), 1.0, 0.0)[:, None]
 
     def func_ic(x):
         return np.zeros((len(x), 1))
 
     def func_zero(x):
         return np.zeros_like(x)
-
-    def output_transform(x, y):
-        return 100 * tf.nn.sigmoid(y)
 
     bc_right_edge = dde.DirichletBC(
         geotime,
