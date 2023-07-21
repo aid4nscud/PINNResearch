@@ -10,13 +10,14 @@ ALPHA = 1.0
 LENGTH = 1.0
 WIDTH = 1.0
 MAX_TIME = 1.0
-LAYER_SIZE = [3] + [32] * 9 + [1]
+LAYER_SIZE = [3] + [60] * 5 + [1]
 ACTIVATION = "tanh"
 INITIALIZER = "Glorot uniform"
 OPTIMIZER = "adam"
 LEARNING_RATE = 5e-4
 ITERATIONS = 10000
-LOSS_WEIGHTS = [1, 1, 1, 1, 1, 1]
+LOSS_WEIGHTS = [10, 1, 1, 1, 1, 10]
+BATCH_SIZE = 256
 
 # FDM Parameters
 NX = 100  # Number of spatial points in x-direction
@@ -93,24 +94,24 @@ def main():
         and not np.isclose(x[0], 0)
         and not np.isclose(x[0], LENGTH),
     )
-    ic = dde.IC(geotime, func_ic)
+    ic = dde.IC(geotime, func_ic, lambda _, on_initial: on_initial)
 
     # Define Training Data
     data = dde.data.TimePDE(
         geotime,
         pde,
         [bc_right_edge, bc_left, bc_top, bc_bottom, ic],
-        num_domain=10000,
-        num_boundary=4000,
-        num_initial=2000,
-        num_test=10000,
+        num_domain=30000,
+        num_boundary=8000,
+        num_initial=20000,
+        num_test=20000,
     )
 
     pde_resampler = dde.callbacks.PDEPointResampler(period=10)
 
     # Define Neural Network Architecture and Model
     net = dde.nn.FNN(LAYER_SIZE, ACTIVATION, INITIALIZER)
-    model = dde.Model(data, net)
+    net.apply_output_transform(lambda x, y: abs(y))
     model = dde.Model(data, net)
     model.compile(
         OPTIMIZER,
@@ -120,7 +121,7 @@ def main():
 
     # Train Model
     # early_stopping = dde.callbacks.EarlyStopping(min_delta=5e-8, patience=1000)
-    model.train(iterations=ITERATIONS, callbacks=[pde_resampler])
+    model.train(iterations=ITERATIONS,batch_size=BATCH_SIZE, callbacks=[pde_resampler])
 
     # Generate Test Data
     x_data = np.linspace(0, LENGTH, num=100)
