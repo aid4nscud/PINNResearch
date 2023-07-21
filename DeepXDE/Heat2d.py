@@ -15,9 +15,11 @@ def pde(X, T):
     dT_xx = dde.grad.hessian(T, X, j=0)
     dT_yy = dde.grad.hessian(T, X, j=1)
     dT_t = dde.grad.jacobian(T, X, j=2)
-
-    alpha = 1.0  # Thermal conductivity
-    return dT_t - alpha * (dT_xx + dT_yy)
+    #     Dividing by rhoc to make it 1
+    rhoc = (3.8151 * 10**3) / (3.8151 * 10**3)
+    kap = 385 / (3.8151 * 10**3)
+    # no forcing function
+    return (rhoc * dT_t) - (kap * (dT_xx + dT_yy))
 
 
 def r_boundary(X, on_boundary):
@@ -140,19 +142,25 @@ for time in t:
 cbar_min = np.min(Ts)
 cbar_max = np.max(Ts)
 
+
 def plotheatmap(T, time):
     # Clear the current plot figure
     plt.clf()
-    plt.title(f"Temperature at t = {time} unit time")  # modified to use actual time instead of frame number
+    plt.title(
+        f"Temperature at t = {time} unit time"
+    )  # modified to use actual time instead of frame number
     plt.xlabel("x")
     plt.ylabel("y")
-    plt.pcolor(xx, yy, T, cmap="hot", vmin=cbar_min, vmax=cbar_max)  # Added vmin and vmax
+    plt.pcolor(
+        xx, yy, T, cmap="hot", vmin=cbar_min, vmax=cbar_max
+    )  # Added vmin and vmax
     plt.colorbar()
     return plt
 
 
 def animate(k):
     plotheatmap(Ts[k], k * delta_t)  # use k * delta_t to get actual time value
+
 
 anim = animation.FuncAnimation(
     plt.figure(), animate, interval=1, frames=len(t), repeat=False
