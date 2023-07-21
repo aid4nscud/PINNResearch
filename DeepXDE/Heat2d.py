@@ -111,8 +111,8 @@ data = dde.data.TimePDE(
 
 
 net = dde.maps.FNN(layer_size, activation_func, initializer)
-net.apply_output_transform(lambda x, y: abs(y))
-net.outputs_modify(lambda x, y: x[:,0:1]*100 + (1 - x[:,0:1]) * y)
+net.apply_output_transform(lambda _, y: abs(y))
+
 model = dde.Model(data, net)
 
 model.compile(optimizer, lr=lr, loss_weights=loss_weights)
