@@ -105,8 +105,7 @@ dde.optimizers.set_LBFGS_options(
 )
 dde.saveplot(losshistory, trainstate, issave=True, isplot=True)
 
-fig = plt.figure()
-ax = fig.add_subplot(111)
+fig, ax = plt.subplots()  # Changed this line to get the ax object
 nelx = 100
 nely = 100
 timesteps = 101
@@ -137,6 +136,9 @@ for time in t:
     T = T.reshape(nelx + 1, nely + 1)
     Ts.append(T)
 
+# Calculate the min and max values for the colorbar
+cbar_min = np.min(Ts)
+cbar_max = np.max(Ts)
 
 def plotheatmap(T, time):
     # Clear the current plot figure
@@ -144,7 +146,7 @@ def plotheatmap(T, time):
     plt.title(f"Temperature at t = {time} unit time")  # modified to use actual time instead of frame number
     plt.xlabel("x")
     plt.ylabel("y")
-    plt.pcolor(xx, yy, T, cmap="hot")
+    plt.pcolor(xx, yy, T, cmap="hot", vmin=cbar_min, vmax=cbar_max)  # Added vmin and vmax
     plt.colorbar()
     return plt
 
