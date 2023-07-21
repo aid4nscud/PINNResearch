@@ -150,8 +150,7 @@ def plotheatmap(T, time):
 
 
 def animate(k):
-    plotheatmap(Ts[k], t[k])  # use the actual time value from array t
-
+    plotheatmap(Ts[k], k * delta_t)  # use k * delta_t to get actual time value
 
 anim = animation.FuncAnimation(
     plt.figure(), animate, interval=1, frames=len(t), repeat=False
