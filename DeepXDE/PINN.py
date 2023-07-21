@@ -16,7 +16,7 @@ INITIALIZER = "Glorot uniform"
 OPTIMIZER = "adam"
 LEARNING_RATE = 5e-4
 ITERATIONS = 10000
-LOSS_WEIGHTS = [100, 1, 1, 1, 1, 1]
+LOSS_WEIGHTS = [1, 1, 1, 1, 1, 1]
 
 # FDM Parameters
 NX = 100  # Number of spatial points in x-direction
@@ -93,7 +93,7 @@ def main():
         and not np.isclose(x[0], 0)
         and not np.isclose(x[0], LENGTH),
     )
-    ic = dde.IC(geotime, func_ic, lambda _, on_initial: on_initial)
+    ic = dde.IC(geotime, func_ic)
 
     # Define Training Data
     data = dde.data.TimePDE(
@@ -101,7 +101,7 @@ def main():
         pde,
         [bc_right_edge, bc_left, bc_top, bc_bottom, ic],
         num_domain=10000,
-        num_boundary=500,
+        num_boundary=4000,
         num_initial=2000,
         num_test=10000,
     )
