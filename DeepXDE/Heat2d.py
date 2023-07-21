@@ -88,7 +88,7 @@ ic = dde.IC(geomtime, init_func, boundary_initial)
 
 
 data = dde.data.TimePDE(
-    geomtime, pde, [bc_l, bc_r, bc_up, bc_low, ic], num_domain=num_domain, num_boundary=num_boundary,  num_initial=num_initial)
+    geomtime, pde, [bc_left, bc_r, bc_up, bc_low, ic], num_domain=num_domain, num_boundary=num_boundary,  num_initial=num_initial)
 
 
 
