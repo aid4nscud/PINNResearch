@@ -58,7 +58,7 @@ def init_func(X):
 
 
 num_domain = 30000
-num_boundary = 8000
+num_boundary = 12000
 num_initial = 20000
 layer_size = [3] + [60] * 5 + [1]
 activation_func = "tanh"
