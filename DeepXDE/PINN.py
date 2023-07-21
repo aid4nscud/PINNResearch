@@ -16,7 +16,7 @@ INITIALIZER = "Glorot uniform"
 OPTIMIZER = "adam"
 LEARNING_RATE = 5e-4
 ITERATIONS = 10000
-LOSS_WEIGHTS = [1, 10, 1, 1, 1, 1]
+LOSS_WEIGHTS = [100, 1, 1, 1, 1, 1]
 
 # FDM Parameters
 NX = 100  # Number of spatial points in x-direction
