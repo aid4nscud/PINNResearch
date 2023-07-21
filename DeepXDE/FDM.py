@@ -80,14 +80,26 @@ class HeatEquationFDM:
         Creates an animated heat map of the solution.
         """
         fig, ax = plt.subplots()  # Changed this line to get the ax object
-        im = ax.imshow(self.u[:, :, 0], animated=True, origin='lower', extent=[0, self.L, 0, self.L], cmap='hot')
+        im = ax.imshow(
+            self.u[:, :, 0],
+            animated=True,
+            origin="lower",
+            extent=[0, self.L, 0, self.L],
+            cmap="hot",
+        )
+
+        # Calculate the min and max values for the colorbar
+        cbar_min = np.min(self.u)
+        cbar_max = np.max(self.u)
+        cbar = fig.colorbar(im, ax=ax)
+        im.set_clim(cbar_min, cbar_max)  # This sets the colorbar limits
 
         x, y, t = self.get_xyt_grids()
 
         def updatefig(i):
             im.set_array(self.u[:, :, i])
             plt.title(f"t = {t[i]:.2f}")  # Set the title to current time
-            return im,  # Return only the updated heatmap
+            return (im,)  # Return only the updated heatmap
 
         ani = animation.FuncAnimation(
             fig, updatefig, frames=self.Nt, interval=50, blit=True
