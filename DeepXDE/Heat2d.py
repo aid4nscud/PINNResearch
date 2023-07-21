@@ -16,10 +16,9 @@ def pde(X, T):
     dT_yy = dde.grad.hessian(T, X, j=1)
     dT_t = dde.grad.jacobian(T, X, j=2)
     #     Dividing by rhoc to make it 1
-    rhoc = (3.8151 * 10**3) / (3.8151 * 10**3)
-    kap = 385 / (3.8151 * 10**3)
+    alpha = 1
     # no forcing function
-    return (rhoc * dT_t) - (kap * (dT_xx + dT_yy))
+    return dT_t - alpha * (dT_xx + dT_yy)
 
 
 def r_boundary(X, on_boundary):
@@ -61,11 +60,11 @@ def init_func(X):
 
 num_domain = 30000
 num_boundary = 12000
-num_initial = 20000
+num_initial = 24000
 layer_size = [3] + [60] * 5 + [1]
 activation_func = "tanh"
 initializer = "Glorot uniform"
-lr = 5e-4
+lr = 1e-3
 # Applying Loss weights as given below
 # [PDE Loss, BC1 loss - Dirichlet Left , BC2 loss - Dirichlet Right, BC3 loss- Neumann up, BC4 loss - Neumann down, IC Loss]
 loss_weights = [10, 1, 1, 1, 1, 10]
