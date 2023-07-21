@@ -116,7 +116,6 @@ def main():
         OPTIMIZER,
         LEARNING_RATE,
         loss_weights=LOSS_WEIGHTS,
-        metrics=["l2 relative error"],
     )
 
     # Train Model
