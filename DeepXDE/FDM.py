@@ -1,5 +1,6 @@
 import numpy as np
-
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 class HeatEquationFDM:
     def __init__(self, alpha, L, T, Nx, Ny, Nt):
         """
@@ -60,3 +61,25 @@ class HeatEquationFDM:
         y_data = np.linspace(0, self.L, self.Ny)
         t_data = np.linspace(0, self.T, self.Nt)
         return x_data, y_data, t_data
+    
+    def animate_solution(self):
+        """
+        Creates an animated heat map of the solution.
+        """
+        fig = plt.figure()
+        im = plt.imshow(self.u[:,:,0], animated=True)
+
+        def updatefig(i):
+            im.set_array(self.u[:,:,i])
+            return im,
+
+        ani = animation.FuncAnimation(fig, updatefig, frames=self.Nt, interval=50, blit=True)
+        ani.save("FDM_Solution.gif")
+  
+
+
+
+if __name__== "__main__":
+    heat_solver = HeatEquationFDM(alpha=1.0, L=1.0, T=1.0, Nx=100, Ny=100, Nt=101)
+    heat_solver.solve()
+    heat_solver.animate_solution()
