@@ -66,8 +66,8 @@ initializer = "Glorot uniform"
 lr = 5e-4
 # Applying Loss weights as given below
 # [PDE Loss, BC1 loss - Dirichlet Left , BC2 loss - Dirichlet Right, BC3 loss- Neumann up, BC4 loss - Neumann down, IC Loss]
-loss_weights = [20, 1, 1, 1, 1, 20]
-epochs = 10000
+loss_weights = [10, 1, 1, 1, 1, 10]
+epochs = 20000
 optimizer = "adam"
 batch_size_ = 256
 
