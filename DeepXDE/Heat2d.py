@@ -107,5 +107,4 @@ model.compile("L-BFGS-B")
 dde.optimizers.set_LBFGS_options(
     maxcor=50,
 )
-losshistory, train_state = model.train(epochs = epochs, batch_size = batch_size_)
 dde.saveplot(losshistory, trainstate, issave=True, isplot=True)
