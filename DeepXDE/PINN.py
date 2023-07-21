@@ -14,9 +14,9 @@ LAYER_SIZE = [3] + [150] * 3 + [1]
 ACTIVATION = "tanh"
 INITIALIZER = "Glorot uniform"
 OPTIMIZER = "adam"
-LEARNING_RATE = 5e-4
+LEARNING_RATE = 1e-4
 ITERATIONS = 10000
-LOSS_WEIGHTS = [10, 10, 1, 1, 1, 1]
+LOSS_WEIGHTS = [5, 10, 1, 1, 1, 1]
 
 # FDM Parameters
 NX = 100  # Number of spatial points in x-direction
