@@ -44,6 +44,7 @@ def boundary_initial(X, on_initial):
     x, y, t = X
     return on_initial and np.isclose(t, 0)
 
+
 def dir_func_r(X):
     return np.ones((len(X), 1)) * 100  # Temperature at right edge is 100 Kelvin
 
@@ -66,7 +67,7 @@ lr = 1e-3
 # Applying Loss weights as given below
 # [PDE Loss, BC1 loss - Dirichlet Left , BC2 loss - Dirichlet Right, BC3 loss- Neumann up, BC4 loss - Neumann down, IC Loss]
 loss_weights = [10, 1, 1, 1, 1, 10]
-epochs = 10000
+epochs = 100000
 optimizer = "adam"
 batch_size_ = 256
 
@@ -77,9 +78,7 @@ geomtime = dde.geometry.GeometryXTime(geom, timedomain)
 bc_r = dde.DirichletBC(geomtime, dir_func_r, r_boundary)
 bc_up = dde.NeumannBC(geomtime, func_zero, up_boundary)
 bc_low = dde.NeumannBC(geomtime, func_zero, down_boundary)
-bc_left = dde.NeumannBC(
-    geomtime, func_zero, l_boundary
-) 
+bc_left = dde.NeumannBC(geomtime, func_zero, l_boundary)
 ic = dde.IC(geomtime, init_func, boundary_initial)
 
 
@@ -91,7 +90,6 @@ data = dde.data.TimePDE(
     num_boundary=num_boundary,
     num_initial=num_initial,
 )
-
 
 net = dde.maps.FNN(layer_size, activation_func, initializer)
 net.apply_output_transform(lambda _, y: abs(y))
