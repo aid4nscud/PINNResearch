@@ -10,13 +10,13 @@ ALPHA = 1.0
 LENGTH = 1.0
 WIDTH = 1.0
 MAX_TIME = 1.0
-LAYER_SIZE = [3] + [20] * 9 + [1]
+LAYER_SIZE = [3] + [32] * 9 + [1]
 ACTIVATION = "tanh"
 INITIALIZER = "Glorot uniform"
 OPTIMIZER = "adam"
 LEARNING_RATE = 5e-4
 ITERATIONS = 20000
-LOSS_WEIGHTS = [1, 20, 1, 1, 1, 100]
+LOSS_WEIGHTS = [1, 1, 1, 1, 1, 10]
 
 # FDM Parameters
 NX = 100  # Number of spatial points in x-direction
@@ -93,7 +93,7 @@ def main():
         and not np.isclose(x[0], 0)
         and not np.isclose(x[0], LENGTH),
     )
-    ic = dde.IC(geotime, func_zero, lambda _, on_initial: on_initial)
+    ic = dde.IC(geotime, func_ic, lambda _, on_initial: on_initial)
 
     # Define Training Data
     data = dde.data.TimePDE(
