@@ -60,10 +60,10 @@ def init_func(X):
 num_domain = 30000
 num_boundary = 12000
 num_initial = 20000
-layer_size = [3] + [96] * 8 + [1]
+layer_size = [3] + [60] * 5 + [1]
 activation_func = "tanh"
 initializer = "Glorot uniform"
-lr = 1e-3
+lr = 5e-4
 # Applying Loss weights as given below
 # [PDE Loss, BC1 loss - Dirichlet Left , BC2 loss - Dirichlet Right, BC3 loss- Neumann up, BC4 loss - Neumann down, IC Loss]
 loss_weights = [20, 1, 1, 1, 1, 20]
