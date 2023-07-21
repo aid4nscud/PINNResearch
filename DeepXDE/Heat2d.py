@@ -60,7 +60,7 @@ def init_func(X):
 num_domain = 30000
 num_boundary = 8000
 num_initial = 20000
-layer_size = [3] + [120] * 5 + [1]
+layer_size = [3] + [300] * 5 + [1]
 activation_func = "tanh"
 initializer = "Glorot uniform"
 lr = 1e-3
