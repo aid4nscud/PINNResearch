@@ -109,6 +109,7 @@ dde.optimizers.set_LBFGS_options(
     maxcor=50,
 )
 dde.saveplot(losshistory, trainstate, issave=True, isplot=True)
+
 fig = plt.figure()
 ax = fig.add_subplot(111)
 nelx = 100
@@ -136,7 +137,7 @@ for time in t:
     X = np.column_stack((x_, y_))
     X = np.column_stack((X, t_))
     T = model.predict(X)
-    T = T * 30
+    # removed the line T = T * 30
     T = T.reshape(
         T.shape[0],
     )
