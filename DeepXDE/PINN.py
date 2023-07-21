@@ -62,6 +62,9 @@ def main():
     def func_zero(x):
         return np.zeros_like(x)
 
+    def output_transform(x, y):
+        return 100 * tf.nn.sigmoid(y)
+
     bc_right_edge = dde.DirichletBC(
         geotime,
         func_bc_right_edge,
@@ -111,6 +114,8 @@ def main():
 
     # Define Neural Network Architecture and Model
     net = dde.nn.FNN(LAYER_SIZE, ACTIVATION, INITIALIZER)
+    net.apply_output_transform(output_transform)
+
     model = dde.Model(data, net)
     model.compile(
         OPTIMIZER,
@@ -120,7 +125,7 @@ def main():
 
     # Train Model
     # early_stopping = dde.callbacks.EarlyStopping(min_delta=5e-8, patience=1000)
-    model.train(iterations=ITERATIONS,batch_size=BATCH_SIZE, callbacks=[pde_resampler])
+    model.train(iterations=ITERATIONS, batch_size=BATCH_SIZE, callbacks=[pde_resampler])
 
     # Generate Test Data
     x_data = np.linspace(0, LENGTH, num=100)
