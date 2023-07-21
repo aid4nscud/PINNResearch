@@ -44,19 +44,6 @@ def boundary_initial(X, on_initial):
     x, y, t = X
     return on_initial and np.isclose(t, 0)
 
-
-def init_func(X):
-    x = X[:, 0:1]
-    y = X[:, 1:2]
-    t = np.zeros((len(X), 1))
-    for count, x_ in enumerate(x):
-        if x_ < 0.5:
-            t[count] = t1
-        else:
-            t[count] = t1 + (2) * (x_ - 0.5)
-    return t
-
-
 def dir_func_r(X):
     return np.ones((len(X), 1)) * 100  # Temperature at right edge is 100 Kelvin
 
