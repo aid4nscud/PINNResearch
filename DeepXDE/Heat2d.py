@@ -57,10 +57,6 @@ def init_func(X):
     return t
 
 
-def dir_func_l(X):
-    return t1 * np.ones((len(X), 1))
-
-
 def dir_func_r(X):
     return np.ones((len(X), 1)) * 100  # Temperature at right edge is 100 Kelvin
 
