@@ -81,19 +81,19 @@ class HeatEquationFDM:
         """
         fig, ax = plt.subplots()  # Changed this line to get the ax object
         im = ax.imshow(self.u[:, :, 0], animated=True, origin='lower', extent=[0, self.L, 0, self.L], cmap='hot')
-        txt = ax.text(0.8, 0.1, '', transform=ax.transAxes)  # Text placeholder
 
         x, y, t = self.get_xyt_grids()
 
         def updatefig(i):
             im.set_array(self.u[:, :, i])
-            txt.set_text(f"t = {t[i]:.2f}")  # Set the text to current time
-            return im, txt  # Return the updated heatmap and text
+            plt.title(f"t = {t[i]:.2f}")  # Set the title to current time
+            return im,  # Return only the updated heatmap
 
         ani = animation.FuncAnimation(
             fig, updatefig, frames=self.Nt, interval=50, blit=True
         )
         ani.save("FDM_Solution.gif")
+
 
 if __name__ == "__main__":
     heat_solver = HeatEquationFDM(alpha=1.0, L=1.0, T=1.0, Nx=100, Ny=100, Nt=101)
