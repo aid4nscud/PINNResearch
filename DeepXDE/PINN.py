@@ -10,7 +10,7 @@ ALPHA = 1.0
 LENGTH = 1.0
 WIDTH = 1.0
 MAX_TIME = 1.0
-LAYER_SIZE = [3] + [150] * 3 + [1]
+LAYER_SIZE = [3] + [300] * 3 + [1]
 ACTIVATION = "tanh"
 INITIALIZER = "Glorot uniform"
 OPTIMIZER = "adam"
@@ -61,13 +61,6 @@ def main():
     def func_zero(x):
         return np.zeros_like(x)
 
-    def solution(x):
-        return fdm_solution[
-            np.floor(x[:, 0] * (NX - 1)).astype(int),
-            np.floor(x[:, 1] * (NY - 1)).astype(int),
-            np.floor(x[:, 2] * (NT - 1)).astype(int),
-        ][:, None]
-
     bc_right_edge = dde.DirichletBC(
         geotime,
         func_bc_right_edge,
@@ -110,9 +103,7 @@ def main():
         num_domain=10000,
         num_boundary=500,
         num_initial=2000,
-        solution=solution,
         num_test=10000,
-        
     )
 
     pde_resampler = dde.callbacks.PDEPointResampler(period=10)
@@ -121,7 +112,12 @@ def main():
     net = dde.nn.FNN(LAYER_SIZE, ACTIVATION, INITIALIZER)
     model = dde.Model(data, net)
     model = dde.Model(data, net)
-    model.compile(OPTIMIZER, LEARNING_RATE, loss_weights=LOSS_WEIGHTS, metrics=["l2 relative error"])
+    model.compile(
+        OPTIMIZER,
+        LEARNING_RATE,
+        loss_weights=LOSS_WEIGHTS,
+        metrics=["l2 relative error"],
+    )
 
     # Train Model
     # early_stopping = dde.callbacks.EarlyStopping(min_delta=5e-8, patience=1000)
