@@ -15,7 +15,7 @@ ACTIVATION = "tanh"
 INITIALIZER = "Glorot uniform"
 OPTIMIZER = "adam"
 LEARNING_RATE = 5e-4
-ITERATIONS = 20000
+ITERATIONS = 10000
 LOSS_WEIGHTS = [1, 10, 1, 1, 1, 10]
 
 # FDM Parameters
