@@ -116,7 +116,6 @@ t = np.linspace(0, 1, timesteps)
 delta_t = t[1] - t[0]
 xx, yy = np.meshgrid(x, y)
 
-
 x_ = np.zeros(shape=((nelx + 1) * (nely + 1),))
 y_ = np.zeros(shape=((nelx + 1) * (nely + 1),))
 for c1, ycor in enumerate(y):
@@ -132,7 +131,6 @@ for time in t:
     X = np.column_stack((x_, y_))
     X = np.column_stack((X, t_))
     T = model.predict(X)
-    # removed the line T = T * 30
     T = T.reshape(
         T.shape[0],
     )
@@ -143,7 +141,7 @@ for time in t:
 def plotheatmap(T, time):
     # Clear the current plot figure
     plt.clf()
-    plt.title(f"Temperature at t = {time*delta_t} unit time")
+    plt.title(f"Temperature at t = {time} unit time")  # modified to use actual time instead of frame number
     plt.xlabel("x")
     plt.ylabel("y")
     plt.pcolor(xx, yy, T, cmap="hot")
@@ -152,11 +150,11 @@ def plotheatmap(T, time):
 
 
 def animate(k):
-    plotheatmap(Ts[k], k)
+    plotheatmap(Ts[k], t[k])  # use the actual time value from array t
 
 
 anim = animation.FuncAnimation(
     plt.figure(), animate, interval=1, frames=len(t), repeat=False
 )
 
-anim.save("trial1.gif")
+anim.save("pinn_solution.gif")
