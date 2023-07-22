@@ -14,9 +14,7 @@ def pde(X,T):
     dT_xx = dde.grad.hessian(T, X ,j=0)
     dT_yy = dde.grad.hessian(T, X, j=1)
     dT_t = dde.grad.jacobian(T, X, j=2)
-#     Dividing by rhoc to make it 1
     alpha = 1.0
-    # no forcing function
     return dT_t - (alpha * (dT_xx + dT_yy))
 
 
@@ -38,14 +36,7 @@ def boundary_initial(X, on_initial):
     return on_initial and np.isclose(t, 0)
 
 def init_func(X):
-    x = X[:, 0:1]
-    y = X[:, 1:2]
     t = np.zeros((len(X),1))
-    for count,x_ in enumerate(x):
-        if x_ < 0.5:
-            t[count] = t1
-        else:
-            t[count] = t1 + (2) * (x_ - 0.5)
     return t
     
 def dir_func_l(X):
