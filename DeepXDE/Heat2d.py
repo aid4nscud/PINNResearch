@@ -65,11 +65,11 @@ activation_func = "tanh"
 initializer = "Glorot uniform"
 lr = 1e-3
 # Applying Loss weights as given below
-# [PDE Loss, BC1 loss - Dirichlet Left , BC2 loss - Dirichlet Right, BC3 loss- Neumann up, BC4 loss - Neumann down, IC Loss]
-loss_weights = [10, 1, 1, 1, 1, 10]
+# [PDE Loss, BC1 loss - Neumann Left , BC2 loss - Dirichlet Right, BC3 loss- Neumann up, BC4 loss - Neumann down, IC Loss]
+loss_weights = [20, 1, 5, 1, 1, 10]
 epochs = 10000
 optimizer = "adam"
-batch_size_ = 256
+batch_size_ = 512
 
 geom = dde.geometry.Rectangle(xmin=[0, 0], xmax=[1, 1])
 timedomain = dde.geometry.TimeDomain(0, end_time)
