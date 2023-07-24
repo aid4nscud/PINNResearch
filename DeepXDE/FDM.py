@@ -85,7 +85,7 @@ class HeatEquationFDM:
             animated=True,
             origin="lower",
             extent=[0, self.L, 0, self.L],
-            cmap="hot",
+            cmap="jet",
         )
 
         # Calculate the min and max values for the colorbar

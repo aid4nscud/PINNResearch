@@ -59,7 +59,7 @@ def func_zero(X):
 
 
 num_domain = 30000
-num_boundary = 15000
+num_boundary = 8000
 num_initial = 20000
 layer_size = [3] + [60] * 5 + [1]
 activation_func = "tanh"
@@ -155,7 +155,6 @@ for time in t:
     T = T.reshape(nelx + 1, nely + 1)
     Ts.append(T)
 
-
 def plotheatmap(T, time):
     # Clear the current plot figure
     plt.clf()
@@ -166,13 +165,12 @@ def plotheatmap(T, time):
     plt.colorbar()
     return plt
 
-
 def animate(k):
     plotheatmap(Ts[k], k)
-
 
 anim = animation.FuncAnimation(
     plt.figure(), animate, interval=100, frames=len(t), repeat=False
 )
 
-anim.save("pinn_solution.mp4", writer="ffmpeg")
+anim.save("pinn_heat2d_solution.mp4", writer="ffmpeg")
+
