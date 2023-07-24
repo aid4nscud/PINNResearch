@@ -155,6 +155,8 @@ for time in t:
     T = T.reshape(nelx + 1, nely + 1)
     Ts.append(T)
 
+global_min_temp = np.min([np.min(T) for T in Ts])
+global_max_temp = np.max([np.max(T) for T in Ts])
 
 def plotheatmap(T, time):
     # Clear the current plot figure
@@ -162,7 +164,7 @@ def plotheatmap(T, time):
     plt.title(f"Temperature at t = {round(time*delta_t, ndigits=2)}")
     plt.xlabel("x")
     plt.ylabel("y")
-    plt.pcolor(xx, yy, T, cmap="jet")
+    plt.pcolor(xx, yy, T, cmap="jet", vmin=global_min_temp, vmax=global_max_temp)
     plt.colorbar()
     return plt
 
