@@ -20,27 +20,27 @@ def pde(X, T):
 
 
 def r_boundary(X, on_boundary):
-    x, y, t = X
+    x, _, _ = X
     return on_boundary and np.isclose(x, 1)
 
 
 def l_boundary(X, on_boundary):
-    x, y, t = X
+    x, _, _ = X
     return on_boundary and np.isclose(x, 0)
 
 
 def up_boundary(X, on_boundary):
-    x, y, t = X
+    _, y, _ = X
     return on_boundary and np.isclose(y, 1)
 
 
 def down_boundary(X, on_boundary):
-    x, y, t = X
+    _, y, _ = X
     return on_boundary and np.isclose(y, 0)
 
 
 def boundary_initial(X, on_initial):
-    x, y, t = X
+    _, _, t = X
     return on_initial and np.isclose(t, 0)
 
 
@@ -65,24 +65,31 @@ layer_size = [3] + [60] * 5 + [1]
 activation_func = "tanh"
 initializer = "Glorot uniform"
 lr = 1e-3
-# Applying Loss weights as given below
-# [PDE Loss, BC1 loss - Neumann Left , BC2 loss - Dirichlet Right, BC3 loss- Neumann up, BC4 loss - Neumann down, IC Loss]
-loss_weights = [10, 1, 1, 1, 1, 10]
+loss_weights = [
+    10,
+    1,
+    1,
+    1,
+    1,
+    10,
+]  # [PDE Loss, BC1 loss - Neumann Left , BC2 loss - Dirichlet Right, BC3 loss- Neumann up, BC4 loss - Neumann down, IC Loss]
 epochs = 10000
 optimizer = "adam"
 batch_size_ = 256
 
+# Space + Time Domain
 geom = dde.geometry.Rectangle(xmin=[0, 0], xmax=[1, 1])
 timedomain = dde.geometry.TimeDomain(0, END_TIME)
 geomtime = dde.geometry.GeometryXTime(geom, timedomain)
 
+# Boundary + Initial Conditions
 bc_l = dde.NeumannBC(geomtime, func_zero, l_boundary)
 bc_r = dde.DirichletBC(geomtime, dir_func_r, r_boundary)
 bc_up = dde.NeumannBC(geomtime, func_zero, up_boundary)
 bc_low = dde.NeumannBC(geomtime, func_zero, down_boundary)
 ic = dde.IC(geomtime, init_func, boundary_initial)
 
-
+# Data Source
 data = dde.data.TimePDE(
     geomtime,
     pde,
@@ -92,26 +99,29 @@ data = dde.data.TimePDE(
     num_initial=num_initial,
 )
 
-
+# Define Model
 net = dde.maps.FNN(layer_size, activation_func, initializer)
 net.apply_output_transform(lambda x, y: abs(y))
 model = dde.Model(data, net)
 
 model.compile(optimizer, lr=lr, loss_weights=loss_weights)
 
+# Train Model
 losshistory, trainstate = model.train(
     epochs=epochs,
     batch_size=batch_size_,
 )
+# Re-Compile with L-BFGS Optimizer
 model.compile("L-BFGS-B")
 dde.optimizers.set_LBFGS_options(
     maxcor=50,
 )
+# Train again
 losshistory, train_state = model.train(epochs=epochs, batch_size=batch_size_)
 dde.saveplot(losshistory, trainstate, issave=True, isplot=True)
 
+# Test and build animation from each predicted time frame
 fig, ax = plt.subplots()
-
 ax = fig.add_subplot(111)
 nelx = 100
 nely = 100
