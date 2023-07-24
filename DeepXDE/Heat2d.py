@@ -66,14 +66,14 @@ activation_func = "tanh"
 initializer = "Glorot uniform"
 lr = 1e-3
 loss_weights = [
-    1,
-    1,
     10,
+    1,
+    1,
     1,
     1,
     10,
 ]  # [PDE Loss, BC1 loss - Neumann Left , BC2 loss - Dirichlet Right, BC3 loss- Neumann up, BC4 loss - Neumann down, IC Loss]
-epochs = 10000
+iterations = 20000
 optimizer = "adam"
 batch_size_ = 256
 
@@ -101,14 +101,14 @@ data = dde.data.TimePDE(
 
 # Define Model
 net = dde.maps.FNN(layer_size, activation_func, initializer)
-net.apply_output_transform(lambda x, y: abs(y))
+net.apply_output_transform(lambda _, y: abs(y))
 model = dde.Model(data, net)
 
 model.compile(optimizer, lr=lr, loss_weights=loss_weights)
 
 # Train Model
 losshistory, trainstate = model.train(
-    epochs=epochs,
+    iterations=iterations,
     batch_size=batch_size_,
 )
 # Re-Compile with L-BFGS Optimizer
@@ -117,7 +117,7 @@ dde.optimizers.set_LBFGS_options(
     maxcor=50,
 )
 # Train again
-losshistory, train_state = model.train(epochs=epochs, batch_size=batch_size_)
+losshistory, train_state = model.train(iterations=iterations, batch_size=batch_size_)
 dde.saveplot(losshistory, trainstate, issave=True, isplot=True)
 
 # Test and build animation from each predicted time frame
