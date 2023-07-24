@@ -59,7 +59,7 @@ def func_zero(X):
 
 
 num_domain = 30000
-num_boundary = 8000
+num_boundary = 15000
 num_initial = 20000
 layer_size = [3] + [60] * 5 + [1]
 activation_func = "tanh"
@@ -73,7 +73,7 @@ loss_weights = [
     1,
     10,
 ]  # [PDE Loss, BC1 loss - Neumann Left , BC2 loss - Dirichlet Right, BC3 loss- Neumann up, BC4 loss - Neumann down, IC Loss]
-iterations = 20000
+iterations = 10000
 optimizer = "adam"
 batch_size_ = 256
 
@@ -155,6 +155,7 @@ for time in t:
     T = T.reshape(nelx + 1, nely + 1)
     Ts.append(T)
 
+
 def plotheatmap(T, time):
     # Clear the current plot figure
     plt.clf()
@@ -175,4 +176,3 @@ anim = animation.FuncAnimation(
 )
 
 anim.save("pinn_solution.mp4", writer="ffmpeg")
-
