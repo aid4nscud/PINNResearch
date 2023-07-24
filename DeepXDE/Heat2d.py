@@ -158,7 +158,7 @@ def plotheatmap(T, time):
     plt.title(f"Temperature at t = {round(time*delta_t, ndigits=2)} unit time")
     plt.xlabel("x")
     plt.ylabel("y")
-    plt.pcolor(xx, yy, T, cmap="hot")
+    plt.pcolor(xx, yy, T, cmap="jet")
     plt.colorbar()
     return plt
 
