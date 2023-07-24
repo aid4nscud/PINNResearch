@@ -108,6 +108,6 @@ class HeatEquationFDM:
 
 
 if __name__ == "__main__":
-    heat_solver = HeatEquationFDM(alpha=1.0, L=1.0, T=1.0, Nx=100, Ny=100, Nt=101)
+    heat_solver = HeatEquationFDM(alpha=0.1, L=1.0, T=1.0, Nx=100, Ny=100, Nt=101)
     heat_solver.solve()
     heat_solver.animate_solution()
