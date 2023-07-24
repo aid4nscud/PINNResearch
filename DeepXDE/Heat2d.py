@@ -90,12 +90,6 @@ data = dde.data.TimePDE(
     num_domain=num_domain,
     num_boundary=num_boundary,
     num_initial=num_initial,
-    exclusions=[
-        lambda X, on_boundary: on_boundary and np.isclose(X[0], 0) and np.isclose(X[1], 0),  # bottom left vertex
-        lambda X, on_boundary: on_boundary and np.isclose(X[0], 1) and np.isclose(X[1], 0),  # bottom right vertex
-        lambda X, on_boundary: on_boundary and np.isclose(X[0], 0) and np.isclose(X[1], 1),  # top left vertex
-        lambda X, on_boundary: on_boundary and np.isclose(X[0], 1) and np.isclose(X[1], 1),  # top right vertex
-    ],
 )
 
 
