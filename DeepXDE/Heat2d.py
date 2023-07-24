@@ -158,7 +158,7 @@ def plotheatmap(T, time):
 
 
 def animate(k):
-    plotheatmap(Ts[k], t[k])
+    plotheatmap(Ts[k], k)
 
 
 anim = animation.FuncAnimation(
