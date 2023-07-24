@@ -6,17 +6,17 @@ import matplotlib.animation as animation
 from matplotlib.animation import FuncAnimation
 
 # Some useful functions
-t1 = 0
-t2 = 1
-end_time = 1
+START = 0
+END_TIME = 1
+ALPHA = 1.0
 
 
 def pde(X, T):
     dT_xx = dde.grad.hessian(T, X, j=0)
     dT_yy = dde.grad.hessian(T, X, j=1)
     dT_t = dde.grad.jacobian(T, X, j=2)
-    alpha = 1.0
-    return dT_t - (alpha * (dT_xx + dT_yy))
+
+    return dT_t - (ALPHA * (dT_xx + dT_yy))
 
 
 def r_boundary(X, on_boundary):
@@ -50,7 +50,8 @@ def init_func(X):
 
 
 def dir_func_r(X):
-    return t2 * np.ones((len(X), 1))
+    # IMPORTANT: The boundary condition is scaled down to be between 0 and 1 (1 for this scenario) so that the NN can minimize all of the diff losses effectively using Tanh.
+    return np.ones((len(X), 1))
 
 
 def func_zero(X):
@@ -72,7 +73,7 @@ optimizer = "adam"
 batch_size_ = 256
 
 geom = dde.geometry.Rectangle(xmin=[0, 0], xmax=[1, 1])
-timedomain = dde.geometry.TimeDomain(0, end_time)
+timedomain = dde.geometry.TimeDomain(0, END_TIME)
 geomtime = dde.geometry.GeometryXTime(geom, timedomain)
 
 bc_l = dde.NeumannBC(geomtime, func_zero, l_boundary)
