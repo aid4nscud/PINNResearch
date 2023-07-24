@@ -159,7 +159,7 @@ for time in t:
 def plotheatmap(T, time):
     # Clear the current plot figure
     plt.clf()
-    plt.title(f"Temperature at t = {round(time*delta_t, ndigits=2)} unit time")
+    plt.title(f"Temperature at t = {round(time*delta_t, ndigits=2)}")
     plt.xlabel("x")
     plt.ylabel("y")
     plt.pcolor(xx, yy, T, cmap="jet")
