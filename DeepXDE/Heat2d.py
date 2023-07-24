@@ -61,17 +61,17 @@ def func_zero(X):
 num_domain = 30000
 num_boundary = 8000
 num_initial = 20000
-layer_size = [3] + [60] * 5 + [1]
+layer_size = [3] + [120] * 5 + [1]
 activation_func = "tanh"
 initializer = "Glorot uniform"
 lr = 1e-3
 loss_weights = [
-    10,
-    1,
-    1,
-    1,
+    15,
     1,
     10,
+    1,
+    1,
+    15,
 ]  # [PDE Loss, BC1 loss - Neumann Left , BC2 loss - Dirichlet Right, BC3 loss- Neumann up, BC4 loss - Neumann down, IC Loss]
 epochs = 10000
 optimizer = "adam"
