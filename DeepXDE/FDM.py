@@ -91,7 +91,6 @@ class HeatEquationFDM:
         # Calculate the min and max values for the colorbar
         cbar_min = np.min(self.u)
         cbar_max = np.max(self.u)
-        cbar = fig.colorbar(im, ax=ax)
         im.set_clim(cbar_min, cbar_max)  # This sets the colorbar limits
 
         x, y, t = self.get_xyt_grids()
@@ -108,6 +107,6 @@ class HeatEquationFDM:
 
 
 if __name__ == "__main__":
-    heat_solver = HeatEquationFDM(alpha=1, L=1.0, T=1.0, Nx=50, Ny=50, Nt=51)
+    heat_solver = HeatEquationFDM(alpha=1.0, L=1.0, T=1.0, Nx=100, Ny=100, Nt=101)
     heat_solver.solve()
     heat_solver.animate_solution()
