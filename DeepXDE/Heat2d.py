@@ -155,16 +155,13 @@ for time in t:
     T = T.reshape(nelx + 1, nely + 1)
     Ts.append(T)
 
-global_min_temp = np.min([np.min(T) for T in Ts])
-global_max_temp = np.max([np.max(T) for T in Ts])
-
 def plotheatmap(T, time):
     # Clear the current plot figure
     plt.clf()
     plt.title(f"Temperature at t = {round(time*delta_t, ndigits=2)}")
     plt.xlabel("x")
     plt.ylabel("y")
-    plt.pcolor(xx, yy, T, cmap="jet", vmin=global_min_temp, vmax=global_max_temp)
+    plt.pcolor(xx, yy, T, cmap="jet")
     plt.colorbar()
     return plt
 
@@ -174,7 +171,8 @@ def animate(k):
 
 
 anim = animation.FuncAnimation(
-    plt.figure(), animate, interval=1, frames=len(t), repeat=False
+    plt.figure(), animate, interval=100, frames=len(t), repeat=False
 )
 
-anim.save("pinn_solution.gif")
+anim.save("pinn_solution.mp4", writer="ffmpeg")
+
