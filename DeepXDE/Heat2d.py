@@ -2,7 +2,7 @@
 import deepxde as dde  # Deep learning framework for solving differential equations
 import matplotlib.pyplot as plt  # For creating static, animated, and interactive visualizations in Python
 import numpy as np  # For numerical operations
-from deepxde.backT_END import tf  # Tensorflow backT_END for DeepXDE
+from deepxde.backend import tf  # Tensorflow backT_END for DeepXDE
 import matplotlib.animation as animation  # For creating animations
 from matplotlib.animation import (
     FuncAnimation,
