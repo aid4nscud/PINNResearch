@@ -107,7 +107,7 @@ data = dde.data.TimePDE(
 net = dde.maps.FNN(layer_size, activation_func, initializer)
 net.apply_output_transform(lambda x, y: abs(y))
 ## Uncomment below line to apply hard Dirichlet Boundary Conditions
-# net.outputs_modify(lambda x, y: x[:,0:1]*t2 + x[:,0:1] * (1 - x[:,0:1]) * y)
+net.outputs_modify(lambda x, y: x[:,0:1]*t2 + x[:,0:1] * (1 - x[:,0:1]) * y)
 model = dde.Model(data, net)
 
 model.compile(optimizer, lr=lr, loss_weights=loss_weights)
