@@ -87,7 +87,7 @@ geom = dde.geometry.Rectangle(xmin=[0, 0], xmax=[1, 1])
 timedomain = dde.geometry.TimeDomain(0, end_time)
 geomtime = dde.geometry.GeometryXTime(geom, timedomain)
 
-bc_l = dde.DirichletBC(geomtime, dir_func_l, l_boundary)
+bc_l = dde.NeumannBC(geomtime, func_zero, l_boundary)
 bc_r = dde.DirichletBC(geomtime, dir_func_r, r_boundary)
 bc_up = dde.NeumannBC(geomtime, func_zero, up_boundary)
 bc_low = dde.NeumannBC(geomtime, func_zero, down_boundary)
@@ -107,7 +107,7 @@ data = dde.data.TimePDE(
 net = dde.maps.FNN(layer_size, activation_func, initializer)
 net.apply_output_transform(lambda x, y: abs(y))
 ## Uncomment below line to apply hard Dirichlet Boundary Conditions
-net.apply_output_transform(lambda x, y: x[:,0:1]*t2 + x[:,0:1] * (1 - x[:,0:1]) * y)
+net.apply_output_transform(lambda x, y: x[:,0:1]*t2 + (1 - x[:,0:1]) * y)
 model = dde.Model(data, net)
 
 model.compile(optimizer, lr=lr, loss_weights=loss_weights)
