@@ -26,10 +26,10 @@ LEARNING_RATE = 1e-3  # Learning rate
 LOSS_WEIGHTS = [
     10,
     1,
+    1,
+    1,
+    1,
     10,
-    1,
-    1,
-    1,
 ]  # Weights for different components of the loss function
 ITERATIONS = 10000  # Number of training iterations
 OPTIMIZER = "adam"  # Optimizer for the first part of the training
@@ -119,7 +119,7 @@ data = dde.data.TimePDE(
 # Define the neural network model
 net = dde.maps.FNN(ARCHITECTURE, ACTIVATION, INITIALIZER)  # Feed-forward neural network
 tolerance = 1e-3
-net.apply_output_transform(lambda _, y: abs(y)) # All output values should be positibe
+net.apply_output_transform(lambda _, y: abs(y))
 model = dde.Model(data, net)  # Create the model
 
 # Compile the model with the chosen optimizer, learning rate and loss weights
@@ -132,6 +132,7 @@ losshistory, trainstate = model.train(
 )
 
 # Re-compile the model with the L-BFGS optimizer
+
 model.compile("L-BFGS-B")
 dde.optimizers.set_LBFGS_options(
     maxcor=50,
@@ -183,7 +184,9 @@ for time in t:
 # Function to plot the heatmap of the solution
 def plotheatmap(T, time):
     plt.clf()  # Clear the current plot figure
-    plt.title(f"Temperature at t = {round(time*delta_t, ndigits=2)}")
+    plt.title(
+        f"Time = {round(time*delta_t, ndigits=2)}     Surface: Dependent variable T (K)"
+    )
     plt.xlabel("x")  # x label
     plt.ylabel("y")  # y label
     plt.pcolor(xx, yy, T, cmap="jet")  # Plot the solution as a colored heatmap
