@@ -120,7 +120,7 @@ data = dde.data.TimePDE(
 net = dde.maps.FNN(ARCHITECTURE, ACTIVATION, INITIALIZER)  # Feed-forward neural network
 tolerance = 1e-3
 net.apply_output_transform(
-    lambda x, y: tf.where(x[:, 0:1] > (1 - tolerance), tf.ones_like(y), abs(y))
+    lambda x, y: tf.where(x[:, 0:1] > (1 - tolerance), tf.ones_like(y))
 )
 model = dde.Model(data, net)  # Create the model
 
