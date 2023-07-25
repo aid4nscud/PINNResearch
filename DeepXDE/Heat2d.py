@@ -25,10 +25,10 @@ INITIALIZER = "Glorot uniform"  # Weights initializer
 LEARNING_RATE = 1e-3  # Learning rate
 LOSS_WEIGHTS = [
     10,
+    10,
     1,
-    1,
-    1,
-    1,
+    10,
+    10,
     10,
 ]  # Weights for different components of the loss function
 ITERATIONS = 10000  # Number of training iterations
@@ -120,7 +120,7 @@ data = dde.data.TimePDE(
 net = dde.maps.FNN(ARCHITECTURE, ACTIVATION, INITIALIZER)  # Feed-forward neural network
 tolerance = 1e-3
 net.apply_output_transform(
-    lambda x, y: tf.where(x[:, 0:1] > (1 - tolerance), tf.ones_like(y))
+    lambda x, y: tf.where(x[:, 0:1] > (1 - tolerance), tf.ones_like(y), abs(y))
 )
 model = dde.Model(data, net)  # Create the model
 
