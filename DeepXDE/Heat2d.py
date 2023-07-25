@@ -2,7 +2,7 @@
 import deepxde as dde  # Deep learning framework for solving differential equations
 import matplotlib.pyplot as plt  # For creating static, animated, and interactive visualizations in Python
 import numpy as np  # For numerical operations
-from deepxde.backend import tf  # Tensorflow backT_END for DeepXDE
+from deepxde.backend import tf  # Tensorflow backend for DeepXDE
 import matplotlib.animation as animation  # For creating animations
 from matplotlib.animation import (
     FuncAnimation,
@@ -179,7 +179,7 @@ for time in t:
         T.shape[0],
     )
     T = T.reshape(nelx + 1, nely + 1)
-    Ts.appT_END(T)
+    Ts.append(T)
 
 
 # Function to plot the heatmap of the solution
