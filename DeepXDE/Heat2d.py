@@ -16,10 +16,9 @@ def pde(X, T):
     dT_yy = dde.grad.hessian(T, X, j=1)
     dT_t = dde.grad.jacobian(T, X, j=2)
     #     Dividing by rhoc to make it 1
-    rhoc = (3.8151 * 10**3) / (3.8151 * 10**3)
-    kap = 385 / (3.8151 * 10**3)
+    ALPHA = 1.0
     # no forcing function
-    return (rhoc * dT_t) - (kap * (dT_xx + dT_yy))
+    return dT_t - (ALPHA * (dT_xx + dT_yy))
 
 
 def r_boundary(X, on_boundary):
