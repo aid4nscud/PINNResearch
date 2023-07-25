@@ -25,11 +25,11 @@ INITIALIZER = "Glorot uniform"  # Weights initializer
 LEARNING_RATE = 1e-3  # Learning rate
 LOSS_WEIGHTS = [
     10,
-    10,
     1,
     10,
-    10,
-    10,
+    1,
+    1,
+    1,
 ]  # Weights for different components of the loss function
 ITERATIONS = 10000  # Number of training iterations
 OPTIMIZER = "adam"  # Optimizer for the first part of the training
@@ -119,9 +119,7 @@ data = dde.data.TimePDE(
 # Define the neural network model
 net = dde.maps.FNN(ARCHITECTURE, ACTIVATION, INITIALIZER)  # Feed-forward neural network
 tolerance = 1e-3
-net.apply_output_transform(
-    lambda x, y: tf.where(x[:, 0:1] > (1 - tolerance), tf.ones_like(y), abs(y))
-)
+net.apply_output_transform(lambda _, y: abs(y)) # All output values should be positibe
 model = dde.Model(data, net)  # Create the model
 
 # Compile the model with the chosen optimizer, learning rate and loss weights
@@ -169,8 +167,8 @@ for time in t:
     t_ = np.ones(
         (nelx + 1) * (nely + 1),
     ) * (time)
-    X = np.column_stack((x_, y_)) # Making 2d array with x and y
-    X = np.column_stack((X, t_)) # Making 3d array with the 2d array and t
+    X = np.column_stack((x_, y_))  # Making 2d array with x and y
+    X = np.column_stack((X, t_))  # Making 3d array with the 2d array and t
     T = model.predict(X)  # Predict the solution
     T = (
         T * 100
