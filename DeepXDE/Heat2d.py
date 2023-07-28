@@ -50,23 +50,15 @@ def pde(X, T):
 def boundary_right(X, on_boundary):
     x, _, _ = X
     return on_boundary and np.isclose(x, WIDTH)  # Check if on the right boundary
-
-
 def boundary_left(X, on_boundary):
     x, _, _ = X
     return on_boundary and np.isclose(x, 0)  # Check if on the left boundary
-
-
 def boundary_top(X, on_boundary):
     _, y, _ = X
     return on_boundary and np.isclose(y, LENGTH)  # Check if on the upper boundary
-
-
 def boundary_bottom(X, on_boundary):
     _, y, _ = X
     return on_boundary and np.isclose(y, 0)  # Check if on the lower boundary
-
-
 # Define initial condition
 def boundary_initial(X, on_initial):
     _, _, t = X
