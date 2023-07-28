@@ -69,13 +69,9 @@ def boundary_initial(X, on_initial):
 def init_func(X):
     t = np.zeros((len(X), 1))  # Temperature is zero everywhere at the T_START
     return t
-
-
 # Define Dirichlet and Neumann boundary conditions
 def constraint_right(X):
-    # The boundary condition is scaled down to be between 0 and 1 (1 for this scenario) so that the NN can minimize all of the diff losses effectively using Tanh.
     return np.ones((len(X), 1))  # On the right boundary, temperature is kept at 1
-
 
 def func_zero(X):
     return np.zeros(
@@ -112,20 +108,16 @@ model = dde.Model(data, net)  # Create the model
 
 # Compile the model with the chosen optimizer, learning rate and loss weights
 model.compile(OPTIMIZER, lr=LEARNING_RATE, loss_weights=LOSS_WEIGHTS)
-
 # Train the model
 losshistory, trainstate = model.train(
     iterations=ITERATIONS,
     batch_size=BATCH_SIZE,
 )
-
 # Re-compile the model with the L-BFGS optimizer
-
 model.compile("L-BFGS-B")
 dde.optimizers.set_LBFGS_options(
     maxcor=50,
 )
-
 # Train the model again with the new optimizer
 losshistory, train_state = model.train(iterations=ITERATIONS, batch_size=BATCH_SIZE)
 dde.saveplot(losshistory, trainstate, issave=True, isplot=True)
