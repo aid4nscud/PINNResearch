@@ -86,8 +86,6 @@ def init_func(X):
 
 
 # Define Neumann boundary condition
-
-
 def func_zero(X):
     return np.zeros(
         (len(X), 1)
