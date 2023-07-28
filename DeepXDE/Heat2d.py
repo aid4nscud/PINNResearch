@@ -115,7 +115,6 @@ data = dde.data.TimePDE(
 
 # Define the neural network model
 net = dde.maps.FNN(ARCHITECTURE, ACTIVATION, INITIALIZER)  # Feed-forward neural network
-tolerance = 1e-3
 net.apply_output_transform(lambda _, y: abs(y))
 model = dde.Model(data, net)  # Create the model
 
