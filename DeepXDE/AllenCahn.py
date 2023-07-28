@@ -34,7 +34,7 @@ OPTIMIZER = "adam"  # Optimizer for the first part of the training
 BATCH_SIZE = 256  # Batch size
 
 
-# Define PDE
+# Define Allen-Cahn PDE
 def pde(X, u):
     # Calculate second derivatives (Hessians) of u with respect to X in both dimensions
     du_xx = dde.grad.hessian(u, X, i=0, j=0)
