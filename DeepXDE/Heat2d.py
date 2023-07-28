@@ -10,10 +10,7 @@ from matplotlib.animation import (
 
 # Constants/Network Parameters
 T_START = 0
-T_END = 1
-WIDTH = 1.0
-LENGTH = 1.0
-ALPHA = 1.0  # Coefficient of the partial differential equation (PDE)
+T_END, WIDTH, LENGTH, ALPHA = 1.0
 NUM_DOMAIN = 30000  # Number of training samples in the domain
 NUM_BOUNDARY = 8000  # Number of training samples on the boundary
 NUM_INITIAL = 20000  # Number of training samples for initial conditions
