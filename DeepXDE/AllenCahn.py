@@ -10,7 +10,7 @@ from matplotlib.animation import (
 
 # Constants/Network Parameters
 T_START = 0
-T_END, WIDTH, LENGTH = 1.0
+T_END = WIDTH = LENGTH = 1.0
 EPSILON = 0.0125
 NUM_DOMAIN = 30000  # Number of training samples in the domain
 NUM_BOUNDARY = 8000  # Number of training samples on the boundary
