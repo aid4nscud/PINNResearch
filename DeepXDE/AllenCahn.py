@@ -35,50 +35,38 @@ BATCH_SIZE = 256  # Batch size
 
 
 # Define Allen-Cahn PDE
-def pde(X, y):
-    dy_t = dde.grad.jacobian(y, X, i=0, j=2)
-    dy_xx = dde.grad.hessian(y, X, i=0, j=0)
-    dy_yy = dde.grad.hessian(y, X, i=1, j=1)
-    return dy_t - EPSILON * (dy_xx + dy_yy) - 10 * (y - y**3)
+def pde(X, u): 
+    du_t = dde.grad.jacobian(u, X, i=0, j=2) 
+    du_xx = dde.grad.hessian(u, X, i=0, j=0)
+    du_yy = dde.grad.hessian(u, X, i=1, j=1)
+    return du_t - EPSILON * (du_xx + du_yy) - 10 * (u - u**3)
 
-def output_transform(x, y):
-    return init_func(x) + x[:, 1:2] * (1 - x[:, 0:1]**2) * y
+def output_transform(X, u):
+    return (1 - X[:, 0:1]**2) * (1 - X[:, 1:2]**2) * u + (1 - X[:, 2:3]) * init_func(X)
 
 # Define boundary conditions
 def boundary_right(X, on_boundary):
     x, _, _ = X
     return on_boundary and np.isclose(x, WIDTH)  # Check if on the right boundary
-
-
 def boundary_left(X, on_boundary):
     x, _, _ = X
     return on_boundary and np.isclose(x, 0)  # Check if on the left boundary
-
-
 def boundary_top(X, on_boundary):
     _, y, _ = X
     return on_boundary and np.isclose(y, LENGTH)  # Check if on the upper boundary
-
-
 def boundary_bottom(X, on_boundary):
     _, y, _ = X
     return on_boundary and np.isclose(y, 0)  # Check if on the lower boundary
-
-
 # Define initial condition
 def boundary_initial(X, on_initial):
     _, _, t = X
     return on_initial and np.isclose(t, 0)  # Check if at the initial time
-
-
 # Initialize a function for the temperature field
 def init_func(X):
     t = np.random.uniform(
         -0.05, 0.05, (len(X), 1)
     )  # Temperature is randomly distributed between -0.05 and 0.05 everywhere at the start
     return t * 20
-
-
 # Define Neumann boundary condition
 def func_zero(X):
     return np.zeros(
@@ -102,7 +90,7 @@ ic = dde.IC(geomtime, init_func, boundary_initial)  # Initial condition
 data = dde.data.TimePDE(
     geomtime,
     pde,
-    [bc_l, bc_r, bc_up, bc_low, ic],
+    [],
     num_domain=NUM_DOMAIN,
     num_boundary=NUM_BOUNDARY,
     num_initial=NUM_INITIAL,
