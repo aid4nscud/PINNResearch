@@ -43,7 +43,7 @@ def pde(X, u):
     # Calculate first derivative (Jacobian) of u with respect to X in time dimension
     du_t = dde.grad.jacobian(u, X, j=2)
 
-    # Calculate f(u) = u^3 - u
+    # Calculate f(u) = 10u^3 - u
     f_u = (10 * tf.pow(u, 3)) - u
 
     # Return the defined PDE
