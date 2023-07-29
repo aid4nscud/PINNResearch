@@ -16,7 +16,7 @@ NUM_DOMAIN = 30000  # Number of training samples in the domain
 NUM_BOUNDARY = 8000  # Number of training samples on the boundary
 NUM_INITIAL = 20000  # Number of training samples for initial conditions
 ARCHITECTURE = (
-    [3] + [120] * 10 + [1]
+    [3] + [60] * 5 + [1]
 )  # Network architecture ([input_dim, hidden_layer_1_dim, ..., output_dim])
 ACTIVATION = "tanh"  # Activation function
 INITIALIZER = "Glorot uniform"  # Weights initializer
@@ -44,7 +44,7 @@ def pde(X, u):
     du_t = dde.grad.jacobian(u, X, j=2)
 
     # Calculate f(u) = 10u^3 - u
-    f_u = (10 * tf.pow(u, 3)) - u
+    f_u = 10 * (tf.pow(u, 3) - u)
 
     # Return the defined PDE
     return du_t - EPSILON**2 * (du_xx + du_yy) + f_u
