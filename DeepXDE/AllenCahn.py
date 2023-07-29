@@ -41,8 +41,8 @@ def pde(X, u):
     du_yy = dde.grad.hessian(u, X, i=1, j=1)
     return du_t - EPSILON * (du_xx + du_yy) - 10 * (u - u**3)
 
-def output_transform(X, u):
-    return (1 - X[:, 0:1]**2) * (1 - X[:, 1:2]**2) * u + (1 - X[:, 2:3]) * init_func(X)
+def output_transform(x, y):
+    return (4 * (x[:, 0:1] - 0.5)**2) * (4 * (x[:, 1:2] - 0.5)**2) * y + (1 - x[:, 2:3]) * init_func(x)
 
 # Define boundary conditions
 def boundary_right(X, on_boundary):
