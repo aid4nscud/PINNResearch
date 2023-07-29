@@ -16,7 +16,7 @@ NUM_DOMAIN = 30000  # Number of training samples in the domain
 NUM_BOUNDARY = 8000  # Number of training samples on the boundary
 NUM_INITIAL = 20000  # Number of training samples for initial conditions
 ARCHITECTURE = (
-    [3] + [60] * 10 + [1]
+    [3] + [60] * 5 + [1]
 )  # Network architecture ([input_dim, hidden_layer_1_dim, ..., output_dim])
 ACTIVATION = "tanh"  # Activation function
 INITIALIZER = "Glorot uniform"  # Weights initializer
@@ -35,20 +35,14 @@ BATCH_SIZE = 256  # Batch size
 
 
 # Define Allen-Cahn PDE
-def pde(X, u):
-    # Calculate second derivatives (Hessians) of u with respect to X in both dimensions
-    du_xx = dde.grad.hessian(u, X, i=0, j=0)
-    du_yy = dde.grad.hessian(u, X, i=1, j=1)
+def pde(X, y):
+    dy_t = dde.grad.jacobian(y, X, i=0, j=2)
+    dy_xx = dde.grad.hessian(y, X, i=0, j=0)
+    dy_yy = dde.grad.hessian(y, X, i=1, j=1)
+    return dy_t - EPSILON * (dy_xx + dy_yy) - 10 * (y - y**3)
 
-    # Calculate first derivative (Jacobian) of u with respect to X in time dimension
-    du_t = dde.grad.jacobian(u, X, j=2)
-
-    # Calculate f(u) = 10u^3 - u
-    f_u = 10 * (tf.pow(u, 3) - u)
-
-    # Return the defined PDE
-    return du_t - EPSILON**2 * (du_xx + du_yy) + f_u
-
+def output_transform(x, y):
+    return init_func(x) + x[:, 1:2] * (1 - x[:, 0:1]**2) * y
 
 # Define boundary conditions
 def boundary_right(X, on_boundary):
@@ -116,6 +110,7 @@ data = dde.data.TimePDE(
 
 # Define the neural network model
 net = dde.maps.FNN(ARCHITECTURE, ACTIVATION, INITIALIZER)  # Feed-forward neural network
+net.apply_output_transform(output_transform)
 model = dde.Model(data, net)  # Create the model
 
 # Compile the model with the chosen optimizer, learning rate and loss weights
