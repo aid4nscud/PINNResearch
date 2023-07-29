@@ -172,10 +172,9 @@ for time in t:
 
 # Function to plot the heatmap of the solution
 def plotheatmap(T, time):
+    time_text = round(time * delta_t, ndigits=2)
     plt.clf()  # Clear the current plot figure
-    plt.title(
-        f"Time = {round(time*delta_t, ndigits=2)}     Surface: Dependent variable T (K)"
-    )
+    plt.title(f"Time = {time_text}     Surface: Dependent variable u ({time_text})")
     plt.xlabel("x")  # x label
     plt.ylabel("y")  # y label
     plt.pcolor(xx, yy, T, cmap="jet")  # Plot the solution as a colored heatmap
