@@ -22,7 +22,7 @@ ACTIVATION = "tanh"  # Activation function
 INITIALIZER = "Glorot uniform"  # Weights initializer
 LEARNING_RATE = 1e-3  # Learning rate
 LOSS_WEIGHTS = [
-    10,
+    1,
     1,
     1,
     1,
@@ -44,7 +44,7 @@ def pde(X, u):
     du_t = dde.grad.jacobian(u, X, j=2)
 
     # Calculate f(u) = u^3 - u
-    f_u = tf.pow(u, 3) - u
+    f_u = (10 * tf.pow(u, 3)) - u
 
     # Return the defined PDE
     return du_t - EPSILON**2 * (du_xx + du_yy) + f_u
