@@ -18,7 +18,7 @@ NUM_INITIAL = 20000  # Number of training samples for initial conditions
 ARCHITECTURE = (
     [3] + [300] * 5 + [1]
 )  # Network architecture ([input_dim, hidden_layer_1_dim, ..., output_dim])
-ACTIVATION = "tanh"  # Activation function
+ACTIVATION = "relu"  # Activation function
 INITIALIZER = "Glorot uniform"  # Weights initializer
 LEARNING_RATE = 1e-3  # Learning rate
 LOSS_WEIGHTS = [
