@@ -16,7 +16,7 @@ NUM_DOMAIN = 30000  # Number of training samples in the domain
 NUM_BOUNDARY = 8000  # Number of training samples on the boundary
 NUM_INITIAL = 20000  # Number of training samples for initial conditions
 ARCHITECTURE = (
-    [3] + [120] * 5 + [1]
+    [3] + [300] * 5 + [1]
 )  # Network architecture ([input_dim, hidden_layer_1_dim, ..., output_dim])
 ACTIVATION = "tanh"  # Activation function
 INITIALIZER = "Glorot uniform"  # Weights initializer
