@@ -74,7 +74,7 @@ def init_func(X):
     t = np.random.uniform(
         -0.05, 0.05, (len(X), 1)
     )  # Temperature is randomly distributed between -0.05 and 0.05 everywhere at the start
-    
+    return t
 
 
 # Define Neumann boundary condition
@@ -155,7 +155,7 @@ for time in t:
     X = np.column_stack((x_, y_))  # Making 2d array with x and y
     X = np.column_stack((X, t_))  # Making 3d array with the 2d array and t
     T = model.predict(X)  # Predict the solution
-   
+
     T = T.reshape(
         T.shape[0],
     )
