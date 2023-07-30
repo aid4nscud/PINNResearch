@@ -16,7 +16,7 @@ NUM_DOMAIN = 30000  # Number of training samples in the domain
 NUM_BOUNDARY = 8000  # Number of training samples on the boundary
 NUM_INITIAL = 20000  # Number of training samples for initial conditions
 ARCHITECTURE = (
-    [3] + [60] * 5 + [1]
+    [3] + [120] * 5 + [1]
 )  # Network architecture ([input_dim, hidden_layer_1_dim, ..., output_dim])
 ACTIVATION = "tanh"  # Activation function
 INITIALIZER = "Glorot uniform"  # Weights initializer
@@ -35,38 +35,48 @@ BATCH_SIZE = 256  # Batch size
 
 
 # Define Allen-Cahn PDE
-def pde(X, u): 
-    du_t = dde.grad.jacobian(u, X, i=0, j=2) 
+def pde(X, u):
+    du_t = dde.grad.jacobian(u, X, i=0, j=2)
     du_xx = dde.grad.hessian(u, X, i=0, j=0)
     du_yy = dde.grad.hessian(u, X, i=1, j=1)
     return du_t - EPSILON * (du_xx + du_yy) - 10 * (u - u**3)
 
-def output_transform(x, y):
-    return (4 * (x[:, 0:1] - 0.5)**2) * (4 * (x[:, 1:2] - 0.5)**2) * y + (1 - x[:, 2:3]) * init_func(x)
 
 # Define boundary conditions
 def boundary_right(X, on_boundary):
     x, _, _ = X
     return on_boundary and np.isclose(x, WIDTH)  # Check if on the right boundary
+
+
 def boundary_left(X, on_boundary):
     x, _, _ = X
     return on_boundary and np.isclose(x, 0)  # Check if on the left boundary
+
+
 def boundary_top(X, on_boundary):
     _, y, _ = X
     return on_boundary and np.isclose(y, LENGTH)  # Check if on the upper boundary
+
+
 def boundary_bottom(X, on_boundary):
     _, y, _ = X
     return on_boundary and np.isclose(y, 0)  # Check if on the lower boundary
+
+
 # Define initial condition
 def boundary_initial(X, on_initial):
     _, _, t = X
     return on_initial and np.isclose(t, 0)  # Check if at the initial time
+
+
 # Initialize a function for the temperature field
 def init_func(X):
     t = np.random.uniform(
         -0.05, 0.05, (len(X), 1)
     )  # Temperature is randomly distributed between -0.05 and 0.05 everywhere at the start
     return t * 20
+
+
 # Define Neumann boundary condition
 def func_zero(X):
     return np.zeros(
@@ -90,7 +100,7 @@ ic = dde.IC(geomtime, init_func, boundary_initial)  # Initial condition
 data = dde.data.TimePDE(
     geomtime,
     pde,
-    [],
+    [bc_r, bc_low, bc_l, bc_up, ic],
     num_domain=NUM_DOMAIN,
     num_boundary=NUM_BOUNDARY,
     num_initial=NUM_INITIAL,
@@ -98,7 +108,6 @@ data = dde.data.TimePDE(
 
 # Define the neural network model
 net = dde.maps.FNN(ARCHITECTURE, ACTIVATION, INITIALIZER)  # Feed-forward neural network
-net.apply_output_transform(output_transform)
 model = dde.Model(data, net)  # Create the model
 
 # Compile the model with the chosen optimizer, learning rate and loss weights
