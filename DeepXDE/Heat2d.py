@@ -1,188 +1,159 @@
-# Import necessary libraries
-import deepxde as dde  # Deep learning framework for solving differential equations
-import matplotlib.pyplot as plt  # For creating static, animated, and interactive visualizations in Python
-import numpy as np  # For numerical operations
-from deepxde.backend import tf  # Tensorflow backend for DeepXDE
-import matplotlib.animation as animation  # For creating animations
-from matplotlib.animation import (
-    FuncAnimation,
-)  # Function-based interface to create animations
+import deepxde as dde
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+import tensorflow as tf
 
-# Constants/Network Parameters
-T_START = 0
-T_END = WIDTH = LENGTH = ALPHA = 1.0
-NUM_DOMAIN = 30000  # Number of training samples in the domain
-NUM_BOUNDARY = 8000  # Number of training samples on the boundary
-NUM_INITIAL = 20000  # Number of training samples for initial conditions
-ARCHITECTURE = (
-    [3] + [60] * 5 + [1]
-)  # Network architecture ([input_dim, hidden_layer_1_dim, ..., output_dim])
-ACTIVATION = "tanh"  # Activation function
-INITIALIZER = "Glorot uniform"  # Weights initializer
-LEARNING_RATE = 1e-3  # Learning rate
-LOSS_WEIGHTS = [
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-]  # Weights for different components of the loss function
-ITERATIONS = 10000  # Number of training iterations
-OPTIMIZER = "adam"  # Optimizer for the first part of the training
-BATCH_SIZE = 256  # Batch size
+# Configuration Parameters
+ALPHA = 1.0
+LENGTH = 1.0
+WIDTH = 1.0
+MAX_TIME = 1.0
+LAYER_SIZE = [3] + [150] * 3 + [1]
+ACTIVATION = "relu"
+INITIALIZER = "Glorot uniform"
+OPTIMIZER = "adam"
+LEARNING_RATE = 1e-4
+ITERATIONS = 5000
 
 
-# Define PDE
-def pde(X, T):
-    # Calculate second derivatives (Hessians) of T with respect to X in both dimensions
-    dT_xx = dde.grad.hessian(T, X, j=0)
-    dT_yy = dde.grad.hessian(T, X, j=1)
-
-    # Calculate first derivative (Jacobian) of T with respect to X in time dimension
-    dT_t = dde.grad.jacobian(T, X, j=2)
-
-    # Return the defined PDE
-    return dT_t - (ALPHA * (dT_xx + dT_yy))
-
-
-# Define boundary conditions
-def boundary_right(X, on_boundary):
-    x, _, _ = X
-    return on_boundary and np.isclose(x, WIDTH)  # Check if on the right boundary
-
-
-def boundary_left(X, on_boundary):
-    x, _, _ = X
-    return on_boundary and np.isclose(x, 0)  # Check if on the left boundary
-
-
-def boundary_top(X, on_boundary):
-    _, y, _ = X
-    return on_boundary and np.isclose(y, LENGTH)  # Check if on the upper boundary
-
-
-def boundary_bottom(X, on_boundary):
-    _, y, _ = X
-    return on_boundary and np.isclose(y, 0)  # Check if on the lower boundary
-
-
-# Define initial condition
-def boundary_initial(X, on_initial):
-    _, _, t = X
-    return on_initial and np.isclose(t, 0)  # Check if at the initial time
-
-
-# Initialize a function for the temperature field
-def init_func(X):
-    t = np.zeros((len(X), 1))  # Temperature is zero everywhere at the T_START
-    return t
-
-
-# Define Dirichlet and Neumann boundary conditions
-def constraint_right(X):
-    return np.where(np.isclose(X[:, 0], LENGTH), 100.0, 0.0)[:, None]
-
-def func_zero(X):
-    return np.zeros(
-        (len(X), 1)
-    )  # On the other boundaries, the derivative of temperature is kept at 0 (Neumann condition)
-
-
-# Define geometry and time domains
-geom = dde.geometry.Rectangle([0, 0], [WIDTH, LENGTH])  # Geometry domain
-timedomain = dde.geometry.TimeDomain(0, T_END)  # Time domain
-geomtime = dde.geometry.GeometryXTime(geom, timedomain)  # Space-time domain
-
-# Define boundary conditions and initial condition
-bc_l = dde.NeumannBC(geomtime, func_zero, boundary_left)  # Left boundary
-bc_r = dde.DirichletBC(geomtime, constraint_right, boundary_right)  # Right boundary
-bc_up = dde.NeumannBC(geomtime, func_zero, boundary_top)  # Upper boundary
-bc_low = dde.NeumannBC(geomtime, func_zero, boundary_bottom)  # Lower boundary
-ic = dde.IC(geomtime, init_func, boundary_initial)  # Initial condition
-
-# Define data for the PDE
-data = dde.data.TimePDE(
-    geomtime,
-    pde,
-    [bc_l, bc_r, bc_up, bc_low, ic],
-    num_domain=NUM_DOMAIN,
-    num_boundary=NUM_BOUNDARY,
-    num_initial=NUM_INITIAL,
-)
-
-# Define the neural network model
-net = dde.maps.FNN(ARCHITECTURE, ACTIVATION, INITIALIZER)  # Feed-forward neural network
-model = dde.Model(data, net)  # Create the model
-
-# Compile the model with the chosen optimizer, learning rate and loss weights
-model.compile(OPTIMIZER, lr=LEARNING_RATE, loss_weights=LOSS_WEIGHTS)
-# Train the model
-losshistory, trainstate = model.train(
-    iterations=ITERATIONS,
-    batch_size=BATCH_SIZE,
-)
-
-dde.saveplot(losshistory, trainstate, issave=True, isplot=True)
-
-# Predict the solution at different time points and create an animation
-fig, ax = plt.subplots()
-ax = fig.add_subplot(111)
-nelx = 100  # Number of elements in x direction
-nely = 100  # Number of elements in y direction
-timesteps = 101  # Number of time steps
-x = np.linspace(0, 1, nelx + 1)  # x coordinates
-y = np.linspace(0, 1, nely + 1)  # y coordinates
-t = np.linspace(0, 1, timesteps)  # Time points
-delta_t = t[1] - t[0]  # Time step
-xx, yy = np.meshgrid(x, y)
-
-# Prepare the data for the prediction
-x_ = np.zeros(shape=((nelx + 1) * (nely + 1),))
-y_ = np.zeros(shape=((nelx + 1) * (nely + 1),))
-for c1, ycor in enumerate(y):
-    for c2, xcor in enumerate(x):
-        x_[c1 * (nelx + 1) + c2] = xcor
-        y_[c1 * (nelx + 1) + c2] = ycor
-
-# Predict the solution at each time point
-Ts = []  # List to store the solution at each time point
-for time in t:
-    t_ = np.ones(
-        (nelx + 1) * (nely + 1),
-    ) * (time)
-    X = np.column_stack((x_, y_))  # Making 2d array with x and y
-    X = np.column_stack((X, t_))  # Making 3d array with the 2d array and t
-    T = model.predict(X)  # Predict the solution
-    T = T.reshape(
-        T.shape[0],
+def main():
+    # Check GPU Availability
+    print(
+        "Num GPUs Available: ", len(tf.config.experimental.list_physical_devices("GPU"))
     )
-    T = T.reshape(nelx + 1, nely + 1)
-    Ts.append(T)
 
+    # Define Domain
+    geom = dde.geometry.Rectangle([0, 0], [LENGTH, WIDTH])
+    timedomain = dde.geometry.TimeDomain(0, MAX_TIME)
+    geotime = dde.geometry.GeometryXTime(geom, timedomain)
 
-# Function to plot the heatmap of the solution
-def plotheatmap(T, time):
-    plt.clf()  # Clear the current plot figure
-    plt.title(
-        f"Time = {round(time*delta_t, ndigits=2)}     Surface: Dependent variable T (K)"
+    # Define PDE
+    def pde(X, u):
+        du_X = tf.gradients(u, X)[0]
+        du_x, du_y, du_t = du_X[:, 0:1], du_X[:, 1:2], du_X[:, 2:3]
+        du_xx = tf.gradients(du_x, X)[0][:, 0:1]
+        du_yy = tf.gradients(du_y, X)[0][:, 1:2]
+        return du_t - ALPHA * (du_xx + du_yy)
+
+    # Define Boundary Conditions
+    def func_bc_right_edge(x):
+        return np.where(np.isclose(x[:, 0], LENGTH), 100.0, 0.0)[:, None]
+
+    def func_ic(x):
+        return np.zeros((len(x), 1))
+
+    def func_zero(x):
+        return np.zeros_like(x)
+
+    bc_right_edge = dde.DirichletBC(
+        geotime,
+        func_bc_right_edge,
+        lambda x, on_boundary: on_boundary
+        and np.isclose(x[0], LENGTH)
+        and not np.isclose(x[1], 0)
+        and not np.isclose(x[1], WIDTH),
     )
-    plt.xlabel("x")  # x label
-    plt.ylabel("y")  # y label
-    plt.pcolor(xx, yy, T, cmap="jet")  # Plot the solution as a colored heatmap
-    plt.colorbar()  # Add a colorbar to the plot
-    return plt
+    bc_left = dde.NeumannBC(
+        geotime,
+        func_zero,
+        lambda x, on_boundary: on_boundary
+        and np.isclose(x[0], 0)
+        and not np.isclose(x[1], 0)
+        and not np.isclose(x[1], WIDTH),
+    )
+    bc_top = dde.NeumannBC(
+        geotime,
+        func_zero,
+        lambda x, on_boundary: on_boundary
+        and np.isclose(x[1], WIDTH)
+        and not np.isclose(x[0], 0)
+        and not np.isclose(x[0], LENGTH),
+    )
+    bc_bottom = dde.NeumannBC(
+        geotime,
+        func_zero,
+        lambda x, on_boundary: on_boundary
+        and np.isclose(x[1], 0)
+        and not np.isclose(x[0], 0)
+        and not np.isclose(x[0], LENGTH),
+    )
+    ic = dde.IC(geotime, func_ic, lambda _, on_initial: on_initial)
+
+    # Define Training Data
+    data = dde.data.TimePDE(
+        geotime,
+        pde,
+        [bc_right_edge, bc_left, bc_top, bc_bottom, ic],
+        num_domain=16000,
+        num_boundary=8000,
+        num_initial=8000,
+        num_test=2000,
+    )
+
+    pde_resampler = dde.callbacks.PDEPointResampler(period=50)
+
+    # Define Neural Network Architecture and Model
+    net = dde.nn.FNN(LAYER_SIZE, ACTIVATION, INITIALIZER)
+    model = dde.Model(data, net)
+    model.compile(OPTIMIZER, LEARNING_RATE)
+
+    # Train Model
+    model.train(iterations=ITERATIONS, callbacks=[pde_resampler])
+
+    # Generate Test Data
+    x_data = np.linspace(0, LENGTH, num=100)
+    y_data = np.linspace(0, WIDTH, num=100)
+    t_data = np.linspace(0, 1, num=100)
+    test_x, test_y, test_t = np.meshgrid(x_data, y_data, t_data)
+    test_domain = np.vstack((np.ravel(test_x), np.ravel(test_y), np.ravel(test_t))).T
+
+    # Predict Solution
+    predicted_solution = model.predict(test_domain)
+    residual = model.predict(test_domain, operator=pde)
+
+    # Reshape Solution
+    predicted_solution = predicted_solution.reshape(
+        test_x.shape[0], test_y.shape[1], test_t.shape[2]
+    )
+    residual = residual.reshape(test_x.shape[0], test_y.shape[1], test_t.shape[2])
+
+    # Plot and Save Solution
+    animate_solution(
+        predicted_solution,
+        "pinn_solution.gif",
+        "Heat equation solution",
+        "Temperature (K)",
+        t_data,
+    )
+    animate_solution(residual, "pinn_residual.gif", "Residual plot", "Residual", t_data)
 
 
-# Function to update the plot for each frame of the animation
-def animate(k):
-    plotheatmap(Ts[k], k)
+def animate_solution(data, filename, title, label, t_data):
+    fig, ax = plt.subplots(figsize=(7, 7))
+    im = ax.imshow(
+        data[:, :, 0],
+        origin="lower",
+        cmap="hot",
+        interpolation="bilinear",
+        extent=[0, LENGTH, 0, LENGTH],
+    )
+    plt.colorbar(im, ax=ax, label=label)
+    ax.set_xlabel("x")
+    ax.set_ylabel("y")
+
+    def updatefig(k):
+        im.set_array(data[:, :, k])
+        ax.set_title(
+            f"{title}, t = {t_data[k]:.2f}"
+        )  # Update the title with current time step
+        return [im]
+
+    ani = animation.FuncAnimation(
+        fig, updatefig, frames=range(data.shape[2]), interval=50, blit=True
+    )
+    ani.save(filename, writer="pillow")
 
 
-# Create the animation
-anim = animation.FuncAnimation(
-    plt.figure(), animate, interval=100, frames=len(t), repeat=False
-)
-
-# Save the animation as a mp4 file
-anim.save("pinn_heat2d_solution.mp4", writer="ffmpeg")
+if __name__ == "__main__":
+    main()
