@@ -81,7 +81,7 @@ def init_func(X):
 
 # Define Dirichlet and Neumann boundary conditions
 def constraint_right(X):
-    return np.where(np.isclose(x[:, 0], LENGTH), 100.0, 0.0)[:, None]
+    return np.where(np.isclose(X[:, 0], LENGTH), 100.0, 0.0)[:, None]
 
 def func_zero(X):
     return np.zeros(
