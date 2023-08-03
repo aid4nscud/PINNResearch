@@ -142,14 +142,17 @@ for c1, ycor in enumerate(y):
         x_[c1 * (nelx + 1) + c2] = xcor
         y_[c1 * (nelx + 1) + c2] = ycor
 
-# Predict the solution at each time point
+# Predict the solution and residual at each time point
 Ts = []  # List to store the solution at each time point
+residuals = []  # List to store the residuals at each time point
+
 for time in t:
     t_ = np.ones(
         (nelx + 1) * (nely + 1),
     ) * (time)
     X = np.column_stack((x_, y_))  # Making 2d array with x and y
     X = np.column_stack((X, t_))  # Making 3d array with the 2d array and t
+    
     T = model.predict(X)  # Predict the solution
     T = (
         T * 100
@@ -159,7 +162,28 @@ for time in t:
     )
     T = T.reshape(nelx + 1, nely + 1)
     Ts.append(T)
+    
+    residual = model.predict(X, operator=pde)  # Predict the residuals
+    residual = residual.reshape(nelx + 1, nely + 1)
+    residuals.append(residual)
 
+
+# Function to plot the heatmap of the residuals
+def plot_residual_map(residual, time):
+    plt.clf()  # Clear the current plot figure
+    plt.title(
+        f"Time = {round(time*delta_t, ndigits=2)}     Residual"
+    )
+    plt.xlabel("x")  # x label
+    plt.ylabel("y")  # y label
+    plt.pcolor(xx, yy, residual, cmap="jet")  # Plot the residuals as a colored heatmap
+    plt.colorbar()  # Add a colorbar to the plot
+    return plt
+
+
+# Function to update the plot for each frame of the animation
+def animate_residual(k):
+    plot_residual_map(residuals[k], k)
 
 # Function to plot the heatmap of the solution
 def plotheatmap(T, time):
@@ -183,6 +207,14 @@ def animate(k):
 anim = animation.FuncAnimation(
     plt.figure(), animate, interval=100, frames=len(t), repeat=False
 )
+
+# Create the animation
+anim_residual = animation.FuncAnimation(
+    plt.figure(), animate_residual, interval=100, frames=len(t), repeat=False
+)
+
+# Save the animation as a mp4 file
+anim_residual.save("pinn_heat2d_residual.mp4", writer="ffmpeg")
 
 # Save the animation as a mp4 file
 anim.save("pinn_heat2d_solution.mp4", writer="ffmpeg")
