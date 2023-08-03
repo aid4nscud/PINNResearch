@@ -143,21 +143,19 @@ def generate_grid(nelx, nely, timesteps):
 
 
 def generate_sequence(model, x_, y_, t, operator=None):
-    # Predict the solution at each time point
-    sequence = []  # List to store the solution at each time point
-    for time in t:
-        t_ = (
-            np.ones(
-                (nelx + 1) * (nely + 1),
-            )
-            * time
-        )
-        X = np.column_stack((x_, y_))  # Making 2d array with x and y
-        X = np.column_stack((X, t_))  # Making 3d array with the 2d array and t
-        Y = model.predict(X, operator=operator)  # Predict the solution
-        Y = Y.reshape(Y.shape[0])
-        Y = Y.reshape(nelx + 1, nely + 1)
-        sequence.append(Y)
+    # Prepare inputs
+    t_ = np.repeat(t, (nelx + 1) * (nely + 1))
+    X_ = np.repeat(x_, t.shape[0])
+    Y_ = np.repeat(y_, t.shape[0])
+
+    # Reshape into 3D array
+    X = np.stack((X_, Y_, t_), axis=-1)
+
+    # Predict the solution
+    Y = model.predict(X, operator=operator)
+
+    # Reshape and split by time steps
+    sequence = np.split(Y.reshape(-1, nelx + 1, nely + 1), t.shape[0])
 
     return sequence
 
