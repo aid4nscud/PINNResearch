@@ -10,7 +10,7 @@ from matplotlib.animation import (
 
 # Constants/Network Parameters
 T_START = 0
-T_END = WIDTH = LENGTH =ALPHA = 1.0
+T_END = WIDTH = LENGTH = ALPHA = 1.0
 NUM_DOMAIN = 30000  # Number of training samples in the domain
 NUM_BOUNDARY = 8000  # Number of training samples on the boundary
 NUM_INITIAL = 20000  # Number of training samples for initial conditions
@@ -50,15 +50,23 @@ def pde(X, T):
 def boundary_right(X, on_boundary):
     x, _, _ = X
     return on_boundary and np.isclose(x, WIDTH)  # Check if on the right boundary
+
+
 def boundary_left(X, on_boundary):
     x, _, _ = X
     return on_boundary and np.isclose(x, 0)  # Check if on the left boundary
+
+
 def boundary_top(X, on_boundary):
     _, y, _ = X
     return on_boundary and np.isclose(y, LENGTH)  # Check if on the upper boundary
+
+
 def boundary_bottom(X, on_boundary):
     _, y, _ = X
     return on_boundary and np.isclose(y, 0)  # Check if on the lower boundary
+
+
 # Define initial condition
 def boundary_initial(X, on_initial):
     _, _, t = X
@@ -69,9 +77,12 @@ def boundary_initial(X, on_initial):
 def init_func(X):
     t = np.zeros((len(X), 1))  # Temperature is zero everywhere at the T_START
     return t
+
+
 # Define Dirichlet and Neumann boundary conditions
 def constraint_right(X):
     return np.ones((len(X), 1))  # On the right boundary, temperature is kept at 1
+
 
 def func_zero(X):
     return np.zeros(
@@ -152,7 +163,7 @@ for time in t:
     ) * (time)
     X = np.column_stack((x_, y_))  # Making 2d array with x and y
     X = np.column_stack((X, t_))  # Making 3d array with the 2d array and t
-    
+
     T = model.predict(X)  # Predict the solution
     T = (
         T * 100
@@ -162,7 +173,7 @@ for time in t:
     )
     T = T.reshape(nelx + 1, nely + 1)
     Ts.append(T)
-    
+
     residual = model.predict(X, operator=pde)  # Predict the residuals
     residual = residual.reshape(nelx + 1, nely + 1)
     residuals.append(residual)
@@ -171,9 +182,7 @@ for time in t:
 # Function to plot the heatmap of the residuals
 def plot_residual_map(residual, time):
     plt.clf()  # Clear the current plot figure
-    plt.title(
-        f"Time = {round(time*delta_t, ndigits=2)}     Residual"
-    )
+    plt.title(f"Time = {round(time*delta_t, ndigits=2)}     Residual")
     plt.xlabel("x")  # x label
     plt.ylabel("y")  # y label
     plt.pcolor(xx, yy, residual, cmap="jet")  # Plot the residuals as a colored heatmap
@@ -184,6 +193,7 @@ def plot_residual_map(residual, time):
 # Function to update the plot for each frame of the animation
 def animate_residual(k):
     plot_residual_map(residuals[k], k)
+
 
 # Function to plot the heatmap of the solution
 def plotheatmap(T, time):
