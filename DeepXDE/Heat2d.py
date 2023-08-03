@@ -174,7 +174,7 @@ for time in t:
     T = T.reshape(nelx + 1, nely + 1)
     Ts.append(T)
 
-    residual = model.predict(X, operator=pde)  # Predict the residuals
+    residual = T.reshape(T.shape[1])  # Predict the residuals
     residual = residual.reshape(nelx + 1, nely + 1)
     residuals.append(residual)
 
