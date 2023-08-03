@@ -164,20 +164,33 @@ residual = residual.reshape(test_x.shape)  # Reshape residuals
 # Animation function
 def animate_solution(data, filename, title, label, t_data):
     fig, ax = plt.subplots(figsize=(7, 7))
+
+    # Create initial image and colorbar
     im = ax.imshow(
         data[:, :, 0],
         origin="lower",
-        cmap="jet",
+        cmap="hot",
         interpolation="bilinear",
         extent=[0, 1, 0, 1],
     )
-    plt.colorbar(im, ax=ax, label=label)
+    cb = plt.colorbar(im, ax=ax, label=label)
     ax.set_xlabel("x")
     ax.set_ylabel("y")
 
+    # Update function for the frames
     def updatefig(k):
+        # Update image data
         im.set_array(data[:, :, k])
+        im.set_clim(
+            vmin=data[:, :, k].min(), vmax=data[:, :, k].max()
+        )  # Update the color limits
+
+        # Update colorbar
+        cb.update_normal(im)
+
+        # Update title
         ax.set_title(f"{title}, t = {t_data[k]:.2f}")
+
         return [im]
 
     ani = animation.FuncAnimation(
