@@ -114,7 +114,6 @@ data = dde.data.TimePDE(
 
 # Define the neural network model
 net = dde.maps.FNN(ARCHITECTURE, ACTIVATION, INITIALIZER)  # Feed-forward neural network
-net.apply_output_transform(lambda _, y: abs(y))
 model = dde.Model(data, net)  # Create the model
 
 # Compile the model with the chosen optimizer, learning rate and loss weights
