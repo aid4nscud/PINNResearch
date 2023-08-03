@@ -125,42 +125,46 @@ losshistory, trainstate = model.train(
     batch_size=BATCH_SIZE,
 )
 
-def generate_grid(nelx, nely, timesteps):
-    x = np.linspace(0, 1, nelx + 1)  # x coordinates
-    y = np.linspace(0, 1, nely + 1)  # y coordinates
-    t = np.linspace(0, 1, timesteps)  # Time points
-    xx, yy = np.meshgrid(x, y)  # create a meshgrid for the pcolor plot
+dde.saveplot(losshistory, trainstate, issave=True, isplot=True)
 
-    # Prepare the data for the prediction
-    x_ = np.zeros(shape=((nelx + 1) * (nely + 1),))
-    y_ = np.zeros(shape=((nelx + 1) * (nely + 1),))
-    for c1, ycor in enumerate(y):
-        for c2, xcor in enumerate(x):
-            x_[c1 * (nelx + 1) + c2] = xcor
-            y_[c1 * (nelx + 1) + c2] = ycor
+# Predict the solution at different time points and create an animation
+fig, ax = plt.subplots()
+ax = fig.add_subplot(111)
+nelx = 100  # Number of elements in x direction
+nely = 100  # Number of elements in y direction
+timesteps = 101  # Number of time steps
+x = np.linspace(0, 1, nelx + 1)  # x coordinates
+y = np.linspace(0, 1, nely + 1)  # y coordinates
+t = np.linspace(0, 1, timesteps)  # Time points
+delta_t = t[1] - t[0]  # Time step
+xx, yy = np.meshgrid(x, y)
 
-    return x, y, t, x_, y_, xx, yy
+# Prepare the data for the prediction
+x_ = np.zeros(shape=((nelx + 1) * (nely + 1),))
+y_ = np.zeros(shape=((nelx + 1) * (nely + 1),))
+for c1, ycor in enumerate(y):
+    for c2, xcor in enumerate(x):
+        x_[c1 * (nelx + 1) + c2] = xcor
+        y_[c1 * (nelx + 1) + c2] = ycor
+
+# Predict the solution at each time point
+Ts = []  # List to store the solution at each time point
+for time in t:
+    t_ = np.ones(
+        (nelx + 1) * (nely + 1),
+    ) * (time)
+    X = np.column_stack((x_, y_))  # Making 2d array with x and y
+    X = np.column_stack((X, t_))  # Making 3d array with the 2d array and t
+    T = model.predict(X)  # Predict the solution
+    T = T.reshape(
+        T.shape[0],
+    )
+    T = T.reshape(nelx + 1, nely + 1)
+    Ts.append(T)
 
 
-def generate_sequence(model, x_, y_, t, operator=None):
-    # Prepare inputs
-    t_ = np.repeat(t, (nelx + 1) * (nely + 1))
-    X_ = np.repeat(x_, t.shape[0])
-    Y_ = np.repeat(y_, t.shape[0])
-
-    # Reshape into 3D array
-    X = np.stack((X_, Y_, t_), axis=-1)
-
-    # Predict the solution
-    Y = model.predict(X, operator=operator)
-
-    # Reshape and split by time steps
-    sequence = np.split(Y.reshape(-1, nelx + 1, nely + 1), t.shape[0])
-
-    return sequence
-
-
-def plotheatmap(T, time, delta_t):
+# Function to plot the heatmap of the solution
+def plotheatmap(T, time):
     plt.clf()  # Clear the current plot figure
     plt.title(
         f"Time = {round(time*delta_t, ndigits=2)}     Surface: Dependent variable T (K)"
@@ -172,51 +176,15 @@ def plotheatmap(T, time, delta_t):
     return plt
 
 
-def plotresiduals(res, time, delta_t):
-    plt.clf()  # Clear the current plot figure
-    plt.title(f"Time = {round(time*delta_t, ndigits=2)}     Residuals")
-    plt.xlabel("x")  # x label
-    plt.ylabel("y")  # y label
-    plt.pcolor(xx, yy, res, cmap="jet")  # Plot the residuals as a colored heatmap
-    plt.colorbar()  # Add a colorbar to the plot
-    return plt
-
-
+# Function to update the plot for each frame of the animation
 def animate(k):
-    plotheatmap(Ts[k], k, delta_t)
+    plotheatmap(Ts[k], k)
 
 
-def animate_res(k):
-    plotresiduals(residuals[k], k, delta_t)
-
-
-# Your grid generating and sequence generating functions here
-
-# Define the parameters
-nelx = 100  # Number of elements in x direction
-nely = 100  # Number of elements in y direction
-timesteps = 101  # Number of time steps
-
-# Generate the grid
-x, y, t, x_, y_, xx, yy = generate_grid(nelx, nely, timesteps)
-delta_t = t[1] - t[0]  # Time step
-
-# Generate the sequences of solutions and residuals
-Ts = generate_sequence(model, x_, y_, t)
-residuals = generate_sequence(model, x_, y_, t, operator=pde)
-
-# Create the animation for the solution
+# Create the animation
 anim = animation.FuncAnimation(
     plt.figure(), animate, interval=100, frames=len(t), repeat=False
 )
 
 # Save the animation as a mp4 file
 anim.save("pinn_heat2d_solution.mp4", writer="ffmpeg")
-
-# Create the animation for the residuals
-anim_res = animation.FuncAnimation(
-    plt.figure(), animate_res, interval=100, frames=len(t), repeat=False
-)
-
-# Save the animation as a mp4 file
-anim_res.save("pinn_heat2d_residuals.mp4", writer="ffmpeg")
