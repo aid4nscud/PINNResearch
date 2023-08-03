@@ -136,95 +136,70 @@ dde.saveplot(losshistory, trainstate, issave=True, isplot=True)
 # Predict the solution at different time points and create an animation
 fig, ax = plt.subplots()
 ax = fig.add_subplot(111)
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+
+# Set up the grid
 nelx = 100  # Number of elements in x direction
 nely = 100  # Number of elements in y direction
 timesteps = 101  # Number of time steps
 x = np.linspace(0, 1, nelx + 1)  # x coordinates
 y = np.linspace(0, 1, nely + 1)  # y coordinates
 t = np.linspace(0, 1, timesteps)  # Time points
-delta_t = t[1] - t[0]  # Time step
-xx, yy = np.meshgrid(x, y)
 
 # Prepare the data for the prediction
-x_ = np.zeros(shape=((nelx + 1) * (nely + 1),))
-y_ = np.zeros(shape=((nelx + 1) * (nely + 1),))
-for c1, ycor in enumerate(y):
-    for c2, xcor in enumerate(x):
-        x_[c1 * (nelx + 1) + c2] = xcor
-        y_[c1 * (nelx + 1) + c2] = ycor
+test_x, test_y, test_t = np.meshgrid(x, y, t)
+test_domain = np.vstack((np.ravel(test_x), np.ravel(test_y), np.ravel(test_t))).T
 
-# Predict the solution and residual at each time point
-Ts = []  # List to store the solution at each time point
-residuals = []  # List to store the residuals at each time point
+# Predict Solution and Residual
+predicted_solution = model.predict(test_domain)
+predicted_solution = (predicted_solution * 100).reshape(
+    test_x.shape
+)  # Scale and reshape solution
+residual = model.predict(test_domain, operator=pde)
+residual = residual.reshape(test_x.shape)  # Reshape residuals
 
-for time in t:
-    t_ = np.ones(
-        (nelx + 1) * (nely + 1),
-    ) * (time)
-    X = np.column_stack((x_, y_))  # Making 2d array with x and y
-    X = np.column_stack((X, t_))  # Making 3d array with the 2d array and t
 
-    T = model.predict(X)  # Predict the solution
-    T = (
-        T * 100
-    )  # Apply scaling to the prediction of the network, since we scaled down our BC by 100
-    T = T.reshape(
-        T.shape[0],
+# Animation function
+def animate_solution(data, filename, title, label, t_data):
+    fig, ax = plt.subplots(figsize=(7, 7))
+    im = ax.imshow(
+        data[:, :, 0],
+        origin="lower",
+        cmap="hot",
+        interpolation="bilinear",
+        extent=[0, 1, 0, 1],
     )
-    T = T.reshape(nelx + 1, nely + 1)
-    Ts.append(T)
+    plt.colorbar(im, ax=ax, label=label)
+    ax.set_xlabel("x")
+    ax.set_ylabel("y")
 
-    residual = T.reshape(T.shape[1])  # Predict the residuals
-    residual = residual.reshape(nelx + 1, nely + 1)
-    residuals.append(residual)
+    def updatefig(k):
+        im.set_array(data[:, :, k])
+        ax.set_title(f"{title}, t = {t_data[k]:.2f}")
+        return [im]
 
-
-# Function to plot the heatmap of the residuals
-def plot_residual_map(residual, time):
-    plt.clf()  # Clear the current plot figure
-    plt.title(f"Time = {round(time*delta_t, ndigits=2)}     Residual")
-    plt.xlabel("x")  # x label
-    plt.ylabel("y")  # y label
-    plt.pcolor(xx, yy, residual, cmap="jet")  # Plot the residuals as a colored heatmap
-    plt.colorbar()  # Add a colorbar to the plot
-    return plt
-
-
-# Function to update the plot for each frame of the animation
-def animate_residual(k):
-    plot_residual_map(residuals[k], k)
-
-
-# Function to plot the heatmap of the solution
-def plotheatmap(T, time):
-    plt.clf()  # Clear the current plot figure
-    plt.title(
-        f"Time = {round(time*delta_t, ndigits=2)}     Surface: Dependent variable T (K)"
+    ani = animation.FuncAnimation(
+        fig, updatefig, frames=range(data.shape[2]), interval=50, blit=True
     )
-    plt.xlabel("x")  # x label
-    plt.ylabel("y")  # y label
-    plt.pcolor(xx, yy, T, cmap="jet")  # Plot the solution as a colored heatmap
-    plt.colorbar()  # Add a colorbar to the plot
-    return plt
+    ani.save(filename, writer="ffmpeg")
 
 
-# Function to update the plot for each frame of the animation
-def animate(k):
-    plotheatmap(Ts[k], k)
-
-
-# Create the animation
-anim = animation.FuncAnimation(
-    plt.figure(), animate, interval=100, frames=len(t), repeat=False
+# Create and save the solution animation
+animate_solution(
+    predicted_solution,
+    "pinn_heat2d_solution.mp4",
+    "Surface: Dependent variable T (K)",
+    "Temperature (K)",
+    t,
 )
 
-# Create the animation
-anim_residual = animation.FuncAnimation(
-    plt.figure(), animate_residual, interval=100, frames=len(t), repeat=False
+# Create and save the residuals animation
+animate_solution(
+    residual,
+    "pinn_heat2d_residual.mp4",
+    "Residual",
+    "Residual",
+    t,
 )
-
-# Save the animation as a mp4 file
-anim_residual.save("pinn_heat2d_residual.mp4", writer="ffmpeg")
-
-# Save the animation as a mp4 file
-anim.save("pinn_heat2d_solution.mp4", writer="ffmpeg")
