@@ -124,15 +124,6 @@ losshistory, trainstate = model.train(
     iterations=ITERATIONS,
     batch_size=BATCH_SIZE,
 )
-# Re-compile the model with the L-BFGS optimizer
-model.compile("L-BFGS-B")
-dde.optimizers.set_LBFGS_options(
-    maxcor=50,
-)
-# Train the model again with the new optimizer
-losshistory, train_state = model.train(iterations=ITERATIONS, batch_size=BATCH_SIZE)
-dde.saveplot(losshistory, trainstate, issave=True, isplot=True)
-
 
 def generate_grid(nelx, nely, timesteps):
     x = np.linspace(0, 1, nelx + 1)  # x coordinates
