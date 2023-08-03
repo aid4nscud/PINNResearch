@@ -21,12 +21,12 @@ ACTIVATION = "tanh"  # Activation function
 INITIALIZER = "Glorot uniform"  # Weights initializer
 LEARNING_RATE = 1e-3  # Learning rate
 LOSS_WEIGHTS = [
-    10,
     1,
     1,
     1,
     1,
-    10,
+    1,
+    1,
 ]  # Weights for different components of the loss function
 ITERATIONS = 10000  # Number of training iterations
 OPTIMIZER = "adam"  # Optimizer for the first part of the training
