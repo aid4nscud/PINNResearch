@@ -134,7 +134,7 @@ def animate_solution(data, filename, title, label, t_data):
     im = ax.imshow(
         data[:, :, 0],
         origin="lower",
-        cmap="hot",
+        cmap="jet",
         interpolation="bilinear",
         extent=[0, LENGTH, 0, LENGTH],
     )
