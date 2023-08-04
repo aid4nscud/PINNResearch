@@ -124,21 +124,27 @@ losshistory, trainstate = model.train(
     iterations=ITERATIONS,
     batch_size=BATCH_SIZE,
 )
-# # Re-compile the model with the L-BFGS optimizer
-# model.compile("L-BFGS-B")
-# dde.optimizers.set_LBFGS_options(
-#     maxcor=50,
-# )
-# # Train the model again with the new optimizer
-# losshistory, train_state = model.train(iterations=ITERATIONS, batch_size=BATCH_SIZE)
+# Re-compile the model with the L-BFGS optimizer
+model.compile("L-BFGS-B")
+dde.optimizers.set_LBFGS_options(
+    maxcor=50,
+)
+# Train the model again with the new optimizer
+losshistory, train_state = model.train(iterations=ITERATIONS, batch_size=BATCH_SIZE)
 dde.saveplot(losshistory, trainstate, issave=True, isplot=True)
+
+# plot the training loss history
+plt.figure(figsize=(12, 6))
+plt.plot(losshistory, label="Training loss")
+plt.title("Training Loss History")
+plt.xlabel("Iterations")
+plt.ylabel("Loss")
+plt.legend()
+plt.show()
 
 # Predict the solution at different time points and create an animation
 fig, ax = plt.subplots()
 ax = fig.add_subplot(111)
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.animation as animation
 
 # Set up the grid
 nelx = 100  # Number of elements in x direction
