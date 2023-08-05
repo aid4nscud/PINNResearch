@@ -134,6 +134,8 @@ losshistory, train_state = model.train(iterations=ITERATIONS, batch_size=BATCH_S
 
 dde.saveplot(losshistory, trainstate, issave=True, isplot=True)
 plt.show()
+plt.savefig("loss_history_plot")
+plt.close()
 
 # Predict the solution at different time points and create an animation
 fig, ax = plt.subplots()
