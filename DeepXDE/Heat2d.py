@@ -124,6 +124,10 @@ losshistory, trainstate = model.train(
     iterations=ITERATIONS,
     batch_size=BATCH_SIZE,
 )
+dde.saveplot(losshistory, trainstate, issave=True, isplot=True)
+plt.show()
+plt.savefig("loss_history_plot_ADAM")
+plt.close()
 # Re-compile the model with the L-BFGS optimizer
 model.compile("L-BFGS-B")
 dde.optimizers.set_LBFGS_options(
@@ -134,7 +138,7 @@ losshistory, train_state = model.train(iterations=ITERATIONS, batch_size=BATCH_S
 
 dde.saveplot(losshistory, trainstate, issave=True, isplot=True)
 plt.show()
-plt.savefig("loss_history_plot")
+plt.savefig("loss_history_plot_L-BFGS-B")
 plt.close()
 
 # Predict the solution at different time points and create an animation
