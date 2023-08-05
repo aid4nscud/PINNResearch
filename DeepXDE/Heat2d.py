@@ -19,7 +19,7 @@ ARCHITECTURE = (
 )  # Network architecture ([input_dim, hidden_layer_1_dim, ..., output_dim])
 ACTIVATION = "tanh"  # Activation function
 INITIALIZER = "Glorot uniform"  # Weights initializer
-LEARNING_RATE = 1e-3  # Learning rate
+LEARNING_RATE = 0.01  # Learning rate
 LOSS_WEIGHTS = [
     10,
     1,
@@ -30,7 +30,7 @@ LOSS_WEIGHTS = [
 ]  # Weights for different components of the loss function
 ITERATIONS = 10000  # Number of training iterations
 OPTIMIZER = "adam"  # Optimizer for the first part of the training
-BATCH_SIZE = 256  # Batch size
+BATCH_SIZE = 32  # Batch size
 
 
 # Define PDE
