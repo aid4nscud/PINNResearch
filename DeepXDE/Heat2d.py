@@ -131,7 +131,7 @@ plt.close()
 # Re-compile the model with the L-BFGS optimizer
 model.compile("L-BFGS-B")
 dde.optimizers.set_LBFGS_options(
-    maxcor=50,
+    maxcor=100,
 )
 # Train the model again with the new optimizer
 losshistory, train_state = model.train(iterations=ITERATIONS, batch_size=BATCH_SIZE)
