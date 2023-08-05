@@ -133,10 +133,7 @@ dde.optimizers.set_LBFGS_options(
 losshistory, train_state = model.train(iterations=ITERATIONS, batch_size=BATCH_SIZE)
 
 dde.saveplot(losshistory, trainstate, issave=True, isplot=True)
-dde.postprocessing.plot_loss_history(losshistory)
 plt.show()
-plt.savefig("loss_history_plot")
-plt.close()
 
 # Predict the solution at different time points and create an animation
 fig, ax = plt.subplots()
