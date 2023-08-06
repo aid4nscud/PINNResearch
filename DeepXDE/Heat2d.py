@@ -40,7 +40,7 @@ def pde(X, T):
     dT_yy = dde.grad.hessian(T, X, i=1, j=1)
 
     # Calculate first derivative (Jacobian) of T with respect to X in time dimension
-    dT_t = dde.grad.jacobian(T, X, j=2)
+    dT_t = dde.grad.jacobian(T, X, i=2)
 
     # Return the defined PDE
     return dT_t - (ALPHA * dT_xx + dT_yy)

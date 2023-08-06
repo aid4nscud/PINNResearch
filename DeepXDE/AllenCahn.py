@@ -12,9 +12,9 @@ from matplotlib.animation import (
 T_START = 0
 T_END = WIDTH = LENGTH = 1.0
 EPSILON = 0.0125
-NUM_DOMAIN = 30000  # Number of training samples in the domain
-NUM_BOUNDARY = 3000  # Number of training samples on the boundary
-NUM_INITIAL = 30000  # Number of training samples for initial conditions
+NUM_DOMAIN = 2000  # Number of training samples in the domain
+NUM_BOUNDARY = 1000  # Number of training samples on the boundary
+NUM_INITIAL = 2000  # Number of training samples for initial conditions
 ARCHITECTURE = (
     [3] + [60] * 5 + [1]
 )  # Network architecture ([input_dim, hidden_layer_1_dim, ..., output_dim])
@@ -36,7 +36,7 @@ BATCH_SIZE = 256  # Batch size
 
 # Define Allen-Cahn PDE
 def pde(X, u):
-    du_t = dde.grad.jacobian(u, X, i=0, j=2)
+    du_t = dde.grad.jacobian(u, X, i=2)
     du_xx = dde.grad.hessian(u, X, i=0, j=0)
     du_yy = dde.grad.hessian(u, X, i=1, j=1)
     return du_t - EPSILON * (du_xx + du_yy) - 10 * (u - u**3)
