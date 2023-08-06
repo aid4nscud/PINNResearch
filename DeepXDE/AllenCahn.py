@@ -41,24 +41,8 @@ def pde(X, u):
 
 
 # Define boundary conditions
-def boundary_right(X, on_boundary):
-    x, _, _ = X
-    return on_boundary and np.isclose(x, WIDTH)  # Check if on the right boundary
-
-
-def boundary_left(X, on_boundary):
-    x, _, _ = X
-    return on_boundary and np.isclose(x, 0)  # Check if on the left boundary
-
-
-def boundary_top(X, on_boundary):
-    _, y, _ = X
-    return on_boundary and np.isclose(y, LENGTH)  # Check if on the upper boundary
-
-
-def boundary_bottom(X, on_boundary):
-    _, y, _ = X
-    return on_boundary and np.isclose(y, 0)  # Check if on the lower boundary
+def boundary_condition(X, on_boundary):
+    return on_boundary
 
 
 # Define initial condition
@@ -88,17 +72,14 @@ timedomain = dde.geometry.TimeDomain(0, T_END)  # Time domain
 geomtime = dde.geometry.GeometryXTime(geom, timedomain)  # Space-time domain
 
 # Define boundary conditions and initial condition
-bc_l = dde.NeumannBC(geomtime, func_zero, boundary_left)  # Left boundary
-bc_r = dde.NeumannBC(geomtime, func_zero, boundary_right)  # Right boundary
-bc_up = dde.NeumannBC(geomtime, func_zero, boundary_top)  # Upper boundary
-bc_low = dde.NeumannBC(geomtime, func_zero, boundary_bottom)  # Lower boundary
+bc = dde.NeumannBC(geomtime, func_zero, boundary_condition)  # Left boundary
 ic = dde.IC(geomtime, init_func, boundary_initial)  # Initial condition
 
 # Define data for the PDE
 data = dde.data.TimePDE(
     geomtime,
     pde,
-    [bc_r, bc_low, bc_l, bc_up, ic],
+    [bc, ic],
     num_domain=SAMPLE_POINTS,
     num_boundary=int(SAMPLE_POINTS / 4),
     num_initial=int(SAMPLE_POINTS / 2),
@@ -118,7 +99,7 @@ losshistory, trainstate = model.train(
 # Re-compile the model with the L-BFGS optimizer
 model.compile("L-BFGS-B")
 dde.optimizers.set_LBFGS_options(
-    maxcor=50,
+    maxcor=100,
 )
 # Train the model again with the new optimizer
 losshistory, train_state = model.train(iterations=ITERATIONS, batch_size=BATCH_SIZE)
