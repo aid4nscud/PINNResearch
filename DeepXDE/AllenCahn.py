@@ -48,16 +48,7 @@ def boundary_initial(X, on_initial):
 def init_func(X):
     x, y, _ = X[:, 0:1], X[:, 1:2], X[:, 2]
     sine_pattern = np.sin(np.pi * x) * np.sin(np.pi * y)
-
-    # Normalizing the pattern to the range [-1, 1]
-    normalized_pattern = (
-        2
-        * (sine_pattern - sine_pattern.min())
-        / (sine_pattern.max() - sine_pattern.min())
-        - 1
-    )
-
-    return normalized_pattern
+    return sine_pattern
 
 
 # Define Neumann boundary condition
