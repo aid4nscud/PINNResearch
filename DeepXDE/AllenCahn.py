@@ -12,9 +12,9 @@ from matplotlib.animation import (
 T_START = 0
 T_END = WIDTH = LENGTH = 1.0
 EPSILON = 0.0125
-SAMPLE_POINTS = 100000
+SAMPLE_POINTS = 1000
 ARCHITECTURE = (
-    [3] + [60] * 10 + [1]
+    [3] + [60] * 5 + [1]
 )  # Network architecture ([input_dim, hidden_layer_1_dim, ..., output_dim])
 ACTIVATION = "tanh"  # Activation function
 INITIALIZER = "Glorot uniform"  # Weights initializer
@@ -25,7 +25,7 @@ LOSS_WEIGHTS = [
     1,
     1,
     1,
-    100,
+    1,
 ]  # Weights for different components of the loss function
 ITERATIONS = 10000  # Number of training iterations
 OPTIMIZER = "adam"  # Optimizer for the first part of the training
