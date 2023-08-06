@@ -46,9 +46,11 @@ def boundary_initial(X, on_initial):
 
 # Initialize a function for the temperature field
 def init_func(X):
-    noise = np.random.uniform(-0.5, 0.5, (len(X), 1))
     x, y, _ = X[:, 0:1], X[:, 1:2], X[:, 2]
     sine_pattern = np.sin(np.pi * x) * np.sin(np.pi * y)
+    noise = np.random.uniform(
+        -0.05, 0.05, (len(X), 1)
+    )  # Reduce the amplitude of the noise
     return sine_pattern + noise
 
 
