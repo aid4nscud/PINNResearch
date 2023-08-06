@@ -25,7 +25,7 @@ LOSS_WEIGHTS = [
     1,
     1,
     1,
-    10,
+    100,
 ]  # Weights for different components of the loss function
 ITERATIONS = 10000  # Number of training iterations
 OPTIMIZER = "adam"  # Optimizer for the first part of the training
