@@ -36,8 +36,8 @@ BATCH_SIZE = 512  # Batch size
 # Define PDE
 def pde(X, T):
     # Calculate second derivatives (Hessians) of T with respect to X in both dimensions
-    dT_xx = dde.grad.hessian(T, X, j=0)
-    dT_yy = dde.grad.hessian(T, X, j=1)
+    dT_xx = dde.grad.hessian(T, X, i=0, j=0)
+    dT_yy = dde.grad.hessian(T, X, i=1, j=1)
 
     # Calculate first derivative (Jacobian) of T with respect to X in time dimension
     dT_t = dde.grad.jacobian(T, X, j=2)
