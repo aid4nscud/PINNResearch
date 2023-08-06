@@ -11,7 +11,7 @@ from matplotlib.animation import (
 # Constants/Network Parameters
 T_START = 0
 T_END = WIDTH = LENGTH = 1.0
-EPSILON = 0.0125
+EPSILON = 1
 SAMPLE_POINTS = 1000
 ARCHITECTURE = (
     [3] + [60] * 5 + [1]
