@@ -105,9 +105,9 @@ data = dde.data.TimePDE(
     geomtime,
     pde,
     [bc_l, bc_r, bc_up, bc_low, ic],
-    num_domain=SAMPLE_POINTS,
-    num_boundary=SAMPLE_POINTS / 4,
-    num_initial=SAMPLE_POINTS / 2,
+    num_domain=int(SAMPLE_POINTS),
+    num_boundary=int(SAMPLE_POINTS / 4),
+    num_initial=int(SAMPLE_POINTS / 2),
 )
 
 # Define the neural network model
