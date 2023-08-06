@@ -89,7 +89,7 @@ geomtime = dde.geometry.GeometryXTime(geom, timedomain)  # Space-time domain
 
 # Define boundary conditions and initial condition
 bc_l = dde.NeumannBC(geomtime, func_zero, boundary_left)  # Left boundary
-bc_r = dde.NuemannBC(geomtime, func_zero, boundary_right)  # Right boundary
+bc_r = dde.NeumannBC(geomtime, func_zero, boundary_right)  # Right boundary
 bc_up = dde.NeumannBC(geomtime, func_zero, boundary_top)  # Upper boundary
 bc_low = dde.NeumannBC(geomtime, func_zero, boundary_bottom)  # Lower boundary
 ic = dde.IC(geomtime, init_func, boundary_initial)  # Initial condition
