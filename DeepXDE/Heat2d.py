@@ -116,13 +116,13 @@ data = dde.data.TimePDE(
 net = dde.maps.FNN(ARCHITECTURE, ACTIVATION, INITIALIZER)  # Feed-forward neural network
 net.apply_output_transform(lambda _, y: abs(y))
 model = dde.Model(data, net)  # Create the model
+pde_resampler = dde.callbacks.PDEPointResampler(period=10)
 
 # Compile the model with the chosen optimizer, learning rate and loss weights
 model.compile(OPTIMIZER, lr=LEARNING_RATE, loss_weights=LOSS_WEIGHTS)
 # Train the model
 losshistory, trainstate = model.train(
-    iterations=ITERATIONS,
-    batch_size=BATCH_SIZE,
+    iterations=ITERATIONS, batch_size=BATCH_SIZE, callbacks=[pde_resampler]
 )
 dde.saveplot(losshistory, trainstate, issave=True, isplot=True)
 plt.show()
@@ -134,7 +134,9 @@ dde.optimizers.set_LBFGS_options(
     maxcor=100,
 )
 # Train the model again with the new optimizer
-losshistory, train_state = model.train(iterations=ITERATIONS, batch_size=BATCH_SIZE)
+losshistory, train_state = model.train(
+    iterations=ITERATIONS, batch_size=BATCH_SIZE, callbacks=[pde_resampler]
+)
 
 dde.saveplot(losshistory, trainstate, issave=True, isplot=True)
 plt.show()
