@@ -11,9 +11,9 @@ from matplotlib.animation import (
 # Constants/Network Parameters
 T_START = 0
 T_END = WIDTH = LENGTH = ALPHA = 1.0
-NUM_DOMAIN = 2000  # Number of training samples in the domain
-NUM_BOUNDARY = 1000  # Number of training samples on the boundary
-NUM_INITIAL = 2000  # Number of training samples for initial conditions
+NUM_DOMAIN = 5000  # Number of training samples in the domain
+NUM_BOUNDARY = 2000  # Number of training samples on the boundary
+NUM_INITIAL = 5000  # Number of training samples for initial conditions
 ARCHITECTURE = (
     [3] + [60] * 5 + [1]
 )  # Network architecture ([input_dim, hidden_layer_1_dim, ..., output_dim])
