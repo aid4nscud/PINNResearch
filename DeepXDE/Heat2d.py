@@ -43,7 +43,7 @@ def pde(X, T):
     dT_t = dde.grad.jacobian(T, X, j=2)
 
     # Return the defined PDE
-    return dT_t - (ALPHA * dT_xx * dT_yy)
+    return dT_t - (ALPHA * dT_xx + dT_yy)
 
 
 # Define boundary conditions
