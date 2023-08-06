@@ -12,9 +12,7 @@ from matplotlib.animation import (
 T_START = 0
 T_END = WIDTH = LENGTH = 1.0
 EPSILON = 0.0125
-NUM_DOMAIN = 2000  # Number of training samples in the domain
-NUM_BOUNDARY = 1000  # Number of training samples on the boundary
-NUM_INITIAL = 2000  # Number of training samples for initial conditions
+SAMPLE_POINTS = 100000
 ARCHITECTURE = (
     [3] + [60] * 5 + [1]
 )  # Network architecture ([input_dim, hidden_layer_1_dim, ..., output_dim])
@@ -74,7 +72,7 @@ def init_func(X):
     t = np.random.uniform(
         -0.05, 0.05, (len(X), 1)
     )  # Temperature is randomly distributed between -0.05 and 0.05 everywhere at the start
-    return t
+    return t * 20
 
 
 # Define Neumann boundary condition
@@ -101,9 +99,9 @@ data = dde.data.TimePDE(
     geomtime,
     pde,
     [bc_r, bc_low, bc_l, bc_up, ic],
-    num_domain=NUM_DOMAIN,
-    num_boundary=NUM_BOUNDARY,
-    num_initial=NUM_INITIAL,
+    num_domain=SAMPLE_POINTS,
+    num_boundary=int(SAMPLE_POINTS / 4),
+    num_initial=int(SAMPLE_POINTS / 2),
 )
 
 # Define the neural network model
@@ -125,6 +123,9 @@ dde.optimizers.set_LBFGS_options(
 # Train the model again with the new optimizer
 losshistory, train_state = model.train(iterations=ITERATIONS, batch_size=BATCH_SIZE)
 dde.saveplot(losshistory, trainstate, issave=True, isplot=True)
+plt.show()
+plt.savefig("loss_history_plot_AllenCahn")
+plt.close()
 
 # Predict the solution at different time points and create an animation
 fig, ax = plt.subplots()
@@ -155,7 +156,7 @@ for time in t:
     X = np.column_stack((x_, y_))  # Making 2d array with x and y
     X = np.column_stack((X, t_))  # Making 3d array with the 2d array and t
     T = model.predict(X)  # Predict the solution
-
+    T = T / 20
     T = T.reshape(
         T.shape[0],
     )
