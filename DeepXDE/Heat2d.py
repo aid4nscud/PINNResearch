@@ -9,11 +9,9 @@ from matplotlib.animation import (
 )  # Function-based interface to create animations
 
 # Constants/Network Parameters
+SAMPLE_POINTS = 100000
 T_START = 0
 T_END = WIDTH = LENGTH = ALPHA = 1.0
-NUM_DOMAIN = 5000  # Number of training samples in the domain
-NUM_BOUNDARY = 2000  # Number of training samples on the boundary
-NUM_INITIAL = 5000  # Number of training samples for initial conditions
 ARCHITECTURE = (
     [3] + [60] * 5 + [1]
 )  # Network architecture ([input_dim, hidden_layer_1_dim, ..., output_dim])
@@ -107,9 +105,9 @@ data = dde.data.TimePDE(
     geomtime,
     pde,
     [bc_l, bc_r, bc_up, bc_low, ic],
-    num_domain=NUM_DOMAIN,
-    num_boundary=NUM_BOUNDARY,
-    num_initial=NUM_INITIAL,
+    num_domain=SAMPLE_POINTS,
+    num_boundary=SAMPLE_POINTS / 4,
+    num_initial=SAMPLE_POINTS / 2,
 )
 
 # Define the neural network model
