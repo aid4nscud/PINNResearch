@@ -36,7 +36,7 @@ BATCH_SIZE = 256  # Batch size
 
 # Define Allen-Cahn PDE
 def pde(X, u):
-    du_t = dde.grad.jacobian(u, X, i=2)
+    du_t = dde.grad.jacobian(u, X, j=2)
     du_xx = dde.grad.hessian(u, X, i=0, j=0)
     du_yy = dde.grad.hessian(u, X, i=1, j=1)
     return du_t - EPSILON * (du_xx + du_yy) - 10 * (u - u**3)
