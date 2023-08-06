@@ -11,7 +11,7 @@ from matplotlib.animation import (
 # Constants/Network Parameters
 T_START = 0
 T_END = WIDTH = LENGTH = 1.0
-EPSILON = 1
+EPSILON = 0.01
 SAMPLE_POINTS = 1000
 ARCHITECTURE = (
     [3] + [60] * 5 + [1]
@@ -19,11 +19,7 @@ ARCHITECTURE = (
 ACTIVATION = "tanh"  # Activation function
 INITIALIZER = "Glorot uniform"  # Weights initializer
 LEARNING_RATE = 1e-3  # Learning rate
-LOSS_WEIGHTS = [
-    1,
-    1,
-    1
-]  # Weights for different components of the loss function
+LOSS_WEIGHTS = [1, 1, 1]  # Weights for different components of the loss function
 ITERATIONS = 10000  # Number of training iterations
 OPTIMIZER = "adam"  # Optimizer for the first part of the training
 BATCH_SIZE = 256  # Batch size
@@ -50,10 +46,10 @@ def boundary_initial(X, on_initial):
 
 # Initialize a function for the temperature field
 def init_func(X):
-    t = np.random.uniform(
-        -0.05, 0.05, (len(X), 1)
-    )  # Temperature is randomly distributed between -0.05 and 0.05 everywhere at the start
-    return t * 20
+    noise = np.random.uniform(-0.5, 0.5, (len(X), 1))
+    x, y, _ = X[:, 0:1], X[:, 1:2], X[:, 2]
+    sine_pattern = np.sin(np.pi * x) * np.sin(np.pi * y)
+    return sine_pattern + noise
 
 
 # Define Neumann boundary condition
@@ -134,7 +130,6 @@ for time in t:
     X = np.column_stack((x_, y_))  # Making 2d array with x and y
     X = np.column_stack((X, t_))  # Making 3d array with the 2d array and t
     T = model.predict(X)  # Predict the solution
-    T = T / 20
     T = T.reshape(
         T.shape[0],
     )
