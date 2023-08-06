@@ -13,8 +13,8 @@ T_START = 0
 T_END = WIDTH = LENGTH = 1.0
 EPSILON = 0.0125
 NUM_DOMAIN = 30000  # Number of training samples in the domain
-NUM_BOUNDARY = 8000  # Number of training samples on the boundary
-NUM_INITIAL = 20000  # Number of training samples for initial conditions
+NUM_BOUNDARY = 3000  # Number of training samples on the boundary
+NUM_INITIAL = 30000  # Number of training samples for initial conditions
 ARCHITECTURE = (
     [3] + [60] * 5 + [1]
 )  # Network architecture ([input_dim, hidden_layer_1_dim, ..., output_dim])
