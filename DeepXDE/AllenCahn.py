@@ -14,7 +14,7 @@ T_END = WIDTH = LENGTH = 1.0
 EPSILON = 0.0125
 SAMPLE_POINTS = 100000
 ARCHITECTURE = (
-    [3] + [60] * 5 + [1]
+    [3] + [60] * 10 + [1]
 )  # Network architecture ([input_dim, hidden_layer_1_dim, ..., output_dim])
 ACTIVATION = "tanh"  # Activation function
 INITIALIZER = "Glorot uniform"  # Weights initializer
@@ -89,7 +89,7 @@ geomtime = dde.geometry.GeometryXTime(geom, timedomain)  # Space-time domain
 
 # Define boundary conditions and initial condition
 bc_l = dde.NeumannBC(geomtime, func_zero, boundary_left)  # Left boundary
-bc_r = dde.DirichletBC(geomtime, func_zero, boundary_right)  # Right boundary
+bc_r = dde.NuemannBC(geomtime, func_zero, boundary_right)  # Right boundary
 bc_up = dde.NeumannBC(geomtime, func_zero, boundary_top)  # Upper boundary
 bc_low = dde.NeumannBC(geomtime, func_zero, boundary_bottom)  # Lower boundary
 ic = dde.IC(geomtime, init_func, boundary_initial)  # Initial condition
