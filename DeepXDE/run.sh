@@ -2,7 +2,7 @@
 #SBATCH --job-name=python         # Job name
 #SBATCH --output=log_slurm.%j.out # Output file
 #SBATCH --error=log_slurm.%j.err  # Error file
-#SBATCH --nodes=3                # Number of nodes
+#SBATCH --nodes=1                # Number of nodes
 #SBATCH --ntasks-per-node=1       # Number of tasks per node
 #SBATCH --gres=gpu:2              # Number of GPUs
 #SBATCH --partition=gpu           # Partition/queue name
