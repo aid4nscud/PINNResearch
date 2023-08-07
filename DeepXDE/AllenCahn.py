@@ -12,14 +12,14 @@ from matplotlib.animation import (
 T_START = 0
 T_END = WIDTH = LENGTH = 1.0
 EPSILON = 0.01
-SAMPLE_POINTS = 1000
+SAMPLE_POINTS = 5000
 ARCHITECTURE = (
     [3] + [60] * 5 + [1]
 )  # Network architecture ([input_dim, hidden_layer_1_dim, ..., output_dim])
 ACTIVATION = "tanh"  # Activation function
 INITIALIZER = "Glorot uniform"  # Weights initializer
 LEARNING_RATE = 1e-3  # Learning rate
-LOSS_WEIGHTS = [1, 1, 1]  # Weights for different components of the loss function
+LOSS_WEIGHTS = [1, 1, 100]  # Weights for different components of the loss function
 ITERATIONS = 10000  # Number of training iterations
 OPTIMIZER = "adam"  # Optimizer for the first part of the training
 BATCH_SIZE = 256  # Batch size
@@ -73,8 +73,8 @@ data = dde.data.TimePDE(
     pde,
     [bc, ic],
     num_domain=SAMPLE_POINTS,
-    num_boundary=int(SAMPLE_POINTS / 4),
-    num_initial=int(SAMPLE_POINTS / 2),
+    num_boundary=int(SAMPLE_POINTS / 8),
+    num_initial=int(SAMPLE_POINTS),
 )
 
 # Define the neural network model
@@ -88,13 +88,35 @@ losshistory, trainstate = model.train(
     iterations=ITERATIONS,
     batch_size=BATCH_SIZE,
 )
-# Re-compile the model with the L-BFGS optimizer
-model.compile("L-BFGS-B")
-dde.optimizers.set_LBFGS_options(
-    maxcor=100,
-)
-# Train the model again with the new optimizer
-losshistory, train_state = model.train(iterations=ITERATIONS, batch_size=BATCH_SIZE)
+
+# Residual Adaptive Refinement (RAR)
+X = geomtime.random_points(1000)
+err = 1
+while err > 0.005:
+    f = model.predict(X, operator=pde)
+    err_eq = np.absolute(f)
+    err = np.mean(err_eq)
+    print("Mean residual: %.3e" % (err))
+    x_id = np.argmax(err_eq)
+    print("Adding new point:", X[x_id], "\n")
+    data.add_anchors(X[x_id])
+    # Stop training if the model isn't learning anymore
+    early_stopping = dde.callbacks.EarlyStopping(min_delta=1e-4, patience=2000)
+    model.compile(OPTIMIZER, lr=LEARNING_RATE)
+    model.train(
+        iterations=ITERATIONS,
+        disregard_previous_best=True,
+        batch_size=BATCH_SIZE,
+        callbacks=[early_stopping],
+    )
+    model.compile("L-BFGS-B")
+    dde.optimizers.set_LBFGS_options(
+        maxcor=100,
+    )
+    losshistory, train_state = model.train(
+        batch_size=BATCH_SIZE,
+    )
+
 dde.saveplot(losshistory, trainstate, issave=True, isplot=True)
 plt.show()
 plt.savefig("loss_history_plot_AllenCahn")

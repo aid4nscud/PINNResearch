@@ -114,24 +114,37 @@ data = dde.data.TimePDE(
 net = dde.maps.FNN(ARCHITECTURE, ACTIVATION, INITIALIZER)  # Feed-forward neural network
 net.apply_output_transform(lambda _, y: abs(y))
 model = dde.Model(data, net)  # Create the model
-pde_resampler = dde.callbacks.PDEPointResampler(period=10)
 
 # Compile the model with the chosen optimizer, learning rate and loss weights
 model.compile(OPTIMIZER, lr=LEARNING_RATE, loss_weights=LOSS_WEIGHTS)
 # Train the model
 losshistory, trainstate = model.train(
-    iterations=ITERATIONS, batch_size=BATCH_SIZE, callbacks=[pde_resampler]
+    iterations=ITERATIONS,
+    batch_size=BATCH_SIZE,
 )
-dde.saveplot(losshistory, trainstate, issave=True, isplot=True)
-# Re-compile the model with the L-BFGS optimizer
-model.compile("L-BFGS-B")
-dde.optimizers.set_LBFGS_options(
-    maxcor=100,
-)
-# Train the model again with the new optimizer
-losshistory, train_state = model.train(
-    iterations=ITERATIONS, batch_size=BATCH_SIZE, callbacks=[pde_resampler]
-)
+
+# Residual Adaptive Refinement (RAR)
+X = geomtime.random_points(1000)
+err = 1
+while err > 0.005:
+    f = model.predict(X, operator=pde)
+    err_eq = np.absolute(f)
+    err = np.mean(err_eq)
+    print("Mean residual: %.3e" % (err))
+    x_id = np.argmax(err_eq)
+    print("Adding new point:", X[x_id], "\n")
+    data.add_anchors(X[x_id])
+    # Stop training if the model isn't learning anymore
+    early_stopping = dde.callbacks.EarlyStopping(min_delta=1e-4, patience=2000)
+    model.compile(OPTIMIZER, lr=LEARNING_RATE)
+    model.train(
+        iterations=ITERATIONS, disregard_previous_best=True, batch_size=BATCH_SIZE, callbacks=[early_stopping]
+    )
+    model.compile("L-BFGS-B")
+    dde.optimizers.set_LBFGS_options(
+        maxcor=100,
+    )
+    losshistory, train_state = model.train(batch_size=BATCH_SIZE,)
 
 dde.saveplot(losshistory, trainstate, issave=True, isplot=True)
 plt.show()
