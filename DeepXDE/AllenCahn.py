@@ -93,7 +93,7 @@ losshistory, trainstate = model.train(
 # Residual Adaptive Refinement (RAR)
 X = geomtime.random_points(1000)
 ep = 0
-while ep > 2:
+while ep < 2:
     f = model.predict(X, operator=pde)
     err_eq = np.absolute(f)
     err = np.mean(err_eq)
@@ -142,6 +142,7 @@ test_domain = np.vstack((np.ravel(test_x), np.ravel(test_y), np.ravel(test_t))).
 
 # Predict Solution and Residual
 predicted_solution = model.predict(test_domain)
+predicted_solution = predicted_solution.reshape(test_x.shape)
 residual = model.predict(test_domain, operator=pde)
 residual = residual.reshape(test_x.shape)  # Reshape residuals
 
