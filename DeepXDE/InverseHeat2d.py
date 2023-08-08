@@ -103,9 +103,9 @@ data = dde.data.TimePDE(
     geomtime,
     pde,
     [bc_l, bc_r, bc_up, bc_low, observe_T],
-    num_domain=700,
-    num_boundary=200,
-    num_initial=100,
+    num_domain=1000,
+    num_boundary=400,
+    num_initial=200,
     anchors=ob_xyt,
 )
 
