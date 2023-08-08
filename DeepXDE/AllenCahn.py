@@ -92,7 +92,7 @@ losshistory, trainstate = model.train(
 # Residual Adaptive Refinement (RAR)
 X = geomtime.random_points(1000)
 ep = 0
-while ep < 1:
+while ep > 1:
     f = model.predict(X, operator=pde)
     err_eq = np.absolute(f)
     err = np.mean(err_eq)
@@ -109,15 +109,14 @@ while ep < 1:
         batch_size=BATCH_SIZE,
         callbacks=[early_stopping],
     )
+    model.compile("L-BFGS-B")
+    dde.optimizers.set_LBFGS_options(
+        maxcor=100,
+    )
+    losshistory, train_state = model.train(
+        batch_size=BATCH_SIZE,
+    )
     ep = ep + 1
-
-model.compile("L-BFGS-B")
-dde.optimizers.set_LBFGS_options(
-    maxcor=100,
-)
-losshistory, train_state = model.train(
-    batch_size=BATCH_SIZE,
-)
 
 dde.saveplot(losshistory, trainstate, issave=True, isplot=True)
 plt.show()
