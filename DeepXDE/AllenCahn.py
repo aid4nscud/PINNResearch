@@ -92,35 +92,29 @@ losshistory, trainstate = model.train(
 
 # Residual Adaptive Refinement (RAR)
 X = geomtime.random_points(1000)
-err = 1
-num = 0
-
-while err > 1e-3 and num < 10:
-    f = model.predict(X, operator=pde)
-    err_eq = np.absolute(f)
-    err = np.mean(err_eq)
-    print("Mean residual: %.3e" % (err))
-    x_id = np.argmax(err_eq)
-    print("Adding new point:", X[x_id], "\n")
-    data.add_anchors(X[x_id])
-    # Stop training if the model isn't learning anymore
-    early_stopping = dde.callbacks.EarlyStopping(min_delta=1e-4, patience=2000)
-    model.compile(OPTIMIZER, lr=LEARNING_RATE)
-    model.train(
-        iterations=100,
-        disregard_previous_best=True,
-        batch_size=BATCH_SIZE,
-        callbacks=[early_stopping],
-    )
-    model.compile("L-BFGS-B")
-    dde.optimizers.set_LBFGS_options(
-        maxcor=100,
-    )
-    losshistory, train_state = model.train(
-        batch_size=BATCH_SIZE,
-    )
-    num = num + 1
-
+f = model.predict(X, operator=pde)
+err_eq = np.absolute(f)
+err = np.mean(err_eq)
+print("Mean residual: %.3e" % (err))
+x_id = np.argmax(err_eq)
+print("Adding new point:", X[x_id], "\n")
+data.add_anchors(X[x_id])
+# Stop training if the model isn't learning anymore
+early_stopping = dde.callbacks.EarlyStopping(min_delta=1e-4, patience=2000)
+model.compile(OPTIMIZER, lr=LEARNING_RATE)
+model.train(
+    iterations=100,
+    disregard_previous_best=True,
+    batch_size=BATCH_SIZE,
+    callbacks=[early_stopping],
+)
+model.compile("L-BFGS-B")
+dde.optimizers.set_LBFGS_options(
+    maxcor=100,
+)
+losshistory, train_state = model.train(
+    batch_size=BATCH_SIZE,
+)
 
 dde.saveplot(losshistory, trainstate, issave=True, isplot=True)
 plt.show()
