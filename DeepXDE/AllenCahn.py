@@ -46,9 +46,10 @@ def boundary_initial(X, on_initial):
 
 # Initialize a function for the temperature field
 def init_func(X):
-    x, y, _ = X[:, 0:1], X[:, 1:2], X[:, 2]
-    sine_pattern = np.sin(np.pi * x) * np.sin(np.pi * y)
-    return sine_pattern
+    t = np.random.uniform(
+        -0.05, 0.05, (len(X), 1)
+    )  # Temperature is randomly distributed between -0.05 and 0.05 everywhere at the start
+    return t
 
 
 # Define Neumann boundary condition
