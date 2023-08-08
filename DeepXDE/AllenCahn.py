@@ -93,7 +93,8 @@ losshistory, trainstate = model.train(
 # Residual Adaptive Refinement (RAR)
 X = geomtime.random_points(1000)
 err = 0
-while err > 1e-3:
+num = 0
+while err > 1e-3 and num < 10:
     f = model.predict(X, operator=pde)
     err_eq = np.absolute(f)
     err = np.mean(err_eq)
@@ -117,7 +118,8 @@ while err > 1e-3:
     losshistory, train_state = model.train(
         batch_size=BATCH_SIZE,
     )
-    ep = ep + 1
+    num = num + 1
+
 
 dde.saveplot(losshistory, trainstate, issave=True, isplot=True)
 plt.show()
