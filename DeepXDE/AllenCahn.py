@@ -109,13 +109,14 @@ while err > 0.01:
         batch_size=BATCH_SIZE,
         callbacks=[early_stopping],
     )
-    model.compile("L-BFGS-B")
-    dde.optimizers.set_LBFGS_options(
-        maxcor=100,
-    )
-    losshistory, train_state = model.train(
-        batch_size=BATCH_SIZE,
-    )
+
+model.compile("L-BFGS-B")
+dde.optimizers.set_LBFGS_options(
+    maxcor=100,
+)
+losshistory, train_state = model.train(
+    batch_size=BATCH_SIZE,
+)
 
 dde.saveplot(losshistory, trainstate, issave=True, isplot=True)
 plt.show()
