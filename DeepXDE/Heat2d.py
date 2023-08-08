@@ -138,7 +138,7 @@ while err > 0.005:
     early_stopping = dde.callbacks.EarlyStopping(min_delta=1e-4, patience=2000)
     model.compile(OPTIMIZER, lr=LEARNING_RATE)
     model.train(
-        iterations=ITERATIONS, disregard_previous_best=True, batch_size=BATCH_SIZE, callbacks=[early_stopping]
+        iterations=100, disregard_previous_best=True, batch_size=BATCH_SIZE, callbacks=[early_stopping]
     )
     model.compile("L-BFGS-B")
     dde.optimizers.set_LBFGS_options(
