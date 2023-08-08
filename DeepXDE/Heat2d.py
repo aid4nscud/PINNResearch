@@ -28,7 +28,7 @@ LOSS_WEIGHTS = [
 ]  # Weights for different components of the loss function
 ITERATIONS = 10000  # Number of training iterations
 OPTIMIZER = "adam"  # Optimizer for the first part of the training
-BATCH_SIZE = 512  # Batch size
+BATCH_SIZE = 32  # Batch size
 
 
 # Define PDE
