@@ -30,7 +30,7 @@ def pde(X, u):
     du_t = dde.grad.jacobian(u, X, j=2)
     du_xx = dde.grad.hessian(u, X, i=0, j=0)
     du_yy = dde.grad.hessian(u, X, i=1, j=1)
-    return du_t - EPSILON**2 * (du_xx + du_yy) + (u - u**3)
+    return du_t - EPSILON**2 * (du_xx + du_yy) + 10 * (u - u**3)
 
 
 # Define boundary conditions
