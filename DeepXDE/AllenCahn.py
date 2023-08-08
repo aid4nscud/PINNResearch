@@ -14,7 +14,7 @@ T_END = WIDTH = LENGTH = 1.0
 EPSILON = 0.0125
 SAMPLE_POINTS = 2000
 ARCHITECTURE = (
-    [3] + [300] * 10 + [1]
+    [3] + [60] * 5 + [1]
 )  # Network architecture ([input_dim, hidden_layer_1_dim, ..., output_dim])
 ACTIVATION = "tanh"  # Activation function
 INITIALIZER = "Glorot uniform"  # Weights initializer
@@ -47,7 +47,7 @@ def boundary_initial(X, on_initial):
 # Initialize a function for the temperature field
 def init_func(X):
     t = np.random.uniform(
-        -0.05, 0.05, (len(X), 1)
+        -1, 1, (len(X), 1)
     )  # Temperature is randomly distributed between -0.05 and 0.05 everywhere at the start
     return t
 
