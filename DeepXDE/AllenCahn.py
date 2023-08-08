@@ -12,7 +12,7 @@ from matplotlib.animation import (
 T_START = 0
 T_END = WIDTH = LENGTH = 1.0
 EPSILON = 0.0125
-SAMPLE_POINTS = 5000
+SAMPLE_POINTS = 2000
 ARCHITECTURE = (
     [3] + [60] * 5 + [1]
 )  # Network architecture ([input_dim, hidden_layer_1_dim, ..., output_dim])
@@ -22,7 +22,7 @@ LEARNING_RATE = 1e-3  # Learning rate
 LOSS_WEIGHTS = [1, 1, 100]  # Weights for different components of the loss function
 ITERATIONS = 10000  # Number of training iterations
 OPTIMIZER = "adam"  # Optimizer for the first part of the training
-BATCH_SIZE = 256  # Batch size
+BATCH_SIZE = 32  # Batch size
 
 
 # Define Allen-Cahn PDE
@@ -30,7 +30,7 @@ def pde(X, u):
     du_t = dde.grad.jacobian(u, X, j=2)
     du_xx = dde.grad.hessian(u, X, i=0, j=0)
     du_yy = dde.grad.hessian(u, X, i=1, j=1)
-    return du_t - EPSILON * (du_xx + du_yy) - 10 * (u - u**3)
+    return du_t - EPSILON**2 * (du_xx + du_yy) + (u - u**3)
 
 
 # Define boundary conditions
