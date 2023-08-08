@@ -9,7 +9,7 @@ from matplotlib.animation import (
 )  # Function-based interface to create animations
 
 # Constants/Network Parameters
-SAMPLE_POINTS = 100000
+SAMPLE_POINTS = 2000
 T_START = 0
 T_END = WIDTH = LENGTH = ALPHA = 1.0
 ARCHITECTURE = (
