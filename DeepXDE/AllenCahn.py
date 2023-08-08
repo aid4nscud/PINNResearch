@@ -14,7 +14,7 @@ T_END = WIDTH = LENGTH = 1.0
 EPSILON = 0.0125
 SAMPLE_POINTS = 2000
 ARCHITECTURE = (
-    [3] + [32] * 100 + [1]
+    [3] + [300] * 10 + [1]
 )  # Network architecture ([input_dim, hidden_layer_1_dim, ..., output_dim])
 ACTIVATION = "tanh"  # Activation function
 INITIALIZER = "Glorot uniform"  # Weights initializer
