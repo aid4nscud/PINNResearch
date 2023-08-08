@@ -92,8 +92,9 @@ losshistory, trainstate = model.train(
 
 # Residual Adaptive Refinement (RAR)
 X = geomtime.random_points(1000)
-err = 0
+err = 1
 num = 0
+
 while err > 1e-3 and num < 10:
     f = model.predict(X, operator=pde)
     err_eq = np.absolute(f)
