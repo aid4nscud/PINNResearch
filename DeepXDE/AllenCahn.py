@@ -93,7 +93,7 @@ losshistory, trainstate = model.train(
 # Residual Adaptive Refinement (RAR)
 X = geomtime.random_points(1000)
 ep = 0
-while ep > 1:
+while ep > 2:
     f = model.predict(X, operator=pde)
     err_eq = np.absolute(f)
     err = np.mean(err_eq)
@@ -127,60 +127,77 @@ plt.close()
 # Predict the solution at different time points and create an animation
 fig, ax = plt.subplots()
 ax = fig.add_subplot(111)
+
+# Set up the grid
 nelx = 100  # Number of elements in x direction
 nely = 100  # Number of elements in y direction
 timesteps = 101  # Number of time steps
 x = np.linspace(0, 1, nelx + 1)  # x coordinates
 y = np.linspace(0, 1, nely + 1)  # y coordinates
 t = np.linspace(0, 1, timesteps)  # Time points
-delta_t = t[1] - t[0]  # Time step
-xx, yy = np.meshgrid(x, y)
 
 # Prepare the data for the prediction
-x_ = np.zeros(shape=((nelx + 1) * (nely + 1),))
-y_ = np.zeros(shape=((nelx + 1) * (nely + 1),))
-for c1, ycor in enumerate(y):
-    for c2, xcor in enumerate(x):
-        x_[c1 * (nelx + 1) + c2] = xcor
-        y_[c1 * (nelx + 1) + c2] = ycor
+test_x, test_y, test_t = np.meshgrid(x, y, t)
+test_domain = np.vstack((np.ravel(test_x), np.ravel(test_y), np.ravel(test_t))).T
 
-# Predict the solution at each time point
-Ts = []  # List to store the solution at each time point
-for time in t:
-    t_ = np.ones(
-        (nelx + 1) * (nely + 1),
-    ) * (time)
-    X = np.column_stack((x_, y_))  # Making 2d array with x and y
-    X = np.column_stack((X, t_))  # Making 3d array with the 2d array and t
-    T = model.predict(X)  # Predict the solution
-    T = T.reshape(
-        T.shape[0],
+# Predict Solution and Residual
+predicted_solution = model.predict(test_domain)
+residual = model.predict(test_domain, operator=pde)
+residual = residual.reshape(test_x.shape)  # Reshape residuals
+
+
+# Animation function
+def animate_solution(data, filename, title, label, t_data):
+    fig, ax = plt.subplots(figsize=(7, 7))
+
+    # Create initial image and colorbar
+    im = ax.imshow(
+        data[:, :, 0],
+        origin="lower",
+        cmap="jet",
+        interpolation="bilinear",
+        extent=[0, 1, 0, 1],
     )
-    T = T.reshape(nelx + 1, nely + 1)
-    Ts.append(T)
+    cb = plt.colorbar(im, ax=ax, label=label)
+    ax.set_xlabel("x")
+    ax.set_ylabel("y")
+
+    # Update function for the frames
+    def updatefig(k):
+        # Update image data
+        im.set_array(data[:, :, k])
+        im.set_clim(
+            vmin=data[:, :, k].min(), vmax=data[:, :, k].max()
+        )  # Update the color limits
+
+        # Update colorbar
+        cb.update_normal(im)
+
+        # Update title
+        ax.set_title(f"{title}, t = {t_data[k]:.2f}")
+
+        return [im]
+
+    ani = animation.FuncAnimation(
+        fig, updatefig, frames=range(data.shape[2]), interval=50, blit=True
+    )
+    ani.save(filename, writer="ffmpeg")
 
 
-# Function to plot the heatmap of the solution
-def plotheatmap(T, time):
-    time_text = round(time * delta_t, ndigits=2)
-    plt.clf()  # Clear the current plot figure
-    plt.title(f"Time = {time_text}     Surface: Dependent variable u ({time_text})")
-    plt.xlabel("x")  # x label
-    plt.ylabel("y")  # y label
-    plt.pcolor(xx, yy, T, cmap="jet")  # Plot the solution as a colored heatmap
-    plt.colorbar()  # Add a colorbar to the plot
-    return plt
-
-
-# Function to update the plot for each frame of the animation
-def animate(k):
-    plotheatmap(Ts[k], k)
-
-
-# Create the animation
-anim = animation.FuncAnimation(
-    plt.figure(), animate, interval=100, frames=len(t), repeat=False
+# Create and save the solution animation
+animate_solution(
+    predicted_solution,
+    "pinn_AC_solution.mp4",
+    "Surface: Dependent variable T (u)",
+    " ",
+    t,
 )
 
-# Save the animation as a mp4 file
-anim.save("pinn_allenCahn_solution.mp4", writer="ffmpeg")
+# Create and save the residuals animation
+animate_solution(
+    residual,
+    "pinn_AC_residual.mp4",
+    "Residual",
+    "Residual",
+    t,
+)
