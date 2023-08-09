@@ -12,7 +12,7 @@ for run in range(1, num_runs):
     H = 1
     Nx = 101
     Ny = 101
-    ALPHA = 100 / num_runs  # You can now change ALPHA dynamically
+    ALPHA = 1 / num_runs  # You can now change ALPHA dynamically
 
     # Discretization
     dx = W / (Nx - 1)
