@@ -2,7 +2,7 @@ import deepxde as dde
 import numpy as np
 import matplotlib.pyplot as plt
 
-# true values
+#Constants
 T_START = 0
 T_END = WIDTH = LENGTH = ALPHA = 1.0
 
