@@ -1,9 +1,13 @@
 import numpy as np
-import matplotlib.pyplot as plt
-import scipy.io
+#import matplotlib.pyplot as plt
 
 data_list = []
 num_runs = 5000
+
+
+def save_to_npz(data_list, filename):
+    np.savez_compressed(filename, data_list=data_list)
+
 
 for run in range(1, num_runs):
     print(str.format("Starting run {}", run))
@@ -95,5 +99,6 @@ for run in range(1, num_runs):
     }
     data_list.append(data_dict)
 
-    # Save to .mat file
-scipy.io.savemat("temperature_data.mat", {"data": data_list})
+# Save to .mat file
+filename = "temperature_data.npz"
+save_to_npz(data_list, filename)

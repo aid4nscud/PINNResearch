@@ -10,13 +10,24 @@ T_END = WIDTH = LENGTH = ALPHA = 1.0
 
 
 # Load training data
-def load_training_data(num):
-    data = loadmat("data_file.mat")  # Replace with the appropriate mat file path
+def load_training_data(filename, num):
+    data_list = np.load(filename, allow_pickle=True)["data_list"]
 
-    x = data["x"][:num].reshape(-1, 1)
-    y = data["y"][:num].reshape(-1, 1)
-    t = data["t"][:num].reshape(-1, 1)
-    T = data["T"][:num].reshape(-1, 1)  # Temperature data
+    x = []
+    y = []
+    t = []
+    T = []
+
+    for data_dict in data_list:
+        x.extend(data_dict["x_data"][:num])
+        y.extend(data_dict["y_data"][:num])
+        t.extend(data_dict["t_data"][:num])
+        T.extend(data_dict["T_data"][:num])
+
+    x = np.array(x).reshape(-1, 1)
+    y = np.array(y).reshape(-1, 1)
+    t = np.array(t).reshape(-1, 1)
+    T = np.array(T).reshape(-1, 1)  # Temperature data
 
     return x, y, t, T
 
@@ -95,7 +106,7 @@ bc_low = dde.NeumannBC(geomtime, func_zero, boundary_bottom)  # Lower boundary
 ic = dde.IC(geomtime, init_func, boundary_initial)  # Initial condition
 
 # Get the training data: num = 5000
-ob_x, ob_y, ob_t, ob_T = load_training_data(num=5000)
+ob_x, ob_y, ob_t, ob_T = load_training_data("temperature_data.npz", num=5000)
 ob_xyt = np.hstack((ob_x, ob_y, ob_t))
 observe_T = dde.icbc.PointSetBC(ob_xyt, ob_T, component=0)
 # Training datasets and Loss
