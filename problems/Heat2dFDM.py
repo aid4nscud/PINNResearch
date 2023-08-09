@@ -25,7 +25,7 @@ for run in range(1, num_runs):
     total_time = 1
     output_times = np.linspace(
         0, total_time, 11
-    )  # You can modify the number of output times as needed
+    )
 
     # Mesh grid
     x = np.linspace(0, W, Nx)
@@ -99,6 +99,6 @@ for run in range(1, num_runs):
     }
     data_list.append(data_dict)
 
-# Save to .mat file
+# Save to .npz file
 filename = "temperature_data.npz"
 save_to_npz(data_list, filename)
