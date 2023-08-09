@@ -133,19 +133,13 @@ variable = dde.callbacks.VariableValue([ALPHA], period=100, filename=fnamevar)
 
 # Compile, train and save model
 model.compile("adam", lr=1e-3, external_trainable_variables=ALPHA)
-loss_history, train_state = model.train(
-    iterations=10000,
-    callbacks=[variable],
-    display_every=1000,
-    disregard_previous_best=True,
-)
+
 
 model.compile("adam", lr=1e-4, external_trainable_variables=[ALPHA])
 loss_history, train_state = model.train(
     iterations=10000,
     callbacks=[variable],
     display_every=1000,
-    disregard_previous_best=True,
 )
 dde.saveplot(loss_history, train_state, issave=True, isplot=True)
 plt.show()
