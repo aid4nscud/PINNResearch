@@ -1,8 +1,6 @@
 import deepxde as dde
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.io import loadmat
-import re
 
 # true values
 T_START = 0
