@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 #Constants
 T_START = 0
 T_END = WIDTH = LENGTH = 1.0
+BATCH_SIZE = 32  # Batch size
 
 
 # Load training data
@@ -130,15 +131,16 @@ fnamevar = "variables.dat"
 variable = dde.callbacks.VariableValue([ALPHA], period=100, filename=fnamevar)
 
 # Compile, train and save model
-model.compile("adam", lr=1e-3, external_trainable_variables=ALPHA)
-
-
 model.compile("adam", lr=1e-4, external_trainable_variables=[ALPHA])
 loss_history, train_state = model.train(
     iterations=10000,
     callbacks=[variable],
     display_every=1000,
+    batch_size=BATCH_SIZE
 )
+
+model.compile("L-BFGS-B", external_trainable_variables=[ALPHA])
+loss_history, train_state = model.train(callbacks=[variable], batch_size=BATCH_SIZE)
 dde.saveplot(loss_history, train_state, issave=True, isplot=True)
 plt.show()
 plt.savefig("loss_history_plot_InverseHeat2d")
