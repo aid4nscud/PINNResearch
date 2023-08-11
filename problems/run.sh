@@ -1,12 +1,13 @@
 #!/bin/bash
-#SBATCH --job-name=python         # Job name
-#SBATCH --output=log_slurm.%j.out # Output file
-#SBATCH --error=log_slurm.%j.err  # Error file
-#SBATCH --nodes=1                # Number of nodes
-#SBATCH --ntasks-per-node=1       # Number of tasks per node
-#SBATCH --gres=gpu:2              # Number of GPUs
-#SBATCH --partition=gpu           # Partition/queue name
-#SBATCH --time=1:00:00            # time limit
+SBATCH --job-name=python         # Job name
+SBATCH --output=log_slurm.%j.out # Output file
+SBATCH --error=log_slurm.%j.err  # Error file
+SBATCH --nodes=1                # Number of nodes
+SBATCH --ntasks-per-node=1       # Number of tasks per node
+SBATCH --gres=gpu:2              # Number of GPUs
+SBATCH --partition=gpu           # Partition/queue name
+SBATCH --time=5:00:00            # time limit
+SBATCH --cpus-per-task 48
 
 # Activate the conda environment
 . ~/.bashrc
