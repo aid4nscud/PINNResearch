@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 #Constants
 T_START = 0
-T_END = WIDTH = LENGTH = ALPHA = 1.0
+T_END = WIDTH = LENGTH = 1.0
 
 
 # Load training data
