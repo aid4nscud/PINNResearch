@@ -1,2 +1,3 @@
 /lib
 *.npz
+*.mat
