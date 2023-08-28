@@ -8,7 +8,7 @@ ALPHA = dde.Variable(1e-3)
 WIDTH = 1
 LENGTH = 1
 T_END = 1
-BATCH_SIZE = 256
+BATCH_SIZE = 128
 ITERATIONS = 10000
 LOSS_WEIGHTS = [
     10,
@@ -136,7 +136,7 @@ data = dde.data.TimePDE(
 )
 
 # Network architecture
-layer_size = [3] + [120] * 5 + [1]
+layer_size = [3] + [60] * 5 + [1]
 activation = "tanh"
 initializer = "Glorot uniform"
 net = dde.nn.FNN(layer_size, activation, initializer)
