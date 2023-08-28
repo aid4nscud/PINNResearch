@@ -156,7 +156,14 @@ variable = dde.callbacks.VariableValue(ALPHA, period=1000)
 losshistory, train_state = model.train(
     iterations=ITERATIONS, batch_size=BATCH_SIZE, callbacks=[variable]
 )
-ALPHA = tf.math.abs(ALPHA) 
+
+model.compile("L-BFGS-B")
+dde.optimizers.set_LBFGS_options(
+    maxcor=100,
+)
+losshistory, train_state = model.train(batch_size=BATCH_SIZE, callbacks=[variable])
+
+ALPHA = tf.math.abs(ALPHA)
 ALPHA_float = float(ALPHA.numpy())  # Convert the tensor to float
 print("PINN Prediction of Alpha Parameter " + str(ALPHA_float) + "\n")
 
