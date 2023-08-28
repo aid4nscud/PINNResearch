@@ -95,12 +95,12 @@ observe_x = np.hstack(
 observe_y = T_data.flatten()[:, None]
 
 # Define observation points
-observe_y_bc = dde.PointSetBC(observe_x, observe_y)
+observed_data = dde.PointSetBC(observe_x, observe_y)
 
 data = dde.data.TimePDE(
     geomtime,
     pde,
-    [bc_l, bc_r, bc_up, bc_low, ic, observe_y_bc],
+    [bc_l, bc_r, bc_up, bc_low, ic, observed_data],
     num_domain=1000,
     num_boundary=500,
     num_initial=250,
