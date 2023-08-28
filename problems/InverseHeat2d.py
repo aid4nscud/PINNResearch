@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Initialize the value of alpha
-ALPHA = dde.Variable(0.01)
+ALPHA = dde.Variable(0.001)
 WIDTH = 1
 LENGTH = 1
 T_END = 1
@@ -137,7 +137,7 @@ layer_size = [3] + [60] * 5 + [1]
 activation = "tanh"
 initializer = "Glorot uniform"
 net = dde.nn.FNN(layer_size, activation, initializer)
-
+net.apply_output_transform(lambda _, y: abs(y))
 model = dde.Model(data, net)
 
 # Compile model
