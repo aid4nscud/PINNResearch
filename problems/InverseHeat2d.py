@@ -24,7 +24,7 @@ observe_y = T_data.flatten()[:, None]
 
 # Define the spatial and temporal domain
 geom = dde.geometry.Rectangle([0, 0], [1, 1])
-timedomain = dde.geometry.TimeDomain([1, 1])
+timedomain = dde.geometry.TimeDomain([0, 1])
 geomtime = dde.geometry.GeometryXTime(geom, timedomain)
 
 # Define observation points
