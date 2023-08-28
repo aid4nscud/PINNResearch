@@ -96,6 +96,19 @@ observe_x = np.hstack(
 )
 observe_y = T_data.flatten()[:, None]
 
+# Normalize all data
+x_min = observe_x[:, 0].min()
+x_max = observe_x[:, 0].max()
+observe_x[:, 0] = (observe_x[:, 0] - x_min) / (x_max - x_min)
+
+y_min = observe_x[:, 1].min()
+y_max = observe_x[:, 1].max()
+observe_x[:, 1] = (observe_x[:, 1] - y_min) / (y_max - y_min)
+
+T_min = observe_y.min()
+T_max = observe_y.max()
+observe_y = (observe_y - T_min) / (T_max - T_min)
+
 # Define observation points
 observed_data = dde.PointSetBC(observe_x, observe_y)
 
@@ -129,7 +142,9 @@ model.compile(
 variable = dde.callbacks.VariableValue(ALPHA, period=1000)
 
 # Train the model
-losshistory, train_state = model.train(iterations=ITERATIONS,batch_size=BATCH_SIZE, callbacks=[variable])
+losshistory, train_state = model.train(
+    iterations=ITERATIONS, batch_size=BATCH_SIZE, callbacks=[variable]
+)
 
 # Save and plot
 dde.saveplot(losshistory, train_state, issave=True, isplot=True)
