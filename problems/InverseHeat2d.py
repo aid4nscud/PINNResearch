@@ -157,7 +157,7 @@ losshistory, train_state = model.train(
     iterations=ITERATIONS, batch_size=BATCH_SIZE, callbacks=[variable]
 )
 
-model.compile("L-BFGS-B")
+model.compile("L-BFGS-B", external_training_variables=[ALPHA])
 dde.optimizers.set_LBFGS_options(
     maxcor=100,
 )
