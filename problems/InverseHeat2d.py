@@ -126,9 +126,9 @@ data = dde.data.TimePDE(
     geomtime,
     pde,
     [bc_l, bc_r, bc_up, bc_low, ic, observed_data],
-    num_domain=40,
-    num_boundary=20,
-    num_initial=10,
+    num_domain=1000,
+    num_boundary=500,
+    num_initial=250,
     anchors=observe_x,
     num_test=10000,
 )
