@@ -105,7 +105,6 @@ data = dde.data.TimePDE(
     num_boundary=500,
     num_initial=250,
     anchors=observe_x,
-    num_test=10000,
 )
 
 # Network architecture
