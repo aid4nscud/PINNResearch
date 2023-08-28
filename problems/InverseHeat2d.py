@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Initialize the value of alpha
-ALPHA = dde.Variable(1.0, trainable=True)
+ALPHA = dde.Variable(1.0)
 
 # Define the PDE
 def pde(x, y):
