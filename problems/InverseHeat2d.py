@@ -4,13 +4,14 @@ import matplotlib.pyplot as plt
 
 # Initialize the value of alpha
 ALPHA = dde.Variable(0.001)
+ALPHA.apply_output_transform(lambda _, y: abs(y))
 WIDTH = 1
 LENGTH = 1
 T_END = 1
 BATCH_SIZE = 256
 ITERATIONS = 10000
 LOSS_WEIGHTS = [
-    10,
+    1,
     1,
     1,
     1,
