@@ -16,7 +16,7 @@ LOSS_WEIGHTS = [
     1,
     1,
     1,
-    10,
+    1,
     10,
 ]  # Weights for different components of the loss function
 
@@ -136,7 +136,7 @@ data = dde.data.TimePDE(
 )
 
 # Network architecture
-layer_size = [3] + [60] * 5 + [1]
+layer_size = [3] + [120] * 5 + [1]
 activation = "tanh"
 initializer = "Glorot uniform"
 net = dde.nn.FNN(layer_size, activation, initializer)
