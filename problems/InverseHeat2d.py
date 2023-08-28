@@ -4,19 +4,19 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Initialize the value of alpha
-ALPHA = dde.Variable(0.001)
+ALPHA = dde.Variable(1e-3)
 WIDTH = 1
 LENGTH = 1
 T_END = 1
 BATCH_SIZE = 256
 ITERATIONS = 10000
 LOSS_WEIGHTS = [
+    10,
     1,
     1,
     1,
     1,
-    1,
-    1,
+    10,
     10,
 ]  # Weights for different components of the loss function
 
@@ -144,7 +144,7 @@ model = dde.Model(data, net)
 # Compile model
 model.compile(
     "adam",
-    lr=0.001,
+    lr=1e-3,
     loss_weights=LOSS_WEIGHTS,
     external_trainable_variables=[ALPHA],
 )
