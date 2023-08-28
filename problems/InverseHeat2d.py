@@ -156,9 +156,10 @@ variable = dde.callbacks.VariableValue(ALPHA, period=1000)
 losshistory, train_state = model.train(
     iterations=ITERATIONS, batch_size=BATCH_SIZE, callbacks=[variable]
 )
+ALPHA = tf.math.abs(ALPHA) 
+ALPHA_float = float(ALPHA.numpy())  # Convert the tensor to float
+print("PINN Prediction of Alpha Parameter " + str(ALPHA_float) + "\n")
 
-ALPHA = tf.math.abs(ALPHA)
-print("PINN Prediction of Alpha Parameter " + ALPHA + "\n")
 
 # Save and plot
 dde.saveplot(losshistory, train_state, issave=True, isplot=True)
