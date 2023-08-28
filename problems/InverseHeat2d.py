@@ -9,7 +9,7 @@ WIDTH = 1
 LENGTH = 1
 T_END = 1
 BATCH_SIZE = 256
-ITERATIONS = 80000
+ITERATIONS = 10000
 LOSS_WEIGHTS = [
     10,
     1,
@@ -17,7 +17,7 @@ LOSS_WEIGHTS = [
     1,
     1,
     1,
-    10,
+    100,
 ]  # Weights for different components of the loss function
 
 
