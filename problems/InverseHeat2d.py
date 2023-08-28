@@ -4,13 +4,79 @@ import matplotlib.pyplot as plt
 
 # Initialize the value of alpha
 ALPHA = dde.Variable(1.0)
+WIDTH = 1
+LENGTH = 1
+T_END = 1
+
 
 # Define the PDE
-def pde(x, y):
-    dy_t = dde.grad.jacobian(y, x, i=0, j=2)
-    dy_xx = dde.grad.hessian(y, x, i=0, j=0)
-    dy_yy = dde.grad.hessian(y, x, i=0, j=1)
-    return dy_t - ALPHA * (dy_xx + dy_yy)
+def pde(X, T):
+    # Calculate second derivatives (Hessians) of T with respect to X in both dimensions
+    dT_xx = dde.grad.hessian(T, X, i=0, j=0)
+    dT_yy = dde.grad.hessian(T, X, i=1, j=1)
+
+    # Calculate first derivative (Jacobian) of T with respect to X in time dimension
+    dT_t = dde.grad.jacobian(T, X, j=2)
+
+    # Return the defined PDE
+    return dT_t - (ALPHA * dT_xx + dT_yy)
+
+
+# Define boundary conditions
+def boundary_right(X, on_boundary):
+    x, _, _ = X
+    return on_boundary and np.isclose(x, WIDTH)  # Check if on the right boundary
+
+
+def boundary_left(X, on_boundary):
+    x, _, _ = X
+    return on_boundary and np.isclose(x, 0)  # Check if on the left boundary
+
+
+def boundary_top(X, on_boundary):
+    _, y, _ = X
+    return on_boundary and np.isclose(y, LENGTH)  # Check if on the upper boundary
+
+
+def boundary_bottom(X, on_boundary):
+    _, y, _ = X
+    return on_boundary and np.isclose(y, 0)  # Check if on the lower boundary
+
+
+# Define initial condition
+def boundary_initial(X, on_initial):
+    _, _, t = X
+    return on_initial and np.isclose(t, 0)  # Check if at the initial time
+
+
+# Initialize a function for the temperature field
+def init_func(X):
+    t = np.zeros((len(X), 1))  # Temperature is zero everywhere at the T_START
+    return t
+
+
+# Define Dirichlet and Neumann boundary conditions
+def constraint_right(X):
+    return np.ones((len(X), 1))  # On the right boundary, temperature is kept at 1
+
+
+def func_zero(X):
+    return np.zeros(
+        (len(X), 1)
+    )  # On the other boundaries, the derivative of temperature is kept at 0 (Neumann condition)
+
+
+# Define geometry and time domains
+geom = dde.geometry.Rectangle([0, 0], [WIDTH, LENGTH])  # Geometry domain
+timedomain = dde.geometry.TimeDomain(0, T_END)  # Time domain
+geomtime = dde.geometry.GeometryXTime(geom, timedomain)  # Space-time domain
+
+# Define boundary conditions and initial condition
+bc_l = dde.NeumannBC(geomtime, func_zero, boundary_left)  # Left boundary
+bc_r = dde.DirichletBC(geomtime, constraint_right, boundary_right)  # Right boundary
+bc_up = dde.NeumannBC(geomtime, func_zero, boundary_top)  # Upper boundary
+bc_low = dde.NeumannBC(geomtime, func_zero, boundary_bottom)  # Lower boundary
+ic = dde.IC(geomtime, init_func, boundary_initial)  # Initial condition
 
 # Load the data
 data_dict = np.load("temperature_data.npz")
@@ -19,13 +85,14 @@ Y_data = data_dict["y_data"]
 T_data = data_dict["T_data"]
 
 # Flatten and stack to create observation points
-observe_x = np.hstack((X_data.flatten()[:, None], Y_data.flatten()[:, None], np.ones_like(X_data.flatten())[:, None]))
+observe_x = np.hstack(
+    (
+        X_data.flatten()[:, None],
+        Y_data.flatten()[:, None],
+        np.ones_like(X_data.flatten())[:, None],
+    )
+)
 observe_y = T_data.flatten()[:, None]
-
-# Define the spatial and temporal domain
-geom = dde.geometry.Rectangle([0, 0], [1, 1])
-timedomain = dde.geometry.TimeDomain(0, 1)
-geomtime = dde.geometry.GeometryXTime(geom, timedomain)
 
 # Define observation points
 observe_y_bc = dde.PointSetBC(observe_x, observe_y)
@@ -33,7 +100,7 @@ observe_y_bc = dde.PointSetBC(observe_x, observe_y)
 data = dde.data.TimePDE(
     geomtime,
     pde,
-    [observe_y_bc],
+    [bc_l, bc_r, bc_up, bc_low, ic, observe_y_bc],
     num_domain=1000,
     num_boundary=500,
     num_initial=250,
@@ -51,7 +118,10 @@ model = dde.Model(data, net)
 
 # Compile model
 model.compile(
-    "adam", lr=0.001, metrics=["l2 relative error"], external_trainable_variables=[ALPHA]
+    "adam",
+    lr=0.001,
+    metrics=["l2 relative error"],
+    external_trainable_variables=[ALPHA],
 )
 
 # Define callback to save ALPHA
