@@ -163,7 +163,7 @@ dde.optimizers.set_LBFGS_options(
 )
 losshistory, train_state = model.train(batch_size=BATCH_SIZE, callbacks=[variable])
 
-ALPHA = tf.math.abs(ALPHA)
+ALPHA = tf.math.abs(ALPHA) * 100
 ALPHA_float = float(ALPHA.numpy())  # Convert the tensor to float
 print("PINN Prediction of Alpha Parameter " + str(ALPHA_float) + "\n")
 
