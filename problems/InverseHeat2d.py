@@ -144,6 +144,7 @@ model = dde.Model(data, net)
 model.compile(
     "adam",
     lr=0.001,
+    loss_weights=LOSS_WEIGHTS,
     external_trainable_variables=[ALPHA],
 )
 
