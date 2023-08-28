@@ -1,10 +1,10 @@
 import deepxde as dde
+import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
 
 # Initialize the value of alpha
 ALPHA = dde.Variable(0.001)
-ALPHA.apply_output_transform(lambda _, y: abs(y))
 WIDTH = 1
 LENGTH = 1
 T_END = 1
@@ -156,6 +156,9 @@ variable = dde.callbacks.VariableValue(ALPHA, period=1000)
 losshistory, train_state = model.train(
     iterations=ITERATIONS, batch_size=BATCH_SIZE, callbacks=[variable]
 )
+
+ALPHA = tf.math.abs(ALPHA)
+print("PINN Prediction of Alpha Parameter " + ALPHA + "\n")
 
 # Save and plot
 dde.saveplot(losshistory, train_state, issave=True, isplot=True)
