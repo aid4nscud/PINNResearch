@@ -9,7 +9,7 @@ WIDTH = 1
 LENGTH = 1
 T_END = 1
 BATCH_SIZE = 256
-ITERATIONS = 10000
+ITERATIONS = 80000
 LOSS_WEIGHTS = [
     10,
     1,
@@ -114,11 +114,11 @@ data = dde.data.TimePDE(
     geomtime,
     pde,
     [bc_l, bc_r, bc_up, bc_low, ic, observed_data],
-    num_domain=1000,
-    num_boundary=500,
-    num_initial=250,
+    num_domain=2000,
+    num_boundary=100,
+    num_initial=100,
     anchors=observe_x,
-    num_test=10000,
+    num_test=50000,
 )
 
 # Network architecture
