@@ -7,6 +7,8 @@ ALPHA = dde.Variable(1.0)
 WIDTH = 1
 LENGTH = 1
 T_END = 1
+BATCH_SIZE = 256
+ITERATIONS = 10000
 
 
 # Define the PDE
@@ -105,6 +107,7 @@ data = dde.data.TimePDE(
     num_boundary=500,
     num_initial=250,
     anchors=observe_x,
+    num_test=10000,
 )
 
 # Network architecture
@@ -119,7 +122,6 @@ model = dde.Model(data, net)
 model.compile(
     "adam",
     lr=0.001,
-    metrics=["l2 relative error"],
     external_trainable_variables=[ALPHA],
 )
 
@@ -127,7 +129,7 @@ model.compile(
 variable = dde.callbacks.VariableValue(ALPHA, period=1000)
 
 # Train the model
-losshistory, train_state = model.train(iterations=50000, callbacks=[variable])
+losshistory, train_state = model.train(iterations=ITERATIONS,batch_size=BATCH_SIZE, callbacks=[variable])
 
 # Save and plot
 dde.saveplot(losshistory, train_state, issave=True, isplot=True)
