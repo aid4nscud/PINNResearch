@@ -96,6 +96,7 @@ X_data = data_dict["x_data"]
 Y_data = data_dict["y_data"]
 T_data = data_dict["T_data"]
 
+
 # Flatten and stack to create observation points
 observe_x = np.hstack(
     (
@@ -105,6 +106,19 @@ observe_x = np.hstack(
     )
 )
 observe_y = T_data.flatten()[:, None]
+
+x_min = observe_x[:, 0].min()
+x_max = observe_x[:, 0].max()
+observe_x[:, 0] = (observe_x[:, 0] - x_min) / (x_max - x_min)
+
+y_min = observe_x[:, 1].min()
+y_max = observe_x[:, 1].max()
+observe_x[:, 1] = (observe_x[:, 1] - y_min) / (y_max - y_min)
+
+# Normalize observe_y
+T_min = observe_y.min()
+T_max = observe_y.max()
+observe_y = (observe_y - T_min) / (T_max - T_min)
 
 
 # Define observation points
