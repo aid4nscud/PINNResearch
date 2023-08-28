@@ -24,61 +24,11 @@ def pde(X, T):
     return dT_t - (ALPHA * dT_xx + dT_yy)
 
 
-# Define boundary conditions
-def boundary_right(X, on_boundary):
-    x, _, _ = X
-    return on_boundary and np.isclose(x, WIDTH)  # Check if on the right boundary
-
-
-def boundary_left(X, on_boundary):
-    x, _, _ = X
-    return on_boundary and np.isclose(x, 0)  # Check if on the left boundary
-
-
-def boundary_top(X, on_boundary):
-    _, y, _ = X
-    return on_boundary and np.isclose(y, LENGTH)  # Check if on the upper boundary
-
-
-def boundary_bottom(X, on_boundary):
-    _, y, _ = X
-    return on_boundary and np.isclose(y, 0)  # Check if on the lower boundary
-
-
-# Define initial condition
-def boundary_initial(X, on_initial):
-    _, _, t = X
-    return on_initial and np.isclose(t, 0)  # Check if at the initial time
-
-
-# Initialize a function for the temperature field
-def init_func(X):
-    t = np.zeros((len(X), 1))  # Temperature is zero everywhere at the T_START
-    return t
-
-
-# Define Dirichlet and Neumann boundary conditions
-def constraint_right(X):
-    return np.ones((len(X), 1))  # On the right boundary, temperature is kept at 1
-
-
-def func_zero(X):
-    return np.zeros(
-        (len(X), 1)
-    )  # On the other boundaries, the derivative of temperature is kept at 0 (Neumann condition)
-
 
 # Define geometry and time domains
 geom = dde.geometry.Rectangle([0, 0], [WIDTH, LENGTH])  # Geometry domain
 timedomain = dde.geometry.TimeDomain(0, T_END)  # Time domain
 geomtime = dde.geometry.GeometryXTime(geom, timedomain)  # Space-time domain
-
-# Define boundary conditions and initial condition
-bc_l = dde.NeumannBC(geomtime, func_zero, boundary_left)  # Left boundary
-bc_r = dde.DirichletBC(geomtime, constraint_right, boundary_right)  # Right boundary
-bc_up = dde.NeumannBC(geomtime, func_zero, boundary_top)  # Upper boundary
-bc_low = dde.NeumannBC(geomtime, func_zero, boundary_bottom)  # Lower boundary
-ic = dde.IC(geomtime, init_func, boundary_initial)  # Initial condition
 
 # Load the data
 data_dict = np.load("temperature_data.npz")
@@ -115,7 +65,7 @@ observed_data = dde.PointSetBC(observe_x, observe_y)
 data = dde.data.TimePDE(
     geomtime,
     pde,
-    [bc_l, bc_r, bc_up, bc_low, ic, observed_data],
+    [observed_data],
     num_domain=1000,
     num_boundary=500,
     num_initial=250,
