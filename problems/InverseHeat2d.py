@@ -172,7 +172,7 @@ while err > 0.01:
     print("Adding new point:", X[x_id], "\n")
     data.add_anchors(X[x_id])
     # Stop training if the model isn't learning anymore
-    early_stopping = dde.callbacks.EarlyStopping(min_delta=1e-4, patience=2000)
+    early_stopping = dde.callbacks.EarlyStopping(min_delta=LEARNING_RATE, patience=2000)
     model.compile(OPTIMIZER, lr=LEARNING_RATE, loss_weights=LOSS_WEIGHTS)
     model.train(
         iterations=100, disregard_previous_best=True, batch_size=BATCH_SIZE, callbacks=[early_stopping]
