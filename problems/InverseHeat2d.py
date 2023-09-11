@@ -8,7 +8,7 @@ ALPHA = dde.Variable(1e-3)
 WIDTH = 1
 LENGTH = 1
 T_END = 1
-BATCH_SIZE = 128
+BATCH_SIZE = 256
 ITERATIONS = 10000
 LOSS_WEIGHTS = [
     10,
@@ -19,7 +19,8 @@ LOSS_WEIGHTS = [
     1,
     100,
 ]  # Weights for different components of the loss function
-
+OPTIMIZER = "adam"
+LEARNING_RATE = 1e-4
 
 # Define the PDE
 def pde(X, T):
@@ -145,8 +146,8 @@ model = dde.Model(data, net)
 
 # Compile model
 model.compile(
-    "adam",
-    lr=1e-4,
+    OPTIMIZER,
+    lr=LEARNING_RATE,
     loss_weights=LOSS_WEIGHTS,
     external_trainable_variables=[ALPHA],
 )
@@ -159,16 +160,32 @@ losshistory, train_state = model.train(
     iterations=ITERATIONS, batch_size=BATCH_SIZE, callbacks=[variable]
 )
 
-model.compile("L-BFGS-B", external_trainable_variables=[ALPHA])
-dde.optimizers.set_LBFGS_options(
-    maxcor=100,
-)
-losshistory, train_state = model.train(batch_size=BATCH_SIZE, callbacks=[variable])
+# Residual Adaptive Refinement (RAR)
+X = geomtime.random_points(1000)
+err = 1
+while err > 0.01:
+    f = model.predict(X, operator=pde)
+    err_eq = np.absolute(f)
+    err = np.mean(err_eq)
+    print("Mean residual: %.3e" % (err))
+    x_id = np.argmax(err_eq)
+    print("Adding new point:", X[x_id], "\n")
+    data.add_anchors(X[x_id])
+    # Stop training if the model isn't learning anymore
+    early_stopping = dde.callbacks.EarlyStopping(min_delta=1e-4, patience=2000)
+    model.compile(OPTIMIZER, lr=LEARNING_RATE, loss_weights=LOSS_WEIGHTS)
+    model.train(
+        iterations=100, disregard_previous_best=True, batch_size=BATCH_SIZE, callbacks=[early_stopping]
+    )
+    model.compile("L-BFGS-B")
+    dde.optimizers.set_LBFGS_options(
+        maxcor=100,
+    )
+    losshistory, train_state = model.train(batch_size=BATCH_SIZE, callbacks=[variable])
 
 ALPHA = tf.math.abs(ALPHA)
 ALPHA_float = float(ALPHA.numpy())  # Convert the tensor to float
 print("PINN Prediction of Alpha Parameter " + str(ALPHA_float) + "\n")
-
 
 # Save and plot
 dde.saveplot(losshistory, train_state, issave=True, isplot=True)
