@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=python         # Job name
+#SBATCH --job-name=PINN         # Job name
 #SBATCH --output=log_slurm.%j.out # Output file
 #SBATCH --error=log_slurm.%j.err  # Error file
 #SBATCH --nodes=1                 # Number of nodes
