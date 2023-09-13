@@ -11,7 +11,8 @@ from matplotlib.animation import (
 # Constants/Network Parameters
 SAMPLE_POINTS = 2000
 T_START = 0
-T_END = WIDTH = LENGTH = ALPHA = 1.0
+T_END = WIDTH = LENGTH = 1.0
+ALPHA = 0.5
 ARCHITECTURE = (
     [3] + [60] * 5 + [1]
 )  # Network architecture ([input_dim, hidden_layer_1_dim, ..., output_dim])
@@ -169,7 +170,7 @@ test_domain = np.vstack((np.ravel(test_x), np.ravel(test_y), np.ravel(test_t))).
 
 # Predict Solution and Residual
 predicted_solution = model.predict(test_domain)
-predicted_solution = (predicted_solution * 100).reshape(
+predicted_solution = predicted_solution.reshape(
     test_x.shape
 )  # Scale and reshape solution
 residual = model.predict(test_domain, operator=pde)
@@ -218,7 +219,7 @@ def animate_solution(data, filename, title, label, t_data):
 animate_solution(
     predicted_solution,
     "pinn_heat2d_solution.mp4",
-    "Surface: Dependent variable T (K)",
+    "Diffusion Equation",
     "Temperature (K)",
     t,
 )
