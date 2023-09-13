@@ -12,7 +12,7 @@ from matplotlib.animation import (
 SAMPLE_POINTS = 2000
 T_START = 0
 T_END = WIDTH = LENGTH = 1.0
-ALPHA = 1.0
+ALPHA = 1.5
 ARCHITECTURE = (
     [3] + [60] * 5 + [1]
 )  # Network architecture ([input_dim, hidden_layer_1_dim, ..., output_dim])
