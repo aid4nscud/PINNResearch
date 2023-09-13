@@ -6,7 +6,7 @@
 #SBATCH --ntasks-per-node=1       # Number of tasks per node
 #SBATCH --gres=gpu:2              # Number of GPUs
 #SBATCH --partition=gpu           # Partition/queue name
-#SBATCH --time=5:00:00            # Time limit
+#SBATCH --time=1:00:00            # Time limit
 #SBATCH --cpus-per-task=48        # Number of CPUs per task
 
 # Activate the conda environment

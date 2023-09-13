@@ -12,7 +12,7 @@ from matplotlib.animation import (
 SAMPLE_POINTS = 2000
 T_START = 0
 T_END = WIDTH = LENGTH = 1.0
-ALPHA = 0.5
+ALPHA = 1.0
 ARCHITECTURE = (
     [3] + [60] * 5 + [1]
 )  # Network architecture ([input_dim, hidden_layer_1_dim, ..., output_dim])
@@ -218,7 +218,7 @@ def animate_solution(data, filename, title, label, t_data):
 # Create and save the solution animation
 animate_solution(
     predicted_solution,
-    "pinn_heat2d_solution.mp4",
+    "pinn_heat2d_solution_alpha_1.mp4",
     "Diffusion Equation",
     "Temperature (K)",
     t,
