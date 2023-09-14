@@ -18,4 +18,6 @@ export TF_GPU_ALLOCATOR=cuda_malloc_async
 conda activate tf-gpu
 
 # Run the Python script
-python3 Heat2d.py
+python3 Heat2d.py 0.01
+python3 Heat2d.py 100
+
