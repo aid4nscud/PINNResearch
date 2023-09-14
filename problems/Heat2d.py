@@ -7,12 +7,17 @@ import matplotlib.animation as animation  # For creating animations
 from matplotlib.animation import (
     FuncAnimation,
 )  # Function-based interface to create animations
+import argparse
+
+parser = argparse.ArgumentParser(description='Heat2D simulation with variable ALPHA.')
+parser.add_argument('alpha', type=float, help='Value of ALPHA')
+args = parser.parse_args()
 
 # Constants/Network Parameters
 SAMPLE_POINTS = 2000
 T_START = 0
 T_END = WIDTH = LENGTH = 1.0
-ALPHA = 1.5
+ALPHA = args.alpha
 ARCHITECTURE = (
     [3] + [60] * 5 + [1]
 )  # Network architecture ([input_dim, hidden_layer_1_dim, ..., output_dim])
@@ -218,7 +223,7 @@ def animate_solution(data, filename, title, label, t_data):
 # Create and save the solution animation
 animate_solution(
     predicted_solution,
-    "pinn_heat2d_solution_alpha_1.5.mp4",
+    "pinn_heat2d_solution_alpha_" + ALPHA + ".mp4",
     "Diffusion Equation",
     "Temperature (K)",
     t,
@@ -227,7 +232,7 @@ animate_solution(
 # Create and save the residuals animation
 animate_solution(
     residual,
-    "pinn_heat2d_residual.mp4",
+    "pinn_heat2d_residual_"+ALPHA+".mp4",
     "Residual",
     "Residual",
     t,
