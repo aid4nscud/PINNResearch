@@ -223,7 +223,7 @@ def animate_solution(data, filename, title, label, t_data):
 # Create and save the solution animation
 animate_solution(
     predicted_solution,
-    f"pinn_heat2d_solution_alpha_{ALPHA}.mp4",
+    f"pinn_heat2d_solution_alpha_{str(ALPHA)}.mp4",
     "Diffusion Equation",
     "Temperature (K)",
     t,
@@ -232,7 +232,7 @@ animate_solution(
 # Create and save the residuals animation
 animate_solution(
     residual,
-    f"pinn_heat2d_residual_{ALPHA}.mp4",
+    f"pinn_heat2d_residual_{str(ALPHA)}.mp4",
     "Residual",
     "Residual",
     t,
