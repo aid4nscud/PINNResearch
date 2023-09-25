@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Initialize the value of alpha
-ALPHA = dde.Variable(1)
+ALPHA = dde.Variable(1.0)
 WIDTH = 1
 LENGTH = 1
 T_END = 1
