@@ -46,7 +46,7 @@ while time < total_time:
     T_new[:, -1] = T_new[:, -2]
 
     # Dirichlet boundary condition
-    T_new[-1, :] = 100
+    T_new[-1, :] = 1
 
     T = T_new
     time += dt
