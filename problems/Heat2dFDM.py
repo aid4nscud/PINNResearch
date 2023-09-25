@@ -52,12 +52,12 @@ while time < total_time:
     time += dt
 
 # Visualization
-plt.contourf(X, Y, T.T, cmap="jet", levels=100, vmin=T.min(), vmax=T.max())
-plt.colorbar()
-plt.title(f"Temperature Distribution at t={total_time}")
-plt.xlabel("x-direction")
-plt.ylabel("y-direction")
-plt.show()
+#plt.contourf(X, Y, T.T, cmap="jet", levels=100, vmin=T.min(), vmax=T.max())
+#plt.colorbar()
+#plt.title(f"Temperature Distribution at t={total_time}")
+#plt.xlabel("x-direction")
+#plt.ylabel("y-direction")
+#plt.show()
 
 # Save to .npz file
 data_dict = {
