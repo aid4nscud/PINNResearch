@@ -152,6 +152,9 @@ while err > 0.01:
     )
     losshistory, train_state = model.train(batch_size=BATCH_SIZE,)
 
+
+model.save("./trained_PINN_model")
+
 dde.saveplot(losshistory, trainstate, issave=True, isplot=True)
 plt.show()
 plt.savefig("loss_history_plot_Heat2d")

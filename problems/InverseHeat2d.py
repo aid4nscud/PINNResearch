@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Initialize the value of alpha
-ALPHA = dde.Variable(1e-3)
+ALPHA = dde.Variable(1)
 WIDTH = 1
 LENGTH = 1
 T_END = 1
@@ -163,7 +163,7 @@ losshistory, train_state = model.train(
 # Residual Adaptive Refinement (RAR)
 X = geomtime.random_points(1000)
 err = 1
-while err > 0.01:
+while err > 0.1:
     f = model.predict(X, operator=pde)
     err_eq = np.absolute(f)
     err = np.mean(err_eq)
