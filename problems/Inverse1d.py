@@ -1,4 +1,3 @@
-"""Backend supported: tensorflow.compat.v1, tensorflow, pytorch, paddle"""
 import deepxde as dde
 import numpy as np
 from deepxde.backend import tf
@@ -10,7 +9,6 @@ C = dde.Variable(2.0)
 def pde(x, y):
     dy_t = dde.grad.jacobian(y, x, i=0, j=1)
     dy_xx = dde.grad.hessian(y, x, i=0, j=0)
-    # Backend tensorflow.compat.v1 or tensorflow
     return (
         dy_t
         - C * dy_xx
