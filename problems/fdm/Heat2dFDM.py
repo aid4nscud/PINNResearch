@@ -1,10 +1,7 @@
 import numpy as np
-import matplotlib.pyplot as plt
-
 
 def save_to_npz(data_dict, filename):
     np.savez_compressed(filename, **data_dict)
-
 
 # Domain parameters
 W = 1
