@@ -1,10 +1,10 @@
-
+import os
 import deepxde as dde
 import numpy as np
 from scipy.io import loadmat
 from deepxde.backend import tf
 
-
+os.environ["DDE_BACKEND"] = "tensorflow"
 
 geom = dde.geometry.Interval(-1, 1)
 timedomain = dde.geometry.TimeDomain(0, 1)

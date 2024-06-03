@@ -1,7 +1,9 @@
+import os
 import deepxde as dde
 import numpy as np
 from deepxde.backend import tf
 
+os.environ["DDE_BACKEND"] = "tensorflow"
 
 C = dde.Variable(2.0)
 

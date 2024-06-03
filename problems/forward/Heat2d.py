@@ -1,14 +1,12 @@
-# Import necessary libraries
+import os
 import deepxde as dde  # Deep learning framework for solving differential equations
 import matplotlib.pyplot as plt  # For creating static, animated, and interactive visualizations in Python
 import numpy as np  # For numerical operations
 from deepxde.backend import tf  # Tensorflow backend for DeepXDE
 import matplotlib.animation as animation  # For creating animations
-from matplotlib.animation import (
-    FuncAnimation,
-)  # Function-based interface to create animations
 import argparse
 
+os.environ["DDE_BACKEND"] = "tensorflow"
 parser = argparse.ArgumentParser(description='Heat2D simulation with variable ALPHA.')
 parser.add_argument('alpha', type=float, help='Value of ALPHA')
 args = parser.parse_args()

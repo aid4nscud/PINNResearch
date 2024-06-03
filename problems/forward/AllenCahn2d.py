@@ -1,12 +1,11 @@
-# Import necessary libraries
+import os
 import deepxde as dde  # Deep learning framework for solving differential equations
 import matplotlib.pyplot as plt  # For creating static, animated, and interactive visualizations in Python
 import numpy as np  # For numerical operations
 from deepxde.backend import tf  # Tensorflow backend for DeepXDE
 import matplotlib.animation as animation  # For creating animations
-from matplotlib.animation import (
-    FuncAnimation,
-)  # Function-based interface to create animations
+
+os.environ["DDE_BACKEND"] = "tensorflow"
 
 # Constants/Network Parameters
 T_START = 0

@@ -1,7 +1,10 @@
+import os
 import deepxde as dde
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
+
+os.environ["DDE_BACKEND"] = "tensorflow"
 
 # Initialize the value of alpha
 ALPHA = dde.Variable(1.0)
