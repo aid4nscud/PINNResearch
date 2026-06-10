@@ -83,10 +83,11 @@ def main():
     x_ic = np.linspace(-1, 1, args.n_ic)
     u_ic = x_ic**2 * np.cos(math.pi * x_ic)
 
+    # Collocation points persist across phases; make_loss only re-casts dtype.
+    state = {"X_np": latin_hypercube(args.n_colloc, BOUNDS, seed=args.seed)}
+
     def make_loss():
-        state = {"X": to_tensor(latin_hypercube(args.n_colloc, BOUNDS,
-                                                seed=args.seed),
-                                requires_grad=True)}
+        state["X"] = to_tensor(state["X_np"], requires_grad=True)
         X_ic = to_tensor(np.stack([x_ic, np.zeros_like(x_ic)], axis=1))
         U_ic = to_tensor(u_ic.reshape(-1, 1))
 
@@ -97,9 +98,9 @@ def main():
         def loss_fn(step):
             if (step > 0 and args.resample_every > 0
                     and step % args.resample_every == 0):
-                state["X"] = to_tensor(
-                    rad_resample(rad_residual, BOUNDS, args.n_colloc, rng=rng),
-                    requires_grad=True)
+                state["X_np"] = rad_resample(rad_residual, BOUNDS,
+                                             args.n_colloc, rng=rng)
+                state["X"] = to_tensor(state["X_np"], requires_grad=True)
             X = state["X"]
             res_sq = residual(net, X) ** 2
             if causal is not None and step >= 0:
@@ -134,8 +135,11 @@ def main():
     err = pinnlab.rel_l2(U_pred, U_ref)
     print(f"\nRelative L2 error vs ETDRK4 spectral reference: {err:.3e}")
 
+    torch.save(net.state_dict(), os.path.join(args.outdir, "model.pt"))
     with open(os.path.join(args.outdir, "metrics.json"), "w") as f:
-        json.dump({"rel_l2": err, "args": vars(args)}, f, indent=2)
+        json.dump({"rel_l2": err,
+                   "max_abs_err": float(np.abs(U_pred - U_ref).max()),
+                   "args": vars(args)}, f, indent=2)
 
     pinnlab.viz.save_spacetime_1d(
         x_ref, t_ref, [U_ref, U_pred, np.abs(U_pred - U_ref)],

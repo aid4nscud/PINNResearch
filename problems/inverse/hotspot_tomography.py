@@ -277,6 +277,8 @@ def main():
             [T_true, T_pred], ["true T", "reconstructed T"], t_snap,
             os.path.join(args.outdir, "evolution.mp4"), points=sensor_xy)
 
+    torch.save({"T_net": T_net.state_dict(), "q_net": q_net.state_dict()},
+               os.path.join(args.outdir, "model.pt"))
     with open(os.path.join(args.outdir, "metrics.json"), "w") as f:
         json.dump(metrics, f, indent=2)
     print(f"Outputs written to {args.outdir}/")

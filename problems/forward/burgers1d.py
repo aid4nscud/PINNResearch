@@ -61,7 +61,7 @@ def main():
     p.add_argument("--lbfgs", type=int, default=3000)
     p.add_argument("--adam-lr", type=float, default=1e-3)
     p.add_argument("--soap-lr", type=float, default=1e-3)
-    p.add_argument("--n-colloc", type=int, default=4096)
+    p.add_argument("--n-colloc", type=int, default=8192)
     p.add_argument("--width", type=int, default=64)
     p.add_argument("--blocks", type=int, default=2)
     p.add_argument("--n-freq", type=int, default=64)
@@ -82,10 +82,12 @@ def main():
     causal = None if args.no_causal else CausalWeighter(0.0, 1.0, args.causal_bins)
     rng = np.random.default_rng(args.seed)
 
+    # Collocation points persist across phases (so the L-BFGS polish keeps the
+    # RAD-refined, shock-concentrated set); make_loss only re-casts dtype.
+    state = {"X_np": latin_hypercube(args.n_colloc, BOUNDS, seed=args.seed)}
+
     def make_loss():
-        state = {"X": to_tensor(latin_hypercube(args.n_colloc, BOUNDS,
-                                                seed=args.seed),
-                                requires_grad=True)}
+        state["X"] = to_tensor(state["X_np"], requires_grad=True)
 
         def rad_residual(np_pts):
             X = to_tensor(np_pts, requires_grad=True)
@@ -94,9 +96,9 @@ def main():
         def loss_fn(step):
             if (step > 0 and args.resample_every > 0
                     and step % args.resample_every == 0):
-                state["X"] = to_tensor(
-                    rad_resample(rad_residual, BOUNDS, args.n_colloc, rng=rng),
-                    requires_grad=True)
+                state["X_np"] = rad_resample(rad_residual, BOUNDS,
+                                             args.n_colloc, rng=rng)
+                state["X"] = to_tensor(state["X_np"], requires_grad=True)
             X = state["X"]
             res_sq = residual(net, X) ** 2
             if causal is not None and step >= 0:
@@ -123,7 +125,20 @@ def main():
     err = pinnlab.rel_l2(U_pred, U_ref)
     print(f"\nRelative L2 error vs Cole-Hopf exact solution: {err:.3e}")
 
-    metrics = {"rel_l2": err, "nu": NU, "args": vars(args)}
+    # Diagnostics: dense-grid residual (off the collocation set) and where in
+    # time the error lives.
+    Xr = to_tensor(latin_hypercube(20000, BOUNDS, seed=7), requires_grad=True)
+    r = residual(net, Xr).detach()
+    dense_rms = float((r**2).mean().sqrt())
+    err_by_t = np.linalg.norm(U_pred - U_ref, axis=1) / max(
+        np.linalg.norm(U_ref), 1e-12)
+    print(f"Dense residual RMS: {dense_rms:.3e}; "
+          f"worst time slice: t={t_eval[np.argmax(err_by_t)]:.2f}")
+
+    torch.save(net.state_dict(), os.path.join(args.outdir, "model.pt"))
+    metrics = {"rel_l2": err, "dense_residual_rms": dense_rms,
+               "max_abs_err": float(np.abs(U_pred - U_ref).max()),
+               "nu": NU, "args": vars(args)}
     with open(os.path.join(args.outdir, "metrics.json"), "w") as f:
         json.dump(metrics, f, indent=2)
 

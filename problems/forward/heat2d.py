@@ -131,6 +131,7 @@ def main():
     err = pinnlab.rel_l2(T_pinn, T_fdm)
     print(f"\nRelative L2 error vs FDM ({nx}x{nx}, 11 snapshots): {err:.3e}")
 
+    torch.save(net.state_dict(), os.path.join(args.outdir, "model.pt"))
     with open(os.path.join(args.outdir, "metrics.json"), "w") as f:
         json.dump({"rel_l2_vs_fdm": err, "args": vars(args)}, f, indent=2)
 
