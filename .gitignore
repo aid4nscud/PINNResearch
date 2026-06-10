@@ -1,6 +1,11 @@
 .vscode/
 .DS_Store
+__pycache__/
+*.pyc
+outputs/
 *.mp4
+*.gif
 *.png
+*.npz
 *.out
 *.err
